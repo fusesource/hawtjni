@@ -52,7 +52,7 @@
         </executions>        
       </plugin>
       
-      <!-- include all the dependencies into this jar -->
+      <!-- include all the dependencies into the jar so it can run standalone -->
       <plugin>
         <groupId>org.fusesource.mvnplugins</groupId>
         <artifactId>maven-uberize-plugin</artifactId>

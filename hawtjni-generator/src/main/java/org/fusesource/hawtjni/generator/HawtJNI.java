@@ -109,13 +109,19 @@ public class HawtJNI {
         if( values!=null ) {
             packages = Arrays.asList(values);
         }
-        if( classpaths!=null ) {
-            classpaths = Arrays.asList(cli.getArgs());
+        
+        values = cli.getArgs();
+        if( values!=null ) {
+            classpaths = Arrays.asList(values);
         }
 
         try {
+            if( classpaths.isEmpty() ) {
+                throw new UsageException("No classpath supplied.");
+            }
             generate();
         } catch (UsageException e) {
+            System.err.println("Invalid usage: "+e.getMessage());
             displayHelp();
             return 1;
         } catch (Throwable e) {
@@ -310,13 +316,13 @@ public class HawtJNI {
         options.addOption(ob()
                 .id("o")
                 .name("native-output")
-                .arg("directory")
+                .arg("dir")
                 .description("Directory where generated native source code will be stored.  Defaults to the current directory.").op());
 
 //        options.addOption(ob()
 //                .id("j")
 //                .name("java-output")
-//                .arg("directory")
+//                .arg("dir")
 //                .description("Directory where generated native source code will be stored.  Defaults to the current directory.").op());
 
         options.addOption(ob()
@@ -331,7 +337,20 @@ public class HawtJNI {
 
     private void displayHelp() {
         System.err.flush();
-        String app = System.getProperty("hawtjni.application", HawtJNI.class.getName());
+        String app = System.getProperty("hawtjni.application");
+        if( app == null ) {
+            try {
+                URL location = getClass().getProtectionDomain().getCodeSource().getLocation();
+                String[] split = location.toString().split("/");
+                if( split[split.length-1].endsWith(".jar") ) {
+                    app = split[split.length-1];
+                }
+            } catch (Throwable e) {
+            }
+            if( app == null ) {
+                app = getClass().getSimpleName();
+            }
+        }
 
         // The commented out line is 80 chars long.  We have it here as a visual reference
 //      p("                                                                                ");
@@ -340,7 +359,7 @@ public class HawtJNI {
         p();
         p("Description:");
         p();
-        pw("   "+ app +" generates the JNI glue code needed to access native methods of your platform.", 2);
+        pw("  "+app+" is a code generator that produces the JNI code needed to implement java native methods.", 2);
         p();
 
         p("Options:");
@@ -349,6 +368,12 @@ public class HawtJNI {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printOptions(out, 78, createOptions(), 2, 2);
         out.flush();
+        p();
+        p("Examples:");
+        p();
+        pw("  "+app+" -o build foo.jar bar.jar ", 2);
+        pw("  "+app+" -o build foo.jar:bar.jar ", 2);
+        pw("  "+app+" -o build -p org.mypackage foo.jar;bar.jar ", 2);
         p();
     }
 

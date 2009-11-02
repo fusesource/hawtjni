@@ -70,19 +70,35 @@
   
   <build>
     <plugins>
+      
+      <!-- include all the dependencies into the jar so it can run standalone -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestEntries>
-              <Main-Class>org.fusesource.hawtjni.generator.HawtJNI</Main-Class>
-              <Specification-Version>${pom.version}</Specification-Version>
-              <Implementation-Version>${pom.version}</Implementation-Version>
-            </manifestEntries>
-          </archive>
-        </configuration>
+        <groupId>org.fusesource.mvnplugins</groupId>
+        <artifactId>maven-uberize-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals><goal>uberize</goal></goals>
+            <configuration>
+              
+              <transformers>
+
+                <!-- Make an executable jar -->
+                <transformer implementation="org.fusesource.mvnplugins.uberize.transformer.ManifestEditor">
+                  <manifestEntries>
+                    <Main-Class>org.fusesource.hawtjni.generator.HawtJNI</Main-Class>
+                    <Specification-Version>${pom.version}</Specification-Version>
+                    <Implementation-Version>${pom.version}</Implementation-Version>
+                  </manifestEntries>
+                </transformer>
+
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
+      
     </plugins>
   </build>
 

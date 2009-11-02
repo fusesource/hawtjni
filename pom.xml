@@ -45,6 +45,7 @@
     <module>hawtjni-generator</module>
     <module>hawtjni-ui</module>
     <module>maven-hawtjni-plugin</module>
+    <module>hawtjni-example</module>
   </modules>
 
 </project>

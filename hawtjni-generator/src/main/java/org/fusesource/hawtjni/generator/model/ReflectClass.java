@@ -13,7 +13,7 @@ package org.fusesource.hawtjni.generator.model;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.fusesource.hawtjni.runtime.Jni;
+import org.fusesource.hawtjni.runtime.JniClass;
 
 public class ReflectClass extends ReflectItem implements JNIClass {
     
@@ -24,7 +24,6 @@ public class ReflectClass extends ReflectItem implements JNIClass {
 
     public ReflectClass(Class<?> clazz) {
         this.clazz = clazz;
-        setJNI(clazz.getAnnotation(Jni.class));
     }
 
     void checkMembers() {
@@ -95,6 +94,14 @@ public class ReflectClass extends ReflectItem implements JNIClass {
 
     public String toString() {
         return clazz.toString();
+    }
+
+    public String getInclude() {
+        JniClass annotation = clazz.getAnnotation(JniClass.class);
+        if( annotation==null ) {
+            return null;
+        }
+        return annotation.include();
     }
 
 }

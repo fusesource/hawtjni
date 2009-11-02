@@ -8,5 +8,5 @@ import static java.lang.annotation.ElementType.*;
 @Target({TYPE, FIELD, METHOD, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Jni {
-    String value();
+    String value() default "";
 }

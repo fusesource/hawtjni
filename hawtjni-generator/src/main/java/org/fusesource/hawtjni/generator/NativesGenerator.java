@@ -34,8 +34,16 @@ public class NativesGenerator extends JNIGenerator {
     public void generateIncludes() {
         String outputName = getOutputName();
         outputln("#include \"hawtjni.h\"");
-        outputln("#include \""+outputName+"_structs.h\"");
-        outputln("#include \""+outputName+"_stats.h\"");
+
+        for (JNIClass clazz : classes) {
+            String include = clazz.getInclude();
+            if(include!=null && include.length()>0 ) {
+                outputln("#include \"" + include + "\"");
+            }
+        }
+
+        outputln("#include \"" + outputName + "_structs.h\"");
+        outputln("#include \"" + outputName + "_stats.h\"");
         outputln();
     }
 

@@ -277,10 +277,6 @@ public class HawtJNI {
         LinkedHashSet<Class<?>> structClasses = new LinkedHashSet<Class<?>>(); 
         try {
             URLClassLoader classLoader = new URLClassLoader(array(URL.class, urls), JniClass.class.getClassLoader());
-            
-            Class<?> loadClass = classLoader.loadClass("test.Platform");
-            System.out.println(loadClass.getAnnotation(JniClass.class));
-            
             UrlSet urlSet = new UrlSet(classLoader);
             urlSet = urlSet.excludeJavaHome();
             ClassFinder finder = new ClassFinder(classLoader, urlSet.getUrls());
@@ -372,7 +368,6 @@ public class HawtJNI {
     @SuppressWarnings("unchecked")
     private void collectMatchingClasses(ClassFinder finder, Class annotation, LinkedHashSet<Class<?>> collector) {
         List<Class> annotated = finder.findAnnotatedClasses(annotation);
-        System.out.println("matches: "+annotated);
         for (Class<?> clazz : annotated) {
             if( packages.isEmpty() ) {
                 collector.add(clazz);

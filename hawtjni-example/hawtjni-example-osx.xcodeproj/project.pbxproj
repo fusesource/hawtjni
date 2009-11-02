@@ -1,0 +1,287 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		53A8DB54109E8F25006F1DC7 /* hawtjni.c in Sources */ = {isa = PBXBuildFile; fileRef = 53A8DB4F109E8F25006F1DC7 /* hawtjni.c */; };
+		53A8DB76109E9395006F1DC7 /* hawtjni-example.c in Sources */ = {isa = PBXBuildFile; fileRef = 53A8DB73109E9395006F1DC7 /* hawtjni-example.c */; };
+		53A8DB77109E9395006F1DC7 /* hawtjni-example_stats.c in Sources */ = {isa = PBXBuildFile; fileRef = 53A8DB74109E9395006F1DC7 /* hawtjni-example_stats.c */; };
+		53C0B08B109E9C27003C88CD /* hawtjni-example.h in Headers */ = {isa = PBXBuildFile; fileRef = 53C0B08A109E9C27003C88CD /* hawtjni-example.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0AB364E40B2F671600788B6C /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+		538089C61099DC790066D210 /* target */ = {isa = PBXFileReference; lastKnownFileType = folder; path = target; sourceTree = "<group>"; };
+		53A8DB4F109E8F25006F1DC7 /* hawtjni.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hawtjni.c; path = "target/generated-sources/hawtjni/native/hawtjni.c"; sourceTree = "<group>"; };
+		53A8DB50109E8F25006F1DC7 /* hawtjni.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hawtjni.h; path = "target/generated-sources/hawtjni/native/hawtjni.h"; sourceTree = "<group>"; };
+		53A8DB73109E9395006F1DC7 /* hawtjni-example.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "hawtjni-example.c"; path = "target/generated-sources/hawtjni/native/hawtjni-example.c"; sourceTree = "<group>"; };
+		53A8DB74109E9395006F1DC7 /* hawtjni-example_stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "hawtjni-example_stats.c"; path = "target/generated-sources/hawtjni/native/hawtjni-example_stats.c"; sourceTree = "<group>"; };
+		53A8DB75109E9395006F1DC7 /* hawtjni-example_stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "hawtjni-example_stats.h"; path = "target/generated-sources/hawtjni/native/hawtjni-example_stats.h"; sourceTree = "<group>"; };
+		53C0B08A109E9C27003C88CD /* hawtjni-example.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "hawtjni-example.h"; path = "src/main/native/hawtjni-example.h"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4CEBA78D08679EF10015D03E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		00E6828FFEC88D1A11DB9C8B = {
+			isa = PBXGroup;
+			children = (
+				0AB364E40B2F671600788B6C /* src */,
+				537E1282109A041B00447AE2 /* referenced */,
+				538089C61099DC790066D210 /* target */,
+			);
+			sourceTree = "<group>";
+		};
+		537E1282109A041B00447AE2 /* referenced */ = {
+			isa = PBXGroup;
+			children = (
+				53C0B08A109E9C27003C88CD /* hawtjni-example.h */,
+				53A8DB73109E9395006F1DC7 /* hawtjni-example.c */,
+				53A8DB74109E9395006F1DC7 /* hawtjni-example_stats.c */,
+				53A8DB75109E9395006F1DC7 /* hawtjni-example_stats.h */,
+				53A8DB4F109E8F25006F1DC7 /* hawtjni.c */,
+				53A8DB50109E8F25006F1DC7 /* hawtjni.h */,
+			);
+			name = referenced;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4CEBA78B08679EF10015D03E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53C0B08B109E9C27003C88CD /* hawtjni-example.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXLegacyTarget section */
+		EB9FD8610AEECCF5008E157E /* hawtjni-example-osx */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = install;
+			buildConfigurationList = EB9FD8690AEECD13008E157E /* Build configuration list for PBXLegacyTarget "hawtjni-example-osx" */;
+			buildPhases = (
+			);
+			buildToolPath = mvn;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = "hawtjni-example-osx";
+			passBuildSettingsInEnvironment = 1;
+			productName = AntJNIWrapper;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXNativeTarget section */
+		4CEBA78E08679EF10015D03E /* jnilib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4CEBA79108679F100015D03E /* Build configuration list for PBXNativeTarget "jnilib" */;
+			buildPhases = (
+				4CEBA78B08679EF10015D03E /* Headers */,
+				4CEBA78C08679EF10015D03E /* Sources */,
+				4CEBA78D08679EF10015D03E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = jnilib;
+			productName = JNILibN;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		00E6828EFEC88D1A11DB9C8B /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 4CEBA75C08679E4D0015D03E /* Build configuration list for PBXProject "hawtjni-example-osx" */;
+			compatibilityVersion = "Xcode 3.0";
+			hasScannedForEncodings = 1;
+			mainGroup = 00E6828FFEC88D1A11DB9C8B;
+			productRefGroup = 00E6828FFEC88D1A11DB9C8B;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4CEBA78E08679EF10015D03E /* jnilib */,
+				EB9FD8610AEECCF5008E157E /* hawtjni-example-osx */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4CEBA78C08679EF10015D03E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53A8DB54109E8F25006F1DC7 /* hawtjni.c in Sources */,
+				53A8DB76109E9395006F1DC7 /* hawtjni-example.c in Sources */,
+				53A8DB77109E9395006F1DC7 /* hawtjni-example_stats.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4CEBA75D08679E4D0015D03E /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ZERO_LINK = NO;
+			};
+			name = debug;
+		};
+		4CEBA75E08679E4D0015D03E /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ZERO_LINK = NO;
+			};
+			name = release;
+		};
+		4CEBA79208679F100015D03E /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_EXTENSION = jnilib;
+				EXECUTABLE_PREFIX = lib;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"/System/Library/Frameworks/JavaVM.framework/Headers/**",
+					"${TARGET_BUILD_DIR}/Headers/**",
+				);
+				HEADER_SEARCH_PATHS_QUOTED_1 = "\"${OBJROOT}/Headers\"";
+				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/JavaVM.framework/Headers\"";
+				HEADER_SEARCH_PATHS_QUOTED_3 = "\"$(CONFIGURATION_BUILD_DIR)/Headers\"";
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = antbasedjni;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = debug;
+		};
+		4CEBA79308679F100015D03E /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_EXTENSION = jnilib;
+				EXECUTABLE_PREFIX = lib;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(HEADER_SEARCH_PATHS_QUOTED_3)",
+					"$(HEADER_SEARCH_PATHS_QUOTED_4)",
+				);
+				HEADER_SEARCH_PATHS_QUOTED_1 = "\"${OBJROOT}/Headers\"";
+				HEADER_SEARCH_PATHS_QUOTED_2 = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/JavaVM.framework/Headers\"";
+				HEADER_SEARCH_PATHS_QUOTED_3 = "\"/System/Library/Frameworks/JavaVM.framework/Headers\"/**";
+				HEADER_SEARCH_PATHS_QUOTED_4 = "\"${TARGET_BUILD_DIR}/Headers\"/**";
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = "hawtjni-example-osx";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = release;
+		};
+		EB9FD86A0AEECD13008E157E /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = AntJNIWrapper;
+			};
+			name = debug;
+		};
+		EB9FD86B0AEECD13008E157E /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				PRODUCT_NAME = "hawtjni-example-osx";
+				ZERO_LINK = NO;
+			};
+			name = release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4CEBA75C08679E4D0015D03E /* Build configuration list for PBXProject "hawtjni-example-osx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CEBA75D08679E4D0015D03E /* debug */,
+				4CEBA75E08679E4D0015D03E /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = release;
+		};
+		4CEBA79108679F100015D03E /* Build configuration list for PBXNativeTarget "jnilib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CEBA79208679F100015D03E /* debug */,
+				4CEBA79308679F100015D03E /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = release;
+		};
+		EB9FD8690AEECD13008E157E /* Build configuration list for PBXLegacyTarget "hawtjni-example-osx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB9FD86A0AEECD13008E157E /* debug */,
+				EB9FD86B0AEECD13008E157E /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 00E6828EFEC88D1A11DB9C8B /* Project object */;
+}

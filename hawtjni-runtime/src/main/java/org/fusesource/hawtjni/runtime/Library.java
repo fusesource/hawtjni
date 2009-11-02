@@ -11,15 +11,16 @@
 package org.fusesource.hawtjni.runtime;
 
 import java.io.*;
+import java.net.URL;
+import java.util.ArrayList;
 
 public class Library {
 
-    static final String SEPARATOR = System.getProperty("line.separator");
-    static final String DELIMITER = System.getProperty("file.separator");
+    static final String SLASH = System.getProperty("file.separator");
 
     static final String SUFFIX_64 = "-64"; 
-    static final String DIR_32 = "lib-32";
-    static final String DIR_64 = "lib-64";
+    static final String DIR_32 = "hawtjni-lib32";
+    static final String DIR_64 = "hawtjni-lib64";
 
     String name;
     int majorVersion = 1;
@@ -115,22 +116,22 @@ public class Library {
             libName1 = libName2 = mappedName1 = mappedName2 = name;
         }
 
-        StringBuffer message = new StringBuffer();
+        ArrayList<String> reasons = new ArrayList<String>();
 
         /* Try loading library from library path */
         String path = System.getProperty(name+".library.path"); 
         if (path != null) {
             path = new File(path).getAbsolutePath();
-            if (load(path + SEPARATOR + mappedName1, message))
+            if (load(path + SLASH + mappedName1, reasons))
                 return;
-            if (mapName && load(path + SEPARATOR + mappedName2, message))
+            if (mapName && load(path + SLASH + mappedName2, reasons))
                 return;
         }
 
         /* Try loading library from java library path */
-        if (load(libName1, message))
+        if (load(libName1, reasons))
             return;
-        if (mapName && load(libName2, message))
+        if (mapName && load(libName2, reasons))
             return;
 
         /*
@@ -139,6 +140,8 @@ public class Library {
          */
         String fileName1 = mappedName1;
         String fileName2 = mappedName2;
+        
+        /* Try extracting and loading library from the jar */
         if (path == null) {
             path = System.getProperty("java.io.tmpdir"); 
             File dir = new File(path, bitModel==64 ? DIR_64 : DIR_32);
@@ -154,22 +157,34 @@ public class Library {
                     fileName2 = mapLibraryName(libName2 + SUFFIX_64);
                 }
             }
-            if (load(path + SEPARATOR + fileName1, message))
-                return;
-            if (mapName && load(path + SEPARATOR + fileName2, message))
-                return;
-        }
-
-        /* Try extracting and loading library from jar */
-        if (path != null) {
-            if (extract(path + SEPARATOR + fileName1, mappedName1, message))
-                return;
-            if (mapName && extract(path + SEPARATOR + fileName2, mappedName2, message))
-                return;
+            
+            ClassLoader classLoader = Library.class.getClassLoader();
+            URL resource = classLoader.getResource(mappedName1);
+            if( resource!=null ) {
+                String fullPath = path + SLASH + fileName1;
+                File file = new File(fullPath);
+                if( !file.exists() ) {
+                    extract(fullPath, resource, reasons);
+                }
+                if( load(fullPath, reasons) ) {
+                    return;
+                }
+            }
+            resource = classLoader.getResource(mappedName2);
+            if( resource!=null ) {
+                String fullPath = path + SLASH + fileName1;
+                File file = new File(fullPath);
+                if( !file.exists() ) {
+                    extract(fullPath, resource, reasons);
+                }
+                if( load(fullPath, reasons) ) {
+                    return;
+                }
+            }
         }
 
         /* Failed to find the library */
-        throw new UnsatisfiedLinkError("Could not load library. Reasons: " + message.toString()); 
+        throw new UnsatisfiedLinkError("Could not load library. Reasons: " + reasons.toString()); 
     }
 
     private String mapLibraryName(String libName) {
@@ -185,14 +200,14 @@ public class Library {
         return libName;
     }
 
-    private boolean extract(String fileName, String mappedName, StringBuffer message) {
+    private boolean extract(String fileName, URL resource, ArrayList<String> message) {
         FileOutputStream os = null;
         InputStream is = null;
         File file = new File(fileName);
         boolean extracted = false;
         try {
             if (!file.exists()) {
-                is = Library.class.getResourceAsStream("/" + mappedName); 
+                is = resource.openStream();
                 if (is != null) {
                     extracted = true;
                     int read;
@@ -234,20 +249,16 @@ public class Library {
         }
     }
 
-    private boolean load(String libName, StringBuffer message) {
+    private boolean load(String libName, ArrayList<String> reasons) {
         try {
-            if (libName.indexOf(SEPARATOR) != -1) {
+            if (libName.indexOf(SLASH) != -1) {
                 System.load(libName);
             } else {
                 System.loadLibrary(libName);
             }
             return true;
         } catch (UnsatisfiedLinkError e) {
-            if (message.length() == 0)
-                message.append(DELIMITER);
-            message.append('\t');
-            message.append(e.getMessage());
-            message.append(DELIMITER);
+            reasons.add(e.getMessage());
         }
         return false;
     }

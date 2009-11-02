@@ -13,6 +13,7 @@ package org.fusesource.hawtjni.generator.model;
 import java.io.File;
 import java.lang.annotation.Annotation;
 
+import org.fusesource.hawtjni.runtime.Jni;
 import org.fusesource.hawtjni.runtime.JniVT;
 
 public class ReflectParameter extends ReflectItem implements JNIParameter {
@@ -20,11 +21,18 @@ public class ReflectParameter extends ReflectItem implements JNIParameter {
 
     int parameter;
 
-    private JniVT jni32or64;
-
     public ReflectParameter(ReflectMethod method, int parameter, Annotation[] annotations) {
         this.method = method;
         this.parameter = parameter;
+        if( annotations!=null ) {
+            for (Annotation annotation : annotations) {
+                if( annotation instanceof Jni ) {
+                    setJNI((Jni)annotation);
+                } else if( annotation instanceof JniVT ) {
+                    setJniVT((JniVT) annotation);
+                }
+            }
+        }
     }
 
     public String getCast() {
@@ -66,7 +74,4 @@ public class ReflectParameter extends ReflectItem implements JNIParameter {
         setParam("cast", str);
     }
 
-    public JniVT getJNI32or64() {
-        return jni32or64;
-    }
 }

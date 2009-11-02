@@ -146,7 +146,7 @@ public class StatsGenerator extends JNIGenerator {
     }
 
     void generateStatsNatives(String className) {
-        outputln("#define STATS_NATIVE(func) Java_org_eclipse_swt_tools_internal_NativeStats_##func");
+        outputln("#define STATS_NATIVE(func) Java_org_fusesource_hawtjni_runtime_NativeStats_##func");
         outputln();
 
         output("JNIEXPORT jint JNICALL STATS_NATIVE(");

@@ -11,20 +11,17 @@
 package org.fusesource.hawtjni.generator.model;
 
 public interface JNIClass extends JNIItem {
-	
-public static String[] FLAGS = {FLAG_NO_GEN, FLAG_CPP};
 
-public String getName();
+    public static String[] FLAGS = { FLAG_NO_GEN, FLAG_CPP };
 
-public String getSimpleName();
+    public String getName();
+    public String getSimpleName();
 
-public JNIClass getSuperclass();
+    public JNIClass getSuperclass();
+    public JNIField[] getDeclaredFields();
+    public JNIMethod[] getDeclaredMethods();
 
-public JNIField[] getDeclaredFields();
-
-public JNIMethod[] getDeclaredMethods();
-
-public String getExclude();
-
-public void setExclude(String str);
+    public String getExclude();
+    public void setExclude(String str);
+    public String getInclude();
 }

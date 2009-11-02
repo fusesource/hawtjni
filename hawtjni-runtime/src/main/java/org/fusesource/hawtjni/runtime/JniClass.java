@@ -8,4 +8,5 @@ import static java.lang.annotation.ElementType.*;
 @Target({TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JniClass {
+    String include() default ""; 
 }

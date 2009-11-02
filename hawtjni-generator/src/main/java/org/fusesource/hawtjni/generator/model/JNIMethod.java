@@ -12,31 +12,35 @@ package org.fusesource.hawtjni.generator.model;
 
 public interface JNIMethod extends JNIItem {
 
-	public static final String[] FLAGS = {FLAG_NO_GEN, FLAG_ADDRESS, FLAG_CONST, FLAG_DYNAMIC, FLAG_JNI, FLAG_CAST, FLAG_CPP, FLAG_NEW, FLAG_DELETE, FLAG_GCNEW, FLAG_OBJECT, FLAG_SETTER, FLAG_GETTER, FLAG_ADDER};
-	
-public String getName();
+    public static final String[] FLAGS = { 
+        FLAG_NO_GEN, FLAG_ADDRESS, FLAG_CONST, 
+        FLAG_DYNAMIC, FLAG_JNI, FLAG_CAST, FLAG_CPP, 
+        FLAG_NEW, FLAG_DELETE, FLAG_GCNEW, FLAG_OBJECT,
+        FLAG_SETTER, FLAG_GETTER, FLAG_ADDER };
 
-public int getModifiers();
+    public String getName();
 
-public boolean isNativeUnique();
+    public int getModifiers();
 
-public JNIParameter[] getParameters();
+    public boolean isNativeUnique();
 
-public JNIType getReturnType();
+    public JNIParameter[] getParameters();
 
-public JNIType getReturnType64();
+    public JNIType getReturnType();
 
-public JNIType[] getParameterTypes();
+    public JNIType getReturnType64();
 
-public JNIType[] getParameterTypes64();
+    public JNIType[] getParameterTypes();
 
-public JNIClass getDeclaringClass();
+    public JNIType[] getParameterTypes64();
 
-public String getAccessor();
+    public JNIClass getDeclaringClass();
 
-public String getExclude();
+    public String getAccessor();
 
-public void setAccessor(String str);
+    public String getExclude();
 
-public void setExclude(String str);
+    public void setAccessor(String str);
+
+    public void setExclude(String str);
 }

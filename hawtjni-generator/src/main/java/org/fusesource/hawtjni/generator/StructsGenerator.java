@@ -33,14 +33,10 @@ public class StructsGenerator extends JNIGenerator {
 
     public void generateIncludes() {
         if (header) {
-            output("#include \"");
-            output(getOutputName());
-            outputln(".h\"");
+            outputln("#include \""+getOutputName()+".h\"");
         } else {
-            outputln("#include \"swt.h\"");
-            output("#include \"");
-            output(getOutputName());
-            outputln("_structs.h\"");
+            outputln("#include \"hawtjni.h\"");
+            outputln("#include \""+getOutputName()+"_structs.h\"");
         }
         outputln();
     }

@@ -95,7 +95,7 @@ public class MacGeneratorUI {
 	
 	void checkItem(Node node, TreeItem item) {
 		NamedNodeMap attributes = node.getAttributes();
-		Node gen = attributes.getNamedItem("swt_gen");
+		Node gen = attributes.getNamedItem("hawtjni_gen");
 		if (gen != null) {
 			String value = gen.getNodeValue();
 			boolean grayed = value.equals("mixed");
@@ -108,7 +108,7 @@ public class MacGeneratorUI {
 	boolean getEditable(TableItem item, int column) {
 		if (!(item.getData() instanceof Node)) return false;
 		String attribName = item.getText();
-		return attribName.startsWith("swt_");
+		return attribName.startsWith("hawtjni_");
 	}
 
 	String getPrettyText(String text) {
@@ -163,9 +163,9 @@ public class MacGeneratorUI {
 	void checkNodes(Node node, boolean checked) {
 		if (node instanceof Element) {
 			if (checked) {
-				((Element)node).setAttribute("swt_gen", "true");
+				((Element)node).setAttribute("hawtjni_gen", "true");
 			} else {
-				((Element)node).removeAttribute("swt_gen");
+				((Element)node).removeAttribute("hawtjni_gen");
 			}
 		}
 		NodeList childNodes = node.getChildNodes();
@@ -526,7 +526,7 @@ public class MacGeneratorUI {
 		for (int i = 0, length = attributes.getLength(); i < length; i++) {
 			Node attrib = attributes.item(i);
 			String attribName = attrib.getNodeName();
-			if (attribName.startsWith("swt_")) continue;
+			if (attribName.startsWith("hawtjni_")) continue;
 			TableItem attribItem = new TableItem(attribTable, SWT.NONE);
 			attribItem.setText(attribName);
 			attribItem.setText(1, attrib.getNodeValue());
@@ -540,12 +540,12 @@ public class MacGeneratorUI {
 			Element node = (Element)item.getData();
 			if (item.getChecked()) {
 				if (item.getGrayed()) {
-					node.setAttribute("swt_gen", "mixed");
+					node.setAttribute("hawtjni_gen", "mixed");
 				} else {
-					node.setAttribute("swt_gen", "true");
+					node.setAttribute("hawtjni_gen", "true");
 				}
 			} else {
-				node.removeAttribute("swt_gen");
+				node.removeAttribute("hawtjni_gen");
 			}
 		}
 	}
@@ -602,17 +602,17 @@ public class MacGeneratorUI {
 
 	public static void main(String[] args) {
 //		args = new String[]{
-//			"./Mac Generation/org/eclipse/swt/tools/internal/AppKitFull.bridgesupport",
-//			"./Mac Generation/org/eclipse/swt/tools/internal/FoundationFull.bridgesupport",
-//			"./Mac Generation/org/eclipse/swt/tools/internal/WebKitFull.bridgesupport",
+//			"./Mac Generation/org/eclipse/hawtjni/tools/internal/AppKitFull.bridgesupport",
+//			"./Mac Generation/org/eclipse/hawtjni/tools/internal/FoundationFull.bridgesupport",
+//			"./Mac Generation/org/eclipse/hawtjni/tools/internal/WebKitFull.bridgesupport",
 //		};
 		try {
 			Display display = new Display();
 			Shell shell = new Shell(display);
 			MacGenerator gen = new MacGenerator();
 			gen.setXmls(args);
-			gen.setOutputDir("../org.eclipse.swt/Eclipse SWT PI/cocoa/");
-			gen.setMainClass("org.eclipse.swt.internal.cocoa.OS");
+			gen.setOutputDir("../org.eclipse.hawtjni/Eclipse SWT PI/cocoa/");
+			gen.setMainClass("org.eclipse.hawtjni.internal.cocoa.OS");
 			MacGeneratorUI ui = new MacGeneratorUI(gen);
 			ui.open(shell);
 			shell.open();

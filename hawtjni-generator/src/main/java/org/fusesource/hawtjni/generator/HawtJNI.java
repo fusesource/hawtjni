@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -428,7 +429,7 @@ public class HawtJNI {
         InputStream is = getClass().getClassLoader().getResourceAsStream(resource);
         FileSupport.copy(is, out);
         String content = new String(out.toByteArray(), "UTF-8");
-        String[] parts = content.split("/* == HEADER-SNIP-LOCATION == */");
+        String[] parts = content.split(Pattern.quote("/* == HEADER-SNIP-LOCATION == */"));
         if( parts.length==2 ) {
             content = parts[1];
         }

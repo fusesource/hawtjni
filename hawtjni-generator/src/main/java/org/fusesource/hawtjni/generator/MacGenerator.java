@@ -315,8 +315,8 @@ public class MacGenerator {
                 } else {
                     out("\treturn result != 0 ? new ");
                     NamedNodeMap attributes = returnNode.getAttributes();
-                    Node swt_alloc = attributes.getNamedItem("swt_alloc");
-                    if (swt_alloc != null && swt_alloc.getNodeValue().equals("true")) {
+                    Node hawtjni_alloc = attributes.getNamedItem("hawtjni_alloc");
+                    if (hawtjni_alloc != null && hawtjni_alloc.getNodeValue().equals("true")) {
                         out(className);
                     } else {
                         out(returnType);
@@ -492,7 +492,7 @@ public class MacGenerator {
 
     String getSuperclassName(Node node) {
         NamedNodeMap attributes = node.getAttributes();
-        Node superclass = attributes.getNamedItem("swt_superclass");
+        Node superclass = attributes.getNamedItem("hawtjni_superclass");
         if (superclass != null) {
             return superclass.getNodeValue();
         } else {
@@ -692,10 +692,10 @@ public class MacGenerator {
             String[] names = getIDAttributeNames();
             String[] filter = new String[names.length + 2];
             filter[0] = "class_method";
-            filter[1] = "swt_.*";
+            filter[1] = "hawtjni_.*";
             System.arraycopy(names, 0, filter, 2, names.length);
             writer.setAttributeFilter(filter);
-            writer.setNodeFilter("swt_");
+            writer.setNodeFilter("hawtjni_");
             writer.print(document);
             if (out.size() > 0) {
                 FileSupport.write(out.toByteArray(), new File(fileName));
@@ -742,18 +742,18 @@ public class MacGenerator {
     public String[] getExtraAttributeNames(Node node) {
         String name = node.getNodeName();
         if (name.equals("method")) {
-            return new String[] { "swt_gen_super_msgSend", "swt_gen_custom_callback" };
+            return new String[] { "hawtjni_gen_super_msgSend", "hawtjni_gen_custom_callback" };
         } else if (name.equals("function")) {
             NamedNodeMap attribs = node.getAttributes();
             if (attribs != null && attribs.getNamedItem("variadic") != null) {
-                return new String[] { "swt_variadic_count", "swt_variadic_java_types" };
+                return new String[] { "hawtjni_variadic_count", "hawtjni_variadic_java_types" };
             }
         } else if (name.equals("class")) {
-            return new String[] { "swt_superclass" };
+            return new String[] { "hawtjni_superclass" };
         } else if (name.equals("retval")) {
-            return new String[] { "swt_java_type", "swt_java_type64", "swt_alloc" };
+            return new String[] { "hawtjni_java_type", "hawtjni_java_type64", "hawtjni_alloc" };
         } else if (name.equals("arg")) {
-            return new String[] { "swt_java_type", "swt_java_type64" };
+            return new String[] { "hawtjni_java_type", "hawtjni_java_type64" };
         }
         return new String[0];
     }
@@ -820,7 +820,7 @@ public class MacGenerator {
                     for (int j = 0, length = attributes.getLength(); j < length; j++) {
                         Node attr = (Node) attributes.item(j);
                         String name = attr.getNodeName();
-                        if (name.startsWith("swt_")) {
+                        if (name.startsWith("hawtjni_")) {
                             ((Element) childNode).setAttribute(name, attr.getNodeValue());
                         }
                     }
@@ -929,7 +929,7 @@ public class MacGenerator {
         NamedNodeMap attributes = node.getAttributes();
         if (attributes == null)
             return false;
-        Node gen = attributes.getNamedItem("swt_gen");
+        Node gen = attributes.getNamedItem("hawtjni_gen");
         return gen != null && !gen.getNodeValue().equals("false");
     }
 
@@ -937,7 +937,7 @@ public class MacGenerator {
         NamedNodeMap attributes = node.getAttributes();
         if (attributes == null)
             return false;
-        Node gen = attributes.getNamedItem("swt_gen_super_msgSend");
+        Node gen = attributes.getNamedItem("hawtjni_gen_super_msgSend");
         return gen != null && !gen.getNodeValue().equals("false");
     }
 
@@ -945,7 +945,7 @@ public class MacGenerator {
         NamedNodeMap attributes = node.getAttributes();
         if (attributes == null)
             return false;
-        Node gen = attributes.getNamedItem("swt_gen_custom_callback");
+        Node gen = attributes.getNamedItem("hawtjni_gen_custom_callback");
         return gen != null && !gen.getNodeValue().equals("false");
     }
 
@@ -1483,7 +1483,7 @@ public class MacGenerator {
 
     String getType(Node node) {
         NamedNodeMap attributes = node.getAttributes();
-        Node javaType = attributes.getNamedItem("swt_java_type");
+        Node javaType = attributes.getNamedItem("hawtjni_java_type");
         if (javaType != null)
             return javaType.getNodeValue();
         String code = attributes.getNamedItem("type").getNodeValue();
@@ -1492,9 +1492,9 @@ public class MacGenerator {
 
     String getType64(Node node) {
         NamedNodeMap attributes = node.getAttributes();
-        Node javaType = attributes.getNamedItem("swt_java_type");
+        Node javaType = attributes.getNamedItem("hawtjni_java_type");
         if (javaType != null) {
-            Node javaType64 = attributes.getNamedItem("swt_java_type64");
+            Node javaType64 = attributes.getNamedItem("hawtjni_java_type64");
             return javaType64 != null ? javaType64.getNodeValue() : javaType.getNodeValue();
         }
         Node attrib = attributes.getNamedItem("type");
@@ -1603,7 +1603,7 @@ public class MacGenerator {
 
     String getJavaType(Node node) {
         NamedNodeMap attributes = node.getAttributes();
-        Node javaType = attributes.getNamedItem("swt_java_type");
+        Node javaType = attributes.getNamedItem("hawtjni_java_type");
         if (javaType != null)
             return javaType.getNodeValue().trim();
         String code = attributes.getNamedItem("type").getNodeValue();
@@ -1612,9 +1612,9 @@ public class MacGenerator {
 
     String getJavaType64(Node node) {
         NamedNodeMap attributes = node.getAttributes();
-        Node javaType = attributes.getNamedItem("swt_java_type");
+        Node javaType = attributes.getNamedItem("hawtjni_java_type");
         if (javaType != null) {
-            Node javaType64 = attributes.getNamedItem("swt_java_type64");
+            Node javaType64 = attributes.getNamedItem("hawtjni_java_type64");
             return javaType64 != null ? javaType64.getNodeValue() : javaType.getNodeValue();
         }
         Node attrib = attributes.getNamedItem("type");
@@ -1783,9 +1783,9 @@ public class MacGenerator {
 
     void generateVariadics(Node node) {
         NamedNodeMap attributes = node.getAttributes();
-        Node variadicCount = attributes.getNamedItem("swt_variadic_count");
+        Node variadicCount = attributes.getNamedItem("hawtjni_variadic_count");
         if (variadicCount != null) {
-            Node variadicTypes = attributes.getNamedItem("swt_variadic_java_types");
+            Node variadicTypes = attributes.getNamedItem("hawtjni_variadic_java_types");
             String[] types = null;
             if (variadicTypes != null) {
                 types = split(variadicTypes.getNodeValue(), ",");
@@ -1814,8 +1814,8 @@ public class MacGenerator {
         try {
             MacGenerator gen = new MacGenerator();
             gen.setXmls(args);
-            gen.setOutputDir("../org.eclipse.swt/Eclipse SWT PI/cocoa/");
-            gen.setMainClass("org.eclipse.swt.internal.cocoa.OS");
+            gen.setOutputDir("../org.eclipse.hawtjni/Eclipse SWT PI/cocoa/");
+            gen.setMainClass("org.eclipse.hawtjni.internal.cocoa.OS");
             gen.generate(null);
         } catch (Throwable e) {
             e.printStackTrace();

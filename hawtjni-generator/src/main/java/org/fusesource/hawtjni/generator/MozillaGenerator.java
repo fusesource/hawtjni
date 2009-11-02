@@ -66,9 +66,9 @@ public class MozillaGenerator {
             { "PRUint32", "int" }, { "PRInt32", "int" }, { "PRInt64", "long" }, { "nsresult", "int" }, { "PRBool", "int" }, { "float", "float" }, { "PRUint16", "short" },
             { "size_t", "int" }, };
 
-    static String GECKO = "/bluebird/teamswt/swt-builddir/mozilla/1.4/linux_gtk2/mozilla/dist/include/";
+    static String GECKO = "/bluebird/teamhawtjni/hawtjni-builddir/mozilla/1.4/linux_gtk2/mozilla/dist/include/";
 
-    static String TARGET_FOLDER = "/bluebird/teamswt/chrisx/amd64/workspace/org.eclipse.swt/Eclipse SWT Mozilla/common/org/eclipse/swt/internal/mozilla/";
+    static String TARGET_FOLDER = "/bluebird/teamhawtjni/chrisx/amd64/workspace/org.eclipse.hawtjni/Eclipse SWT Mozilla/common/org/eclipse/hawtjni/internal/mozilla/";
 
     static String[] XPCOM_HEADERS = { "profile/nsIProfile.h", "widget/nsIAppShell.h", "widget/nsIBaseWindow.h", "xpcom/nsIComponentManager.h", "xpcom/nsIComponentRegistrar.h",
             "webbrwsr/nsIContextMenuListener.h", "docshell/nsIDocShell.h", "dom/nsIDOMEvent.h", "dom/nsIDOMMouseEvent.h", "dom/nsIDOMUIEvent.h", "dom/nsIDOMWindow.h",
@@ -334,7 +334,7 @@ public class MozillaGenerator {
     }
 
     public String getPackages() {
-        return "package org.eclipse.swt.internal.mozilla;";
+        return "package org.eclipse.hawtjni.internal.mozilla;";
     }
 
     public boolean parse() {
@@ -622,6 +622,6 @@ public class MozillaGenerator {
             + " * Contributor(s):\r\n" + " *\r\n" + " * IBM\r\n" + " * -  Binding to permit interfacing between Mozilla and SWT\r\n"
             + " * -  Copyright (C) 2003, 2009 IBM Corp.  All Rights Reserved.\r\n" + " *\r\n" + " * ***** END LICENSE BLOCK ***** */";
 
-    static String PACKAGE_DECLARATION = "package org.eclipse.swt.internal.mozilla;";
+    static String PACKAGE_DECLARATION = "package org.eclipse.hawtjni.internal.mozilla;";
 
 }

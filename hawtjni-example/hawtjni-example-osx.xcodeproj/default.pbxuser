@@ -3,11 +3,10 @@
 	00E6828EFEC88D1A11DB9C8B /* Project object */ = {
 		activeBuildConfigurationName = Release;
 		activeExecutable = 6A9FA6570246BA6C0CC91562 /* osx */;
-		activeTarget = EB9FD8610AEECCF5008E157E /* osx */;
+		activeTarget = EB9FD8610AEECCF5008E157E /* hawtjni-example-osx */;
 		addToTargets = (
-			4CEBA78E08679EF10015D03E /* JNILib */,
+			4CEBA78E08679EF10015D03E /* jnilib */,
 		);
-		breakpointsGroup = 0AB3651F0B2F67B300788B6C /* XCBreakpointsBucket */;
 		codeSenseManager = 0AB364DB0B2F66FD00788B6C /* Code sense */;
 		executables = (
 			6A9FA6570246BA6C0CC91562 /* osx */,
@@ -19,7 +18,7 @@
 				PBXFileTableDataSourceColumnWidthsKey = (
 					22,
 					300,
-					131,
+					229,
 				);
 				PBXFileTableDataSourceColumnsKey = (
 					PBXExecutablesDataSource_ActiveFlagID,
@@ -32,7 +31,7 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					245,
+					341,
 					20,
 					48,
 					43,
@@ -54,8 +53,8 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					200,
-					65,
+					301,
+					60,
 					20,
 					48,
 					43,
@@ -71,37 +70,13 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
+			PBXPerProjectTemplateStateSaveDate = 278874176;
+			PBXWorkspaceStateSaveDate = 278874176;
 		};
 		sourceControlManager = 0AB364DA0B2F66FD00788B6C /* Source Control */;
 		userBuildSettings = {
 			OBJROOT = target/xcode/build;
 			SYMROOT = target/xcode;
-		};
-	};
-	0AB364DA0B2F66FD00788B6C /* Source Control */ = {
-		isa = PBXSourceControlManager;
-		fallbackIsa = XCSourceControlManager;
-		isSCMEnabled = 0;
-		scmConfiguration = {
-		};
-		scmType = "";
-	};
-	0AB364DB0B2F66FD00788B6C /* Code sense */ = {
-		isa = PBXCodeSenseManager;
-		indexTemplatePath = "";
-	};
-	0AB3651F0B2F67B300788B6C /* XCBreakpointsBucket */ = {
-		isa = XCBreakpointsBucket;
-		name = "Project Breakpoints";
-		objects = (
-		);
-	};
-	0AB365570B2F6ABB00788B6C /* osxjnilib.c */ = {
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {847, 783}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRect = "{{0, 0}, {847, 783}}";
-			sepNavWindowFrame = "{{84, 198}, {886, 912}}";
 		};
 	};
 	0A3CC35E0B94BB8800F6BA26 /* java */ = {
@@ -111,27 +86,38 @@
 		path = /usr/bin/java;
 		sourceTree = "<absolute>";
 	};
-	363028F90383184400C91562 /* Manifest */ = {
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {847, 783}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRect = "{{0, 0}, {847, 783}}";
-			sepNavWindowFrame = "{{38, 240}, {886, 912}}";
+	0AB364DA0B2F66FD00788B6C /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
 		};
+		scmType = "";
 	};
-	4CEBA78E08679EF10015D03E /* JNILib */ = {
+	0AB364DB0B2F66FD00788B6C /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	4CEBA78E08679EF10015D03E /* jnilib */ = {
 		activeExec = 0;
 	};
 	6A9FA6570246BA6C0CC91562 /* osx */ = {
 		isa = PBXExecutable;
-		activeArgIndex = 0;
 		activeArgIndices = (
+			YES,
+			YES,
 			YES,
 		);
 		argumentStrings = (
-			"-cp osx.jar osx",
+			"-cp",
+			"target/hawtjni-example-1.0-SNAPSHOT.jar",
+			test.Platform,
 		);
 		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
 		configStateDict = {
 			"PBXLSLaunchAction-0" = {
 				PBXLSLaunchAction = 0;
@@ -157,6 +143,9 @@
 			};
 		};
 		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
 		debuggerPlugin = GDBDebugging;
 		disassemblyDisplayState = 0;
 		dylibVariantSuffix = "";
@@ -168,19 +157,12 @@
 		launchableReference = 0A3CC35E0B94BB8800F6BA26 /* java */;
 		libgmallocEnabled = 0;
 		name = osx;
+		showTypeColumn = 0;
 		sourceDirectories = (
 		);
-		startupPath = "dist";
+		startupPath = "<<ProjectDirectory>>";
 	};
-	EB9FD8610AEECCF5008E157E /* osx */ = {
+	EB9FD8610AEECCF5008E157E /* hawtjni-example-osx */ = {
 		activeExec = 0;
-	};
-	EB9FD8720AEECD83008E157E /* build.xml */ = {
-		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {847, 1260}}";
-			sepNavSelRange = "{1260, 0}";
-			sepNavVisRect = "{{0, 8}, {847, 783}}";
-			sepNavWindowFrame = "{{752, 266}, {886, 912}}";
-		};
 	};
 }

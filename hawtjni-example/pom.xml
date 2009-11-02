@@ -27,6 +27,7 @@
   <groupId>org.fusesource.hawtjni</groupId>
   <artifactId>hawtjni-example</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <name>HawtJNI Example</name>
   
   <dependencies>
     <dependency>

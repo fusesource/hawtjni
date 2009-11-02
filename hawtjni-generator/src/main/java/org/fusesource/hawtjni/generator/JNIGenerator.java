@@ -10,117 +10,39 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIField;
+import org.fusesource.hawtjni.generator.model.JNIItem;
+import org.fusesource.hawtjni.generator.model.JNIMethod;
+import org.fusesource.hawtjni.generator.model.JNIType;
 
 public abstract class JNIGenerator implements Flags {
-
-    JNIClass mainClass;
-    JNIClass[] classes;
-    MetaData metaData;
-    boolean isCPP;
-    String delimiter;
-    PrintStream output;
-    ProgressMonitor progress;
+    
+    static final String delimiter = System.getProperty("line.separator");
     static final String JNI64 = "JNI64";
 
-    public JNIGenerator() {
-        delimiter = System.getProperty("line.separator");
-        output = System.out;
-        metaData = new MetaData();
-    }
-
-    public static String skipCopyrights(InputStream is) throws IOException {
-        int state = 0;
-        StringBuffer copyrights = new StringBuffer();
-        while (state != 5) {
-            int c = is.read();
-            if (c == -1)
-                return null;
-            switch (state) {
-            case 0:
-                if (!Character.isWhitespace((char) c))
-                    state = 1;
-            case 1:
-                if (c == '/')
-                    state = 2;
-                else
-                    return null;
-                break;
-            case 2:
-                if (c == '*')
-                    state = 3;
-                else
-                    return null;
-                break;
-            case 3:
-                if (c == '*')
-                    state = 4;
-                break;
-            case 4:
-                if (c == '/')
-                    state = 5;
-                else
-                    state = 3;
-                break;
-            }
-            if (state > 0)
-                copyrights.append((char) c);
-        }
-        return copyrights.toString();
-    }
-
-    public static boolean compare(InputStream is1, InputStream is2) throws IOException {
-        skipCopyrights(is1);
-        skipCopyrights(is2);
-        while (true) {
-            int c1 = is1.read();
-            int c2 = is2.read();
-            if (c1 != c2)
-                return false;
-            if (c1 == -1)
-                break;
-        }
-        return true;
-    }
-
-    public static void output(byte[] bytes, String fileName) throws IOException {
-        FileInputStream is = null;
-        try {
-            is = new FileInputStream(fileName);
-            if (compare(new ByteArrayInputStream(bytes), new BufferedInputStream(is)))
-                return;
-        } catch (FileNotFoundException e) {
-        } finally {
-            try {
-                if (is != null)
-                    is.close();
-            } catch (IOException e) {
-            }
-        }
-        FileOutputStream out = new FileOutputStream(fileName);
-        out.write(bytes);
-        out.close();
-    }
-
-    String fixDelimiter(String str) {
-        if (delimiter.equals("\n"))
+    ArrayList<JNIClass> classes;
+    String copyright = "";
+    boolean isCPP;
+    PrintStream output = System.out;
+    ProgressMonitor progress;
+    private String outputName;
+    
+    static String fixDelimiter(String str) {
+        if (delimiter.equals("\n")) {
             return str;
-        int index = 0, length = str.length();
-        StringBuffer buffer = new StringBuffer();
-        while (index != -1) {
-            int start = index;
-            index = str.indexOf('\n', start);
-            if (index == -1) {
-                buffer.append(str.substring(start, length));
-            } else {
-                buffer.append(str.substring(start, index));
-                buffer.append(delimiter);
-                index++;
-            }
         }
-        return buffer.toString();
+        return str.replaceAll("\n", delimiter);
     }
 
     static String getFunctionName(JNIMethod method) {
@@ -178,21 +100,12 @@ public abstract class JNIGenerator implements Flags {
         });
     }
 
-    static void sort(JNIClass[] classes) {
-        Arrays.sort(classes, new Comparator<JNIClass>() {
+    static void sort(ArrayList<JNIClass> classes) {
+        Collections.sort(classes, new Comparator<JNIClass>() {
             public int compare(JNIClass a, JNIClass b) {
                 return a.getName().compareTo(b.getName());
             }
         });
-    }
-
-    static String[] split(String str, String separator) {
-        StringTokenizer tk = new StringTokenizer(str, separator);
-        ArrayList<String> result = new ArrayList<String>();
-        while (tk.hasMoreTokens()) {
-            result.add(tk.nextToken());
-        }
-        return (String[]) result.toArray(new String[result.size()]);
     }
 
     static String toC(String str) {
@@ -237,15 +150,13 @@ public abstract class JNIGenerator implements Flags {
         generateCopyright();
         generateIncludes();
         sort(classes);
-        for (int i = 0; i < classes.length; i++) {
-            JNIClass clazz = classes[i];
+        for (JNIClass clazz : classes) {
             if (clazz.getFlag(FLAG_CPP)) {
                 isCPP = true;
                 break;
             }
         }
-        for (int i = 0; i < classes.length; i++) {
-            JNIClass clazz = classes[i];
+        for (JNIClass clazz : classes) {
             if (getGenerate(clazz))
                 generate(clazz);
             if (progress != null)
@@ -254,24 +165,12 @@ public abstract class JNIGenerator implements Flags {
         output.flush();
     }
 
-    public JNIClass[] getClasses() {
-        return classes;
-    }
-
     public boolean getCPP() {
         return isCPP;
     }
 
     public String getDelimiter() {
         return delimiter;
-    }
-
-    public String getExtension() {
-        return getCPP() ? ".cpp" : ".c";
-    }
-
-    public String getFileName() {
-        return getOutputName() + getSuffix() + getExtension();
     }
 
     protected boolean getGenerate(JNIItem item) {
@@ -283,23 +182,15 @@ public abstract class JNIGenerator implements Flags {
     }
 
     public String getOutputName() {
-        return getMainClass().getSimpleName().toLowerCase();
+        return outputName;
     }
 
-    public JNIClass getMainClass() {
-        return mainClass;
-    }
-
-    public MetaData getMetaData() {
-        return metaData;
+    public void setOutputName(String outputName) {
+        this.outputName = outputName;
     }
 
     public ProgressMonitor getProgressMonitor() {
         return progress;
-    }
-
-    public String getSuffix() {
-        return "";
     }
 
     public void output(String str) {
@@ -315,20 +206,8 @@ public abstract class JNIGenerator implements Flags {
         output(getDelimiter());
     }
 
-    public void setClasses(JNIClass[] classes) {
+    public void setClasses(ArrayList<JNIClass> classes) {
         this.classes = classes;
-    }
-
-    public void setDelimiter(String delimiter) {
-        this.delimiter = delimiter;
-    }
-
-    public void setMainClass(JNIClass mainClass) {
-        this.mainClass = mainClass;
-    }
-
-    public void setMetaData(MetaData data) {
-        metaData = data;
     }
 
     public void setOutput(PrintStream output) {
@@ -337,6 +216,13 @@ public abstract class JNIGenerator implements Flags {
 
     public void setProgressMonitor(ProgressMonitor progress) {
         this.progress = progress;
+    }
+    public String getCopyright() {
+        return copyright;
+    }
+
+    public void setCopyright(String copyright) {
+        this.copyright = copyright;
     }
 
 }

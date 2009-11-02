@@ -8,18 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.fusesource.hawtjni.generator;
+package org.fusesource.hawtjni.generator.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 public abstract class AbstractItem implements JNIItem {
 
     HashMap<String, Object> params;
 
     static String[] split(String str, String separator) {
-        return JNIGenerator.split(str, separator);
+        return str.split(Pattern.quote(separator));
     }
 
     public abstract String flatten();

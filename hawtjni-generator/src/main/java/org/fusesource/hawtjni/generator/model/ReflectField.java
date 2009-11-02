@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.fusesource.hawtjni.generator;
+package org.fusesource.hawtjni.generator.model;
 
 import java.lang.reflect.Field;
 

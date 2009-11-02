@@ -13,6 +13,9 @@ package org.fusesource.hawtjni.generator;
 import java.io.*;
 import java.util.*;
 
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIMethod;
+
 public abstract class CleanupClass extends JNIGenerator {
 
     String classSourcePath;

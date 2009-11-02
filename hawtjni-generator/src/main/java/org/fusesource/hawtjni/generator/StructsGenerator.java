@@ -13,6 +13,10 @@ package org.fusesource.hawtjni.generator;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIField;
+import org.fusesource.hawtjni.generator.model.JNIType;
+
 public class StructsGenerator extends JNIGenerator {
 
     boolean header;
@@ -24,7 +28,7 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     public void generateCopyright() {
-        outputln(fixDelimiter(getMetaData().getCopyright()));
+        outputln(fixDelimiter(getCopyright()));
     }
 
     public void generateIncludes() {
@@ -58,20 +62,6 @@ public class StructsGenerator extends JNIGenerator {
         } else {
             generateSourceFile(clazz);
         }
-    }
-
-    public void generate() {
-        if (!header && getClasses().length == 0)
-            return;
-        super.generate();
-    }
-
-    public String getExtension() {
-        return header ? ".h" : super.getExtension();
-    }
-
-    public String getSuffix() {
-        return "_structs";
     }
 
     void generateExcludes(JNIClass[] classes) {

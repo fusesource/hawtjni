@@ -12,6 +12,12 @@ package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.regex.Pattern;
+
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIMethod;
+import org.fusesource.hawtjni.generator.model.JNIParameter;
+import org.fusesource.hawtjni.generator.model.JNIType;
 
 public class NativesGenerator extends JNIGenerator {
 
@@ -22,18 +28,14 @@ public class NativesGenerator extends JNIGenerator {
     }
 
     public void generateCopyright() {
-        outputln(fixDelimiter(getMetaData().getCopyright()));
+        outputln(fixDelimiter(getCopyright()));
     }
 
     public void generateIncludes() {
         String outputName = getOutputName();
-        outputln("#include \"swt.h\"");
-        output("#include \"");
-        output(outputName);
-        outputln("_structs.h\"");
-        output("#include \"");
-        output(outputName);
-        outputln("_stats.h\"");
+        outputln("#include \"hawtjni.h\"");
+        outputln("#include \""+outputName+"_structs.h\"");
+        outputln("#include \""+outputName+"_stats.h\"");
         outputln();
     }
 
@@ -82,7 +84,7 @@ public class NativesGenerator extends JNIGenerator {
     }
 
     boolean isStruct(String flagsStr) {
-        String[] flags = split(flagsStr, " ");
+        String[] flags = flagsStr.split(Pattern.quote(" "));
         for (int i = 0; i < flags.length; i++) {
             if (flags[i].equals(Flags.FLAG_STRUCT))
                 return true;
@@ -95,8 +97,8 @@ public class NativesGenerator extends JNIGenerator {
         output(function);
         outputln(";");
         output("static ");
-        String[] types = split((String) method.getParam("callback_types"), ";");
-        String[] flags = split((String) method.getParam("callback_flags"), ";");
+        String[] types = ((String) method.getParam("callback_types")).split(Pattern.quote(";"));
+        String[] flags = ((String) method.getParam("callback_flags")).split(Pattern.quote(";"));
         output(types[0]);
         output(" ");
         output("proc_");

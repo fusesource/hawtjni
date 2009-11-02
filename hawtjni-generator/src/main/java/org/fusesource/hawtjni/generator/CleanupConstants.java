@@ -13,6 +13,10 @@ package org.fusesource.hawtjni.generator;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIField;
+import org.fusesource.hawtjni.generator.model.ReflectClass;
+
 public class CleanupConstants extends CleanupClass {
 
     String getFieldValue(JNIField field) {

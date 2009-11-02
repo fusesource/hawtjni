@@ -1,30 +1,28 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.fusesource.hawtjni.generator;
+/* == HEADER-SNIP-LOCATION == */ 
+#include "hawtjni.h"
 
-public interface JNIClass extends JNIItem {
-	
-public static String[] FLAGS = {FLAG_NO_GEN, FLAG_CPP};
+int IS_JNI_1_2 = 0;
 
-public String getName();
+#ifdef JNI_VERSION_1_2
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+	IS_JNI_1_2 = 1;
+	return JNI_VERSION_1_2;
+}
+#endif
 
-public String getSimpleName();
-
-public JNIClass getSuperclass();
-
-public JNIField[] getDeclaredFields();
-
-public JNIMethod[] getDeclaredMethods();
-
-public String getExclude();
-
-public void setExclude(String str);
+void throwOutOfMemory(JNIEnv *env) {
+	jclass clazz = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
+	if (clazz != NULL) {
+		(*env)->ThrowNew(env, clazz, "");
+	}
 }

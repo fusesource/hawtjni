@@ -26,6 +26,7 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 import org.fusesource.hawtjni.generator.MacGenerator;
 import org.fusesource.hawtjni.generator.ProgressMonitor;
+import org.fusesource.hawtjni.generator.HawtJNI.UsageException;
 
 public class MacGeneratorUI {
 	MacGenerator gen;
@@ -340,7 +341,11 @@ public class MacGeneratorUI {
 	}
 	
 	public void generate(ProgressMonitor progress) {
-		gen.generate(progress);
+		try {
+            gen.generate(progress);
+        } catch (UsageException e) {
+            e.printStackTrace();
+        }
 	}
 	
 	public boolean getActionsVisible() {

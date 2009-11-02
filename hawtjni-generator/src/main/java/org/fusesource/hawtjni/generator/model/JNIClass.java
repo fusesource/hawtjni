@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,23 +8,23 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.fusesource.hawtjni.generator;
+package org.fusesource.hawtjni.generator.model;
 
-public interface JNIParameter extends JNIItem {
+public interface JNIClass extends JNIItem {
+	
+public static String[] FLAGS = {FLAG_NO_GEN, FLAG_CPP};
 
-	public static final String[] FLAGS = {FLAG_NO_IN, FLAG_NO_OUT, FLAG_CRITICAL, FLAG_INIT, FLAG_STRUCT, FLAG_UNICODE, FLAG_SENTINEL, FLAG_OBJECT};
+public String getName();
 
-public String getCast();
+public String getSimpleName();
 
-public JNIMethod getMethod();
+public JNIClass getSuperclass();
 
-public int getParameter();
+public JNIField[] getDeclaredFields();
 
-public JNIClass getTypeClass();
+public JNIMethod[] getDeclaredMethods();
 
-public JNIType getType();
+public String getExclude();
 
-public JNIType getType64();
-
-public void setCast(String str);
+public void setExclude(String str);
 }

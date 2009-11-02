@@ -12,6 +12,11 @@ package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
 
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIField;
+import org.fusesource.hawtjni.generator.model.JNIType;
+import org.fusesource.hawtjni.generator.model.ReflectClass;
+
 public class ConstantsGenerator extends JNIGenerator {
 
     public void generate(JNIClass clazz) {

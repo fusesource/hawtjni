@@ -17,23 +17,17 @@
 package org.fusesource.hawtjni.maven;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactCollector;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-import org.apache.maven.project.MavenProjectHelper;
-import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
-import org.fusesource.hawtjni.generator.JNIGeneratorApp;
+import org.fusesource.hawtjni.generator.HawtJNI;
+import org.fusesource.hawtjni.generator.ProgressMonitor;
 
 /**
  * A Maven Mojo that allows you to generate JNI code using HawtJNI.
@@ -54,39 +48,88 @@ public class GenerateMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
-     * The directory where the java classe files are located.
+     * The directory where the generated native files will be placed.
+     * 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-sources/hawtjni/native"
+     */
+    private File nativeOutput;
+
+    /**
+     * The base name of the library, used to determine generated file names.
+     * 
+     * @parameter default-value="${project.artifactId}"
+     */
+    private String name;
+
+    /**
+     * The copyright header template that will be added to the generated source files.
+     * Use the '%END_YEAR%' token to have it replaced with the current year.  
+     * 
+     * @parameter default-value=""
+     */
+    private String copyright;
+
+    /**
+     * Restrict looking for JNI classes to the specified package.
+     *  
+     * @parameter
+     */
+    private List<String> packages = new ArrayList<String>();
+
+//    /**
+//     * The directory where the generated java files will be paced.
+//     * 
+//     * @parameter default-value=
+//     *            "${project.build.directory}/generated-sources/hawtjni/java"
+//     */
+//    private File javaOutput;
+//
+    /**
+     * The directory where the java classes files are located.
      * 
      * @parameter default-value="${project.build.outputDirectory}"
      */
     private File classesDirectory;
 
-    /**
-     * The directory where the generated native files will be paced.
-     * 
-     * @parameter default-value=
-     *            "${project.build.directory}/generated-sources/hawtjni/native"
-     */
-    private File nativeOutputDirectory;
-
-    /**
-     * The directory where the generated java files will be paced.
-     * 
-     * @parameter default-value=
-     *            "${project.build.directory}/generated-sources/hawtjni/java"
-     */
-    private File javaOutputDirectory;
-
     public void execute() throws MojoExecutionException {
 
-        ArrayList<File> artifacts = new ArrayList<File>();
-        for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
-            File file = artifact.getFile();
-            getLog().info("Including: " + file);
-            artifacts.add(file);
+        HawtJNI generator = new HawtJNI();
+        generator.setClasspaths(getClasspath());
+        generator.setName(name);
+        generator.setCopyright(copyright);
+        generator.setNativeOutput(nativeOutput);
+        generator.setPackages(packages);
+        generator.setProgress(new ProgressMonitor() {
+            public void step() {
+            }
+            public void setTotal(int total) {
+            }
+            public void setMessage(String message) {
+                getLog().info(message);
+            }
+        });
+        try {
+            generator.generate();
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed: "+e, e);
         }
-        
-        JNIGeneratorApp generator = new JNIGeneratorApp();
-        //TODO:
+    }
+
+    @SuppressWarnings("unchecked")
+    private ArrayList<String> getClasspath() throws MojoExecutionException {
+        ArrayList<String> artifacts = new ArrayList<String>();
+        try {
+            artifacts.add(classesDirectory.getCanonicalPath());
+            for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
+                File file = artifact.getFile();
+                    getLog().info("Including: " + file);
+                    artifacts.add(file.getCanonicalPath());
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not determine project classath.", e);
+        }
+        return artifacts;
     }
 
 }

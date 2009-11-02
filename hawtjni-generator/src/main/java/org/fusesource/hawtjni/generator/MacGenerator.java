@@ -31,6 +31,8 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.fusesource.hawtjni.generator.HawtJNI.UsageException;
+import org.fusesource.hawtjni.generator.util.FileSupport;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -44,7 +46,6 @@ public class MacGenerator {
     String outputDir, mainClassName;
     String delimiter = System.getProperty("line.separator");
     PrintStream out;
-    public static boolean BUILD_C_SOURCE = true;
 
     public MacGenerator() {
     }
@@ -132,9 +133,9 @@ public class MacGenerator {
         }
     }
 
-    public void generate(ProgressMonitor progress) {
+    public void generate(ProgressMonitor progress) throws UsageException {
         if (progress != null) {
-            progress.setTotal(BUILD_C_SOURCE ? 4 : 3);
+            progress.setTotal(3);
             progress.setMessage("extra attributes...");
         }
         generateExtraAttributes();
@@ -148,24 +149,12 @@ public class MacGenerator {
             progress.setMessage("classes...");
         }
         generateClasses();
-        if (BUILD_C_SOURCE) {
-            if (progress != null) {
-                progress.step();
-                progress.setMessage("C source...");
-            }
-            generateCSource();
-        }
         if (progress != null) {
             progress.step();
             progress.setMessage("Done.");
         }
     }
 
-    void generateCSource() {
-        JNIGeneratorApp app = new JNIGeneratorApp();
-        app.setMainClassName(mainClassName, outputDir + "/library");
-        app.generate();
-    }
 
     String fixDelimiter(String str) {
         if (delimiter.equals("\n"))
@@ -517,7 +506,6 @@ public class MacGenerator {
     }
 
     void generateClasses() {
-        MetaData metaData = new MetaData();
         TreeMap<String, NodeEntry> classes = getGeneratedClasses();
         copyClassMethodsDown(classes);
 
@@ -526,7 +514,7 @@ public class MacGenerator {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             this.out = new PrintStream(out);
 
-            out(fixDelimiter(metaData.getCopyright()));
+//            out(fixDelimiter(metaData.getCopyright()));
 
             String className = iterator.next();
             NodeEntry clazz = classes.get(className);
@@ -553,8 +541,9 @@ public class MacGenerator {
             String fileName = outputDir + packageName.replace('.', '/') + "/" + className + ".java";
             try {
                 out.flush();
-                if (out.size() > 0)
-                    JNIGenerator.output(out.toByteArray(), fileName);
+                if (out.size() > 0) {
+                    FileSupport.write(out.toByteArray(), new File(fileName));
+                }
             } catch (Exception e) {
                 System.out.println("Problem");
                 e.printStackTrace(System.out);
@@ -649,8 +638,10 @@ public class MacGenerator {
         out(footer);
         try {
             out.flush();
-            if (out.size() > 0)
-                JNIGenerator.output(out.toByteArray(), fileName);
+            if (out.size() > 0) {
+                FileSupport.write(out.toByteArray(), new File(fileName));
+                
+            }
         } catch (Exception e) {
             System.out.println("Problem");
             e.printStackTrace(System.out);
@@ -706,8 +697,9 @@ public class MacGenerator {
             writer.setAttributeFilter(filter);
             writer.setNodeFilter("swt_");
             writer.print(document);
-            if (out.size() > 0)
-                JNIGenerator.output(out.toByteArray(), fileName);
+            if (out.size() > 0) {
+                FileSupport.write(out.toByteArray(), new File(fileName));
+            }
         } catch (Exception e) {
             System.out.println("Problem");
             e.printStackTrace(System.out);

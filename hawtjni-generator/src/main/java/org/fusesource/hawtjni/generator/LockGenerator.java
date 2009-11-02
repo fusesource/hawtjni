@@ -14,6 +14,12 @@ import java.lang.reflect.Modifier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIMethod;
+import org.fusesource.hawtjni.generator.model.JNIType;
+import org.fusesource.hawtjni.generator.model.ReflectClass;
+import org.fusesource.hawtjni.generator.model.ReflectType;
+
 public class LockGenerator extends CleanupClass {
 	
 public LockGenerator() {

@@ -14,6 +14,10 @@ import java.util.*;
 import java.io.File;
 import java.lang.reflect.*;
 
+import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIMethod;
+import org.fusesource.hawtjni.generator.model.ReflectClass;
+
 public class CleanupNatives extends CleanupClass {
 
     public CleanupNatives() {

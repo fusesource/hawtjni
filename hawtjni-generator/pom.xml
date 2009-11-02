@@ -75,7 +75,7 @@
       <plugin>
         <groupId>org.fusesource.mvnplugins</groupId>
         <artifactId>maven-uberize-plugin</artifactId>
-        <version>1.4</version>
+        <version>1.5-SNAPSHOT</version>
         <executions>
           <execution>
             <phase>package</phase>

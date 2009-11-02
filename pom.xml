@@ -39,7 +39,7 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-    
+
   <modules>
     <module>hawtjni-runtime</module>
     <module>hawtjni-generator</module>

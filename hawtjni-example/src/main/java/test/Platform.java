@@ -12,7 +12,6 @@ import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniMethod;
 import org.fusesource.hawtjni.runtime.Library;
-import org.fusesource.hawtjni.runtime.T32;
 
 /**
  * 
@@ -35,12 +34,12 @@ public class Platform {
     }
 
 	
-	@JniMethod(cast="JAVA_PTR_CAST")
-    public static final native @T32 long malloc (@T32 long size);
+    @JniMethod(cast="intptr_t")
+    public static final native long malloc (long size);
     
-    public static final native void free (@JniArg(cast="NATIVE_PTR_CAST") @T32 long ptr);
+    public static final native void free (@JniArg(cast="void *") long ptr);
     
-    public static final native @T32 long open (String file, int flags, int mode);
+    public static final native long open (String file, int flags, int mode);
     
     
 }

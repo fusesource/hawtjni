@@ -78,7 +78,7 @@ public enum MethodFlag {
     CS_NEW,
     
     /**
-     * Indicate that the native method's return value or parameter is a 
+     * Indicate that the native method's return value is a 
      * C# managed object.
      */
     CS_OBJECT,

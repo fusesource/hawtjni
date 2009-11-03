@@ -69,8 +69,13 @@ public enum ArgFlag {
     SENTINEL,
     
     /**
-     * Indicate that the native method's return value or parameter is a 
-     * C# managed object.
+     * Indicate that the native method's parameter is a 
+     * C or C++ pointer
+     */
+    POINTER,
+    
+    /**
+     * Indicate that the native parameter is a C# managed object.
      */
     CS_OBJECT,
 

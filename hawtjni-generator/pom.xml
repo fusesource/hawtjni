@@ -40,7 +40,7 @@
     <dependency>
       <artifactId>xbean-finder</artifactId>    
       <groupId>org.apache.xbean</groupId>
-      <version>3.7-SNAPSHOT</version>
+      <version>3.6</version>
     </dependency>
     <dependency>
       <groupId>asm</groupId>

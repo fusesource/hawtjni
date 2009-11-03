@@ -1,3 +1,12 @@
+/*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ *******************************************************************************/
 package org.fusesource.hawtjni.generator.util;
 
 import org.apache.commons.cli.Option;
@@ -6,7 +15,7 @@ import org.apache.commons.cli.Option;
  * a better version of org.apache.commons.cli.OptionBuilder
  * IDE provides nicer auto complete and less compiler warnings.
  * 
- * @author chirino
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class OptionBuilder {
 

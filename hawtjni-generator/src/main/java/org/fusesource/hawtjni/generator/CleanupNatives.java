@@ -1,12 +1,12 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2007 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
@@ -18,6 +18,10 @@ import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIMethod;
 import org.fusesource.hawtjni.generator.model.ReflectClass;
 
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class CleanupNatives extends CleanupClass {
 
     public CleanupNatives() {
@@ -26,15 +30,14 @@ public class CleanupNatives extends CleanupClass {
     public void generate(JNIClass clazz) {
         unusedCount = usedCount = 0;
         super.generate(clazz);
-        JNIMethod[] methods = clazz.getDeclaredMethods();
+        List<JNIMethod> methods = clazz.getDeclaredMethods();
         generate(methods);
         output("used=" + usedCount + " unused=" + unusedCount + " total=" + (unusedCount + usedCount));
     }
 
-    public void generate(JNIMethod[] methods) {
-        sort(methods);
-        for (int i = 0; i < methods.length; i++) {
-            JNIMethod method = methods[i];
+    public void generate(List<JNIMethod> methods) {
+        sortMethods(methods);
+        for (JNIMethod method : methods) {
             if ((method.getModifiers() & Modifier.NATIVE) == 0)
                 continue;
             generate(method);

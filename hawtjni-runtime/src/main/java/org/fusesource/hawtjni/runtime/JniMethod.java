@@ -1,33 +1,32 @@
 /*******************************************************************************
  * Copyright (c) 2009 Progress Software, Inc.
- * Copyright (c) 2004, 2008 IBM Corporation and others.
- *
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
  *******************************************************************************/
-package org.fusesource.hawtjni.generator.model;
+package org.fusesource.hawtjni.runtime;
 
-import org.fusesource.hawtjni.runtime.FieldFlag;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
 
 /**
  * 
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public interface JNIField {
-
-    public boolean getFlag(FieldFlag flag);
-
-    public String getName();
-    public int getModifiers();
-
-    public JNIType getType();
-    public JNIType getType64();
-
-    public JNIClass getDeclaringClass();
-    public String getAccessor();
-    public String getCast();
-    public String getExclude();
+@Target({METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface JniMethod {
+    
+    String cast() default "";
+    String accessor() default "";
+    MethodFlag[] flags() default {};
+    String copy() default "";
+    String exclude() default "";
+    
+    JniArg[] callbackArgs() default {};
 }

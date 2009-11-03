@@ -1,22 +1,28 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2009 Progress Software, Inc.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
  *******************************************************************************/
-package org.fusesource.hawtjni.generator;
+package org.fusesource.hawtjni.runtime;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
 
 /**
  * 
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public interface ProgressMonitor {
-
-    public void setTotal(int total);
-    public void setMessage(String message);
-    public void step();
-
+@Target({FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface JniField {
+    String cast() default "";
+    String accessor() default "";
+    String exclude() default "";
+    FieldFlag[] flags() default {};
 }

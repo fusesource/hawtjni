@@ -1,22 +1,30 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2007 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIField;
 import org.fusesource.hawtjni.generator.model.JNIType;
+import org.fusesource.hawtjni.runtime.ClassFlag;
+import org.fusesource.hawtjni.runtime.FieldFlag;
 
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class StructsGenerator extends JNIGenerator {
 
     boolean header;
@@ -42,22 +50,26 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     public void generate(JNIClass clazz) {
-        int j = 0;
-        JNIField[] fields = clazz.getDeclaredFields();
-        for (; j < fields.length; j++) {
-            JNIField field = fields[j];
-            int mods = field.getModifiers();
-            if ((mods & Modifier.PUBLIC) != 0 && (mods & Modifier.STATIC) == 0) {
-                break;
-            }
-        }
-        if (j == fields.length)
+        ArrayList<JNIField> fields = getStructFields(clazz);
+        if (fields.isEmpty())
             return;
         if (header) {
             generateHeaderFile(clazz);
         } else {
             generateSourceFile(clazz);
         }
+    }
+
+    private ArrayList<JNIField> getStructFields(JNIClass clazz) {
+        ArrayList<JNIField> rc = new ArrayList<JNIField>();
+        List<JNIField> fields = clazz.getDeclaredFields();
+        for (JNIField field : fields) {
+            int mods = field.getModifiers();
+            if ((mods & Modifier.PUBLIC) != 0 && (mods & Modifier.STATIC) == 0) {
+                rc.add(field);
+            }
+        }
+        return rc;
     }
 
     void generateExcludes(JNIClass[] classes) {
@@ -143,14 +155,14 @@ public class StructsGenerator extends JNIGenerator {
         output("void cache");
         output(clazzName);
         outputln("Fields(JNIEnv *env, jobject lpObject);");
-        if (clazz.getFlag(Flags.FLAG_STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT)) {
             output("struct ");
         }
         output(clazzName);
         output(" *get");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(Flags.FLAG_STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT)) {
             output("struct ");
         }
         output(clazzName);
@@ -158,7 +170,7 @@ public class StructsGenerator extends JNIGenerator {
         output("void set");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(Flags.FLAG_STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT)) {
             output("struct ");
         }
         output(clazzName);
@@ -166,7 +178,7 @@ public class StructsGenerator extends JNIGenerator {
         output("#define ");
         output(clazzName);
         output("_sizeof() sizeof(");
-        if (clazz.getFlag(Flags.FLAG_STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT)) {
             output("struct ");
         }
         output(clazzName);
@@ -181,10 +193,9 @@ public class StructsGenerator extends JNIGenerator {
         outputln("\tint cached;");
         outputln("\tjclass clazz;");
         output("\tjfieldID ");
-        JNIField[] fields = clazz.getDeclaredFields();
+        List<JNIField> fields = clazz.getDeclaredFields();
         boolean first = true;
-        for (int i = 0; i < fields.length; i++) {
-            JNIField field = fields[i];
+        for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
             if (!first)
@@ -230,9 +241,8 @@ public class StructsGenerator extends JNIGenerator {
             }
         }
         outputln();
-        JNIField[] fields = clazz.getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            JNIField field = fields[i];
+        List<JNIField> fields = clazz.getDeclaredFields();
+        for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
             output("\t");
@@ -281,16 +291,15 @@ public class StructsGenerator extends JNIGenerator {
                 generateGetFields(superclazz);
             }
         }
-        JNIField[] fields = clazz.getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            JNIField field = fields[i];
+        List<JNIField> fields = clazz.getDeclaredFields();
+        for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
             String exclude = field.getExclude();
             if (exclude.length() != 0) {
                 outputln(exclude);
             }
-            boolean noWinCE = field.getFlag(FLAG_NO_WINCE);
+            boolean noWinCE = field.getFlag(FieldFlag.NO_WINCE);
             if (noWinCE) {
                 outputln("#ifndef _WIN32_WCE");
             }
@@ -393,14 +402,14 @@ public class StructsGenerator extends JNIGenerator {
 
     void generateGetFunction(JNIClass clazz) {
         String clazzName = clazz.getSimpleName();
-        if (clazz.getFlag(Flags.FLAG_STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT)) {
             output("struct ");
         }
         output(clazzName);
         output(" *get");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(Flags.FLAG_STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT)) {
             output("struct ");
         }
         output(clazzName);
@@ -435,16 +444,15 @@ public class StructsGenerator extends JNIGenerator {
                 generateSetFields(superclazz);
             }
         }
-        JNIField[] fields = clazz.getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            JNIField field = fields[i];
+        List<JNIField> fields = clazz.getDeclaredFields();
+        for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
             String exclude = field.getExclude();
             if (exclude.length() != 0) {
                 outputln(exclude);
             }
-            boolean noWinCE = field.getFlag(FLAG_NO_WINCE);
+            boolean noWinCE = field.getFlag(FieldFlag.NO_WINCE);
             if (noWinCE) {
                 outputln("#ifndef _WIN32_WCE");
             }
@@ -546,7 +554,7 @@ public class StructsGenerator extends JNIGenerator {
         output("void set");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(Flags.FLAG_STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT)) {
             output("struct ");
         }
         output(clazzName);

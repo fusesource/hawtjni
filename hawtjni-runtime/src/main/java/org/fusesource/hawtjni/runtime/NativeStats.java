@@ -1,12 +1,11 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.runtime;
 
@@ -18,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
- * Instructions on how to use the NativeStats tool with a standlaone SWT
+ * Instructions on how to use the NativeStats tool with a standalone SWT
  * example:
  * <ol>
  * <li> Compile the native libraries defining the NATIVE_STATS flag.</li>
@@ -37,6 +36,8 @@ import java.util.Map.Entry;
  *      </pre></code>
  * </li>
  * </ol>
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class NativeStats {
 

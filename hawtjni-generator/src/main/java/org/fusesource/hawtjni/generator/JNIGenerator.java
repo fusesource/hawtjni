@@ -1,12 +1,12 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2006 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
@@ -16,17 +16,21 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIField;
-import org.fusesource.hawtjni.generator.model.JNIItem;
 import org.fusesource.hawtjni.generator.model.JNIMethod;
 import org.fusesource.hawtjni.generator.model.JNIType;
+import org.fusesource.hawtjni.runtime.ClassFlag;
 
-public abstract class JNIGenerator implements Flags {
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
+public abstract class JNIGenerator {
     
     static final String delimiter = System.getProperty("line.separator");
     static final String JNI64 = "JNI64";
@@ -49,7 +53,7 @@ public abstract class JNIGenerator implements Flags {
         return getFunctionName(method, method.getParameterTypes());
     }
 
-    static String getFunctionName(JNIMethod method, JNIType[] paramTypes) {
+    static String getFunctionName(JNIMethod method, List<JNIType> paramTypes) {
         if ((method.getModifiers() & Modifier.NATIVE) == 0)
             return method.getName();
         String function = toC(method.getName());
@@ -57,8 +61,7 @@ public abstract class JNIGenerator implements Flags {
             StringBuffer buffer = new StringBuffer();
             buffer.append(function);
             buffer.append("__");
-            for (int i = 0; i < paramTypes.length; i++) {
-                JNIType paramType = paramTypes[i];
+            for (JNIType paramType : paramTypes) {
                 buffer.append(toC(paramType.getTypeSignature(false)));
             }
             return buffer.toString();
@@ -83,8 +86,8 @@ public abstract class JNIGenerator implements Flags {
         }
     }
 
-    public static void sort(JNIMethod[] methods) {
-        Arrays.sort(methods, new Comparator<JNIMethod>() {
+    public static void sortMethods(List<JNIMethod> methods) {
+        Collections.sort(methods, new Comparator<JNIMethod>() {
             public int compare(JNIMethod mth1, JNIMethod mth2) {
                 int result = mth1.getName().compareTo(mth2.getName());
                 return result != 0 ? result : getFunctionName(mth1).compareTo(getFunctionName(mth2));
@@ -92,15 +95,15 @@ public abstract class JNIGenerator implements Flags {
         });
     }
 
-    static void sort(JNIField[] fields) {
-        Arrays.sort(fields, new Comparator<JNIField>() {
+    static void sortFields(List<JNIField> fields) {
+        Collections.sort(fields, new Comparator<JNIField>() {
             public int compare(JNIField a, JNIField b) {
                 return a.getName().compareTo(b.getName());
             }
         });
     }
 
-    static void sort(ArrayList<JNIClass> classes) {
+    static void sortClasses(ArrayList<JNIClass> classes) {
         Collections.sort(classes, new Comparator<JNIClass>() {
             public int compare(JNIClass a, JNIClass b) {
                 return a.getName().compareTo(b.getName());
@@ -149,15 +152,15 @@ public abstract class JNIGenerator implements Flags {
             return;
         generateCopyright();
         generateIncludes();
-        sort(classes);
+        sortClasses(classes);
         for (JNIClass clazz : classes) {
-            if (clazz.getFlag(FLAG_CPP)) {
+            if (clazz.getFlag(ClassFlag.CPP)) {
                 isCPP = true;
                 break;
             }
         }
         for (JNIClass clazz : classes) {
-            if (getGenerate(clazz))
+            if (clazz.getGenerate())
                 generate(clazz);
             if (progress != null)
                 progress.step();
@@ -171,10 +174,6 @@ public abstract class JNIGenerator implements Flags {
 
     public String getDelimiter() {
         return delimiter;
-    }
-
-    protected boolean getGenerate(JNIItem item) {
-        return item.getGenerate();
     }
 
     public PrintStream getOutput() {

@@ -1,34 +1,38 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIField;
 import org.fusesource.hawtjni.generator.model.JNIType;
 import org.fusesource.hawtjni.generator.model.ReflectClass;
 
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class ConstantsGenerator extends JNIGenerator {
 
     public void generate(JNIClass clazz) {
-        JNIField[] fields = clazz.getDeclaredFields();
+        List<JNIField> fields = clazz.getDeclaredFields();
         generate(fields);
     }
 
-    public void generate(JNIField[] fields) {
-        sort(fields);
+    public void generate(List<JNIField> fields) {
+        sortFields(fields);
         outputln("int main() {");
-        for (int i = 0; i < fields.length; i++) {
-            JNIField field = fields[i];
+        for (JNIField field : fields) {
             if ((field.getModifiers() & Modifier.FINAL) == 0)
                 continue;
             generate(field);
@@ -59,8 +63,7 @@ public class ConstantsGenerator extends JNIGenerator {
         }
         try {
             ConstantsGenerator gen = new ConstantsGenerator();
-            for (int i = 0; i < args.length; i++) {
-                String clazzName = args[i];
+            for (String clazzName : args) {
                 Class<?> clazz = Class.forName(clazzName);
                 gen.generate(new ReflectClass(clazz));
             }

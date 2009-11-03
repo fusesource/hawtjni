@@ -1,20 +1,25 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2007 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIMethod;
 
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class StatsGenerator extends JNIGenerator {
 
     boolean header;
@@ -45,8 +50,8 @@ public class StatsGenerator extends JNIGenerator {
 
     void generateHeaderFile(JNIClass clazz) {
         generateNATIVEMacros(clazz);
-        JNIMethod[] methods = clazz.getDeclaredMethods();
-        sort(methods);
+        List<JNIMethod> methods = clazz.getDeclaredMethods();
+        sortMethods(methods);
         generateFunctionEnum(methods);
     }
 
@@ -92,10 +97,9 @@ public class StatsGenerator extends JNIGenerator {
     void generateSourceFile(JNIClass clazz) {
         outputln("#ifdef NATIVE_STATS");
         outputln();
-        JNIMethod[] methods = clazz.getDeclaredMethods();
+        List<JNIMethod> methods = clazz.getDeclaredMethods();
         int methodCount = 0;
-        for (int i = 0; i < methods.length; i++) {
-            JNIMethod method = methods[i];
+        for (JNIMethod method : methods) {
             if ((method.getModifiers() & Modifier.NATIVE) == 0)
                 continue;
             methodCount++;
@@ -114,9 +118,8 @@ public class StatsGenerator extends JNIGenerator {
         output("char * ");
         output(className);
         outputln("_nativeFunctionNames[] = {");
-        sort(methods);
-        for (int i = 0; i < methods.length; i++) {
-            JNIMethod method = methods[i];
+        sortMethods(methods);
+        for (JNIMethod method : methods) {
             if ((method.getModifiers() & Modifier.NATIVE) == 0)
                 continue;
             String function = getFunctionName(method), function64 = getFunctionName(method, method.getParameterTypes64());
@@ -187,12 +190,11 @@ public class StatsGenerator extends JNIGenerator {
         outputln("}");
     }
 
-    void generateFunctionEnum(JNIMethod[] methods) {
-        if (methods.length == 0)
+    void generateFunctionEnum(List<JNIMethod> methods) {
+        if (methods.isEmpty())
             return;
         outputln("typedef enum {");
-        for (int i = 0; i < methods.length; i++) {
-            JNIMethod method = methods[i];
+        for (JNIMethod method : methods) {
             if ((method.getModifiers() & Modifier.NATIVE) == 0)
                 continue;
             String function = getFunctionName(method), function64 = getFunctionName(method, method.getParameterTypes64());
@@ -214,7 +216,7 @@ public class StatsGenerator extends JNIGenerator {
             if (progress != null)
                 progress.step();
         }
-        JNIClass clazz = methods[0].getDeclaringClass();
+        JNIClass clazz = methods.get(0).getDeclaringClass();
         output("} ");
         output(clazz.getSimpleName());
         outputln("_FUNCS;");

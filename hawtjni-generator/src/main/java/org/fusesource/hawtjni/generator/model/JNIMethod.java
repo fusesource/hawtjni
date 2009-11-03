@@ -1,22 +1,27 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2008 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
-public interface JNIMethod extends JNIItem {
+import java.util.List;
 
-    public static final String[] FLAGS = { 
-        FLAG_NO_GEN, FLAG_ADDRESS, FLAG_CONST, 
-        FLAG_DYNAMIC, FLAG_JNI, FLAG_CAST, FLAG_CPP, 
-        FLAG_NEW, FLAG_DELETE, FLAG_GCNEW, FLAG_OBJECT,
-        FLAG_SETTER, FLAG_GETTER, FLAG_ADDER };
+import org.fusesource.hawtjni.runtime.ArgFlag;
+import org.fusesource.hawtjni.runtime.MethodFlag;
+
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
+public interface JNIMethod {
+
+    public boolean getFlag(MethodFlag flag);
 
     public String getName();
 
@@ -24,15 +29,15 @@ public interface JNIMethod extends JNIItem {
 
     public boolean isNativeUnique();
 
-    public JNIParameter[] getParameters();
-
-    public JNIType getReturnType();
+    public JNIType getReturnType32();
 
     public JNIType getReturnType64();
 
-    public JNIType[] getParameterTypes();
+    public List<JNIParameter> getParameters();
 
-    public JNIType[] getParameterTypes64();
+    public List<JNIType> getParameterTypes();
+
+    public List<JNIType> getParameterTypes64();
 
     public JNIClass getDeclaringClass();
 
@@ -40,7 +45,10 @@ public interface JNIMethod extends JNIItem {
 
     public String getExclude();
 
-    public void setAccessor(String str);
+    public String getCopy();
 
-    public void setExclude(String str);
+    public String[] getCallbackTypes();
+    public ArgFlag[][] getCallbackFlags();
+
+    public String getCast();
 }

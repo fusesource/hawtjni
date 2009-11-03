@@ -1,12 +1,12 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2007 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -37,15 +36,17 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.xbean.finder.ClassFinder;
 import org.apache.xbean.finder.UrlSet;
 import org.fusesource.hawtjni.generator.model.JNIClass;
-import org.fusesource.hawtjni.generator.model.JNIMethod;
 import org.fusesource.hawtjni.generator.model.ReflectClass;
 import org.fusesource.hawtjni.generator.util.FileSupport;
+import org.fusesource.hawtjni.runtime.ClassFlag;
 import org.fusesource.hawtjni.runtime.JniClass;
-import org.fusesource.hawtjni.runtime.JniStuct;
 
 import static org.fusesource.hawtjni.generator.util.OptionBuilder.*;
 
-
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class HawtJNI {
     public static final String END_YEAR_TAG = "%END_YEAR%";
 
@@ -207,15 +208,8 @@ public class HawtJNI {
         
         if (progress != null) {
             int nativeCount = 0;
-            
             for (JNIClass clazz : natives) {
-                JNIMethod[] methods = clazz.getDeclaredMethods();
-                for (int j = 0; j < methods.length; j++) {
-                    JNIMethod method = methods[j];
-                    if ((method.getModifiers() & Modifier.NATIVE) == 0)
-                        continue;
-                    nativeCount++;
-                }
+                nativeCount += clazz.getNativeMethods().size();
             }
             int total = nativeCount * 4;
             total += natives.size() * (3);
@@ -281,23 +275,23 @@ public class HawtJNI {
             }
         }
         LinkedHashSet<Class<?>> jniClasses = new LinkedHashSet<Class<?>>(); 
-        LinkedHashSet<Class<?>> structClasses = new LinkedHashSet<Class<?>>(); 
         try {
             URLClassLoader classLoader = new URLClassLoader(array(URL.class, urls), JniClass.class.getClassLoader());
             UrlSet urlSet = new UrlSet(classLoader);
             urlSet = urlSet.excludeJavaHome();
             ClassFinder finder = new ClassFinder(classLoader, urlSet.getUrls());
             collectMatchingClasses(finder, JniClass.class, jniClasses);
-            collectMatchingClasses(finder, JniStuct.class, structClasses);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         
         for (Class<?> clazz : jniClasses) {
-            jni.add(new ReflectClass(clazz));
-        }
-        for (Class<?> clazz : structClasses) {
-            structs.add(new ReflectClass(clazz));
+            ReflectClass rc = new ReflectClass(clazz);
+            if( rc.getFlag(ClassFlag.STRUCT) ) {
+                structs.add(rc);
+            } else {
+                jni.add(rc);
+            }
         }
     }
     

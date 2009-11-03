@@ -1,107 +1,132 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2008 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
+import org.fusesource.hawtjni.runtime.ClassFlag;
 import org.fusesource.hawtjni.runtime.JniClass;
 
-public class ReflectClass extends ReflectItem implements JNIClass {
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
+public class ReflectClass implements JNIClass {
     
-    Class<?> clazz;
-    ReflectField[] fields;
-    ReflectMethod[] methods;
-    String sourcePath;
+    private Class<?> clazz;
+    private ArrayList<ReflectField> fields;
+    private ArrayList<ReflectMethod> methods;
+    private JniClass annotation;
+    private HashSet<ClassFlag> flags;
 
     public ReflectClass(Class<?> clazz) {
         this.clazz = clazz;
     }
 
-    void checkMembers() {
-        if (fields != null)
-            return;
-        Field[] fields = clazz.getDeclaredFields();
-        this.fields = new ReflectField[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            this.fields[i] = new ReflectField(this, fields[i]);
-        }
-        Method[] methods = clazz.getDeclaredMethods();
-        this.methods = new ReflectMethod[methods.length];
-        for (int i = 0; i < methods.length; i++) {
-            this.methods[i] = new ReflectMethod(this, methods[i]);
-        }
+    public String toString() {
+        return clazz.toString();
     }
-
     public int hashCode() {
         return clazz.hashCode();
     }
-
     public boolean equals(Object obj) {
         if (!(obj instanceof ReflectClass))
             return false;
         return ((ReflectClass) obj).clazz.equals(clazz);
     }
-
-    public JNIField[] getDeclaredFields() {
-        checkMembers();
-        JNIField[] result = new JNIField[fields.length];
-        System.arraycopy(fields, 0, result, 0, result.length);
-        return result;
+    
+    public Class<?> getWrapedClass() {
+        return clazz;
     }
 
-    public JNIMethod[] getDeclaredMethods() {
-        checkMembers();
-        JNIMethod[] result = new JNIMethod[methods.length];
-        System.arraycopy(methods, 0, result, 0, result.length);
-        return result;
-    }
-
+    ///////////////////////////////////////////////////////////////////
+    // JNIClass interface methods
+    ///////////////////////////////////////////////////////////////////
+    
     public String getName() {
         return clazz.getName();
     }
 
     public JNIClass getSuperclass() {
-        return new ReflectClass((Class<?>) clazz.getSuperclass());
+        return new ReflectClass(clazz.getSuperclass());
     }
-
-    String getSimpleName(Class<?> type) {
-        String name = type.getName();
-        int index = name.lastIndexOf('.') + 1;
-        return name.substring(index, name.length());
-    }
-
+    
     public String getSimpleName() {
-        return getSimpleName(clazz);
+        return clazz.getSimpleName();
+    }
+    
+    public List<JNIField> getDeclaredFields() {
+        lazyLoad();
+        return new ArrayList<JNIField>(fields);
+    }
+
+    public List<JNIMethod> getDeclaredMethods() {
+        lazyLoad();
+        return new ArrayList<JNIMethod>(methods);
+    }
+
+    public List<JNIMethod> getNativeMethods() {
+        ArrayList<JNIMethod> rc = new ArrayList<JNIMethod>();
+        for (JNIMethod method : getDeclaredMethods()) {
+            if ((method.getModifiers() & Modifier.NATIVE) == 0)
+                continue;
+            rc.add(method);
+        }
+        return rc;
     }
 
     public String getExclude() {
-        return (String) getParam("exclude");
+        lazyLoad();
+        return annotation == null ? "" : annotation.exclude();
     }
 
-    public void setExclude(String str) {
-        setParam("exclude", str);
+    public boolean getGenerate() {
+        return !getFlag(ClassFlag.NO_GEN);
+    }
+    
+    public boolean getFlag(ClassFlag flag) {
+        lazyLoad();
+        return flags.contains(flag);
     }
 
+    ///////////////////////////////////////////////////////////////////
+    // Helper methods
+    ///////////////////////////////////////////////////////////////////
 
-    public String toString() {
-        return clazz.toString();
-    }
-
-    public String getInclude() {
-        JniClass annotation = clazz.getAnnotation(JniClass.class);
-        if( annotation==null ) {
-            return null;
+    private void lazyLoad() {
+        if (fields != null)
+            return;
+        
+        this.annotation = this.clazz.getAnnotation(JniClass.class);
+        this.flags = new HashSet<ClassFlag>();
+        if( this.annotation!=null ) {
+            this.flags.addAll(Arrays.asList(this.annotation.flags()));
         }
-        return annotation.include();
+        
+        Field[] fields = clazz.getDeclaredFields();
+        this.fields = new ArrayList<ReflectField>(fields.length);
+        for (Field field : fields) {
+            this.fields.add(new ReflectField(this, field));
+        }
+        Method[] methods = clazz.getDeclaredMethods();
+        this.methods = new ArrayList<ReflectMethod>(methods.length);
+        for (int i = 0; i < methods.length; i++) {
+            this.methods.add(new ReflectMethod(this, methods[i]));
+        }
     }
 
 }

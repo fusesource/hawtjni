@@ -1,57 +1,55 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2008 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
+
+import static org.fusesource.hawtjni.generator.util.TextSupport.cast;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
-import org.fusesource.hawtjni.runtime.Jni;
-import org.fusesource.hawtjni.runtime.JniVT;
+import org.fusesource.hawtjni.runtime.ArgFlag;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.JniMethod;
+import org.fusesource.hawtjni.runtime.MethodFlag;
+import org.fusesource.hawtjni.runtime.T32;
 
-public class ReflectMethod extends ReflectItem implements JNIMethod {
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
+public class ReflectMethod implements JNIMethod {
 
-    Method method;
-    ReflectType returnType32, returnType64;
-    ReflectType[] paramTypes32, paramTypes64;
-    ReflectClass declaringClass;
-    ReflectParameter[] parameters;
-    Boolean unique;
+    private ReflectClass declaringClass;
+    private Method method;
+    
+    private List<JNIType> paramTypes32;
+    private List<JNIType> paramTypes64;
+    private List<JNIParameter> parameters;
+    private boolean unique;
+    private JniMethod annotation;
+
+    private boolean allowConversion;
+    private ReflectType returnType;
+    
+    private HashSet<MethodFlag> flags;
 
     public ReflectMethod(ReflectClass declaringClass, Method method) {
         this.declaringClass = declaringClass;
         this.method = method;
-        
-        this.setJNI(method.getAnnotation(Jni.class));
-        this.setJniVT(method.getAnnotation(JniVT.class));
-        
-        Class<?> returnType = method.getReturnType();
-        Class<?>[] paramTypes = method.getParameterTypes();
-        
-        this.paramTypes32 = new ReflectType[paramTypes.length];
-        this.paramTypes64 = new ReflectType[paramTypes.length];
-        this.parameters = new ReflectParameter[paramTypes.length];
-
-        ReflectType type = new ReflectType(returnType);
-        this.returnType32 = type.asType32(isVariableType());
-        this.returnType64 = type.asType32(isVariableType());
-        
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        for (int i = 0; i < this.paramTypes32.length; i++) {
-            this.parameters[i] = new ReflectParameter(this, i, parameterAnnotations[i]);
-            type = new ReflectType(paramTypes[i]);
-            this.paramTypes32[i] = type.asType32( this.parameters[i].isVariableType() );
-            this.paramTypes64[i] = type.asType64( this.parameters[i].isVariableType() );
-        }
-        
+        lazyLoad();
     }
 
     public int hashCode() {
@@ -64,6 +62,18 @@ public class ReflectMethod extends ReflectItem implements JNIMethod {
         return ((ReflectMethod) obj).method.equals(method);
     }
 
+    public String toString() {
+        return method.toString();
+    }
+    
+    public Method getWrapedMethod() {
+        return method;
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    // JNIMethod interface methods
+    ///////////////////////////////////////////////////////////////////
+
     public JNIClass getDeclaringClass() {
         return declaringClass;
     }
@@ -75,61 +85,134 @@ public class ReflectMethod extends ReflectItem implements JNIMethod {
     public String getName() {
         return method.getName();
     }
-
-    public boolean isNativeUnique() {
-        if (unique != null)
-            return unique.booleanValue();
-        boolean result = true;
-        String name = getName();
-        JNIMethod[] methods = declaringClass.getDeclaredMethods();
-        for (int i = 0; i < methods.length; i++) {
-            JNIMethod mth = methods[i];
-            if ((mth.getModifiers() & Modifier.NATIVE) != 0 && this != mth && !this.equals(mth) && name.equals(mth.getName())) {
-                result = false;
-                break;
-            }
-        }
-        unique = new Boolean(result);
-        return result;
-    }
-
-    public JNIType[] getParameterTypes() {
-        return paramTypes32;
-    }
-
-    public JNIType[] getParameterTypes64() {
-        return paramTypes64;
-    }
-
-    public JNIParameter[] getParameters() {
+    
+    public List<JNIParameter> getParameters() {
+        lazyLoad();
         return parameters;
     }
 
-    public JNIType getReturnType() {
-        return returnType32;
+    public List<JNIType> getParameterTypes() {
+        lazyLoad();
+        return paramTypes32;
+    }
+
+    public List<JNIType> getParameterTypes64() {
+        lazyLoad();
+        return paramTypes64;
+    }
+    
+    public JNIType getReturnType32() {
+        lazyLoad();
+        return returnType.asType32(allowConversion);
     }
 
     public JNIType getReturnType64() {
-        return returnType64;
+        lazyLoad();
+        return returnType.asType64(allowConversion);
+    }
+    
+    public boolean getFlag(MethodFlag flag) {
+        lazyLoad();
+        return flags.contains(flag);
+    }
+
+    public String getCast() {
+        lazyLoad();
+        String rc = annotation == null ? "" : annotation.cast();
+        return cast(rc);
+    }
+
+    public String getCopy() {
+        lazyLoad();
+        return annotation == null ? "" : annotation.copy();
     }
 
     public String getAccessor() {
-        return (String) getParam("accessor");
+        lazyLoad();
+        return annotation == null ? "" : annotation.accessor();
     }
 
     public String getExclude() {
-        return (String) getParam("exclude");
+        lazyLoad();
+        return annotation == null ? "" : annotation.exclude();
+    }
+    
+    public boolean isNativeUnique() {
+        lazyLoad();
+        return unique;
     }
 
-    public void setAccessor(String str) {
-        setParam("accessor", str);
+    public String[] getCallbackTypes() {
+        lazyLoad();
+        if( annotation==null ) {
+            return new String[0];
+        }
+
+        JniArg[] callbackArgs = annotation.callbackArgs();
+        String[] rc = new String[callbackArgs.length];
+        for (int i = 0; i < rc.length; i++) {
+            rc[i] = callbackArgs[i].cast();
+        }
+        
+        return rc;
+    }
+    
+    public ArgFlag[][] getCallbackFlags() {
+        lazyLoad();
+        if( annotation==null ) {
+            return new ArgFlag[0][];
+        }
+        
+        JniArg[] callbackArgs = annotation.callbackArgs();
+        ArgFlag[][] rc = new ArgFlag[callbackArgs.length][];
+        for (int i = 0; i < rc.length; i++) {
+            rc[i] = callbackArgs[i].flags();
+        }
+        return rc;
     }
 
-    public void setExclude(String str) {
-        setParam("exclude", str);
-    }
 
-    public String toString() {
-        return method.toString();
+    ///////////////////////////////////////////////////////////////////
+    // Helper methods
+    ///////////////////////////////////////////////////////////////////
+
+    private void lazyLoad() {
+        if( flags!=null ) {
+            return;
+        }
+        
+        this.annotation = this.method.getAnnotation(JniMethod.class);
+        this.allowConversion = method.getAnnotation(T32.class)!=null;
+        this.flags = new HashSet<MethodFlag>();
+        if( this.annotation!=null ) {
+            this.flags.addAll(Arrays.asList(this.annotation.flags()));
+        }
+        
+        Class<?> returnType = method.getReturnType();
+        Class<?>[] paramTypes = method.getParameterTypes();
+        
+        this.paramTypes32 = new ArrayList<JNIType>(paramTypes.length);
+        this.paramTypes64 = new ArrayList<JNIType>(paramTypes.length);
+        this.parameters = new ArrayList<JNIParameter>(paramTypes.length);
+        this.returnType = new ReflectType(returnType);
+        
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        for (int i = 0; i < paramTypes.length; i++) {
+            ReflectParameter parameter = new ReflectParameter(this, i, parameterAnnotations[i]);
+            this.parameters.add(parameter);
+            this.paramTypes32.add( parameter.getType32() );
+            this.paramTypes64.add( parameter.getType64() );
+        }
+        
+        unique = true;
+        Class<?> parent = ((ReflectClass)declaringClass).getWrapedClass();
+        String name = method.getName();
+        for (Method mth : parent.getDeclaredMethods() ) {
+            if ( (mth.getModifiers()&Modifier.NATIVE) != 0 && method!=mth && !method.equals(mth) && name.equals(mth.getName())) {
+                unique = false;
+                break;
+            }
+        }
+
     }
 }

@@ -1,38 +1,42 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2004, 2008 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
+import static org.fusesource.hawtjni.generator.util.TextSupport.cast;
+
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashSet;
 
-import org.fusesource.hawtjni.runtime.Jni;
-import org.fusesource.hawtjni.runtime.JniVT;
+import org.fusesource.hawtjni.runtime.FieldFlag;
+import org.fusesource.hawtjni.runtime.JniField;
+import org.fusesource.hawtjni.runtime.T32;
 
-public class ReflectField extends ReflectItem implements JNIField {
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
+public class ReflectField implements JNIField {
     
-    ReflectClass parent;
-    Field field;
-    ReflectType type32;
-    ReflectType type64;
+    private ReflectClass parent;
+    private Field field;
+    private ReflectType type;
+    private JniField annotation;
+    private HashSet<FieldFlag> flags;
+    private boolean allowConversion;
 
     public ReflectField(ReflectClass parent, Field field) {
         this.parent = parent;
         this.field = field;
-        Class<?> clazz = field.getType();
-        
-        setJNI(field.getAnnotation(Jni.class));
-        setJniVT(field.getAnnotation(JniVT.class));
-        
-        ReflectType type = new ReflectType(clazz);
-        type32 = type.asType32(isVariableType());
-        type64 = type.asType64(isVariableType());
+        lazyLoad();
     }
 
     public int hashCode() {
@@ -44,6 +48,14 @@ public class ReflectField extends ReflectItem implements JNIField {
             return false;
         return ((ReflectField) obj).field.equals(field);
     }
+    
+    public String toString() {
+        return field.toString();
+    }
+
+    ///////////////////////////////////////////////////////////////////
+    // JNIField interface methods
+    ///////////////////////////////////////////////////////////////////
 
     public JNIClass getDeclaringClass() {
         return parent;
@@ -58,46 +70,44 @@ public class ReflectField extends ReflectItem implements JNIField {
     }
 
     public JNIType getType() {
-        return type32;
+        return type.asType32(allowConversion);
     }
 
     public JNIType getType64() {
-        return type64;
+        return type.asType64(allowConversion);
     }
 
     public String getAccessor() {
-        return (String) getParam("accessor");
+        return annotation == null ? "" : annotation.accessor();
     }
 
     public String getCast() {
-        String cast = ((String) getParam("cast")).trim();
-        if (cast.length() > 0) {
-            if (!cast.startsWith("("))
-                cast = "(" + cast;
-            if (!cast.endsWith(")"))
-                cast = cast + ")";
-        }
-        return cast;
+        String rc = annotation == null ? "" : annotation.cast().trim();
+        return cast(rc);
     }
+
+
 
     public String getExclude() {
-        return (String) getParam("exclude");
+        return annotation == null ? "" : annotation.exclude();
     }
 
-    public void setAccessor(String str) {
-        setParam("accessor", str);
+    public boolean getFlag(FieldFlag flag) {
+        return flags.contains(flag);
     }
 
-    public void setCast(String str) {
-        setParam("cast", str);
+    ///////////////////////////////////////////////////////////////////
+    // Helper methods
+    ///////////////////////////////////////////////////////////////////
+    
+    private void lazyLoad() {
+        this.type = new ReflectType(field.getType());
+        this.annotation = this.field.getAnnotation(JniField.class);
+        this.flags = new HashSet<FieldFlag>();
+        if( this.annotation!=null ) {
+            this.flags.addAll(Arrays.asList(this.annotation.flags()));
+        }
+        
+        allowConversion = this.field.getAnnotation(T32.class)!=null;
     }
-
-    public void setExclude(String str) {
-        setParam("exclude", str);
-    }
-
-    public String toString() {
-        return field.toString();
-    }
-
 }

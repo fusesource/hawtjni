@@ -1,33 +1,54 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2008 IBM Corporation and others.
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Sash;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
+import org.fusesource.hawtjni.generator.MacGenerator;
+import org.fusesource.hawtjni.generator.ProgressMonitor;
+import org.fusesource.hawtjni.generator.HawtJNI.UsageException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.eclipse.swt.*;
-import org.eclipse.swt.custom.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
-import org.fusesource.hawtjni.generator.MacGenerator;
-import org.fusesource.hawtjni.generator.ProgressMonitor;
-import org.fusesource.hawtjni.generator.HawtJNI.UsageException;
-
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class MacGeneratorUI {
 	MacGenerator gen;
 	boolean actions = true;
@@ -415,7 +436,7 @@ public class MacGeneratorUI {
 		cleanup();
 	}
 	
-	ArrayList flatNodes;
+	ArrayList<Node> flatNodes;
 	void searchFor(String name) {
 		TreeItem[] selection = nodesTree.getSelection();
 		Node node = null;
@@ -431,7 +452,7 @@ public class MacGeneratorUI {
 		Document[] documents = gen.getDocuments();
 		if (node == null && documents.length > 0) node = gen.getDocuments()[0];
 		if (flatNodes == null) {
-			flatNodes = new ArrayList();
+			flatNodes = new ArrayList<Node>();
 			for (int i = 0; i < documents.length; i++) {
 				addNodes(documents[i], flatNodes);
 			}
@@ -440,7 +461,7 @@ public class MacGeneratorUI {
 		while (flatNodes.get(index++) != node);		
 		int start = index;
 		while (index < flatNodes.size()) {
-			Node child = (Node)flatNodes.get(index);
+			Node child = flatNodes.get(index);
 			Node attribName = gen.getIDAttribute(child);
 			if (attribName != null && attribName.getNodeValue().matches(name)) {
 				selectNode(child);
@@ -450,7 +471,7 @@ public class MacGeneratorUI {
 		}
 		index = 0;
 		while (index < start) {
-			Node child = (Node)flatNodes.get(index);
+			Node child = flatNodes.get(index);
 			Node attribName = gen.getIDAttribute(child);
 			if (attribName != null && attribName.getNodeValue().matches(name)) {
 				selectNode(child);
@@ -462,7 +483,7 @@ public class MacGeneratorUI {
 	}
 	
 	void selectNode(Node node) {
-		ArrayList path = new ArrayList();
+		ArrayList<Node> path = new ArrayList<Node>();
 		do {
 			path.add(node);
 			node = node.getParentNode();
@@ -471,7 +492,7 @@ public class MacGeneratorUI {
 		Collections.reverse(path);
 		path.remove(0);
 		while (true) {
-			TreeItem item = findItem(items, (Node)path.remove(0));
+			TreeItem item = findItem(items, path.remove(0));
 			if (item == null) return;
 			if (path.isEmpty()) {
 				nodesTree.setSelection(item);
@@ -495,7 +516,7 @@ public class MacGeneratorUI {
 		return null;
 	}
 	
-	void addNodes(Node node, ArrayList list) {
+	void addNodes(Node node, ArrayList<Node> list) {
 		if (node.getNodeType() == Node.TEXT_NODE) return;
 		list.add(node);
 		NodeList children = node.getChildNodes();

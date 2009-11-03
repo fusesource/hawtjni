@@ -1,77 +1,84 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2009 Progress Software, Inc.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
-import java.io.File;
+import static org.fusesource.hawtjni.generator.util.TextSupport.cast;
+
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.HashSet;
 
-import org.fusesource.hawtjni.runtime.Jni;
-import org.fusesource.hawtjni.runtime.JniVT;
+import org.fusesource.hawtjni.runtime.ArgFlag;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.T32;
 
-public class ReflectParameter extends ReflectItem implements JNIParameter {
-    ReflectMethod method;
-
-    int parameter;
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
+public class ReflectParameter implements JNIParameter {
+    
+    private ReflectMethod method;
+    private ReflectType type;
+    private int parameter;
+    
+    private JniArg annotation;
+    private boolean allowConversion;
+    private HashSet<ArgFlag> flags;
 
     public ReflectParameter(ReflectMethod method, int parameter, Annotation[] annotations) {
         this.method = method;
         this.parameter = parameter;
+        this.type = new ReflectType(method.getWrapedMethod().getParameterTypes()[parameter]);
+        this.flags = new HashSet<ArgFlag>();
         if( annotations!=null ) {
             for (Annotation annotation : annotations) {
-                if( annotation instanceof Jni ) {
-                    setJNI((Jni)annotation);
-                } else if( annotation instanceof JniVT ) {
-                    setJniVT((JniVT) annotation);
+                if( annotation instanceof JniArg ) {
+                    this.annotation = (JniArg) annotation;
+                    this.flags.addAll(Arrays.asList(this.annotation.flags()));
+                } else if( annotation instanceof T32 ) {
+                    this.allowConversion = true;
                 }
             }
         }
     }
 
     public String getCast() {
-        String cast = ((String) getParam("cast")).trim();
-        if (cast.length() > 0) {
-            if (!cast.startsWith("("))
-                cast = "(" + cast;
-            if (!cast.endsWith(")"))
-                cast = cast + ")";
-        }
-        return cast;
+        String rc = annotation == null ? "" : annotation.cast();
+        return cast(rc);
     }
 
     public JNIMethod getMethod() {
         return method;
     }
 
-    public JNIClass getTypeClass() {
-        ReflectType type = (ReflectType) getType();
-        ReflectClass declaringClass = method.declaringClass;
-        String sourcePath = declaringClass.sourcePath;
-        sourcePath = new File(sourcePath).getParent() + "/" + type.getSimpleName() + ".java";
-        return new ReflectClass(type.clazz);
+    public boolean getFlag(ArgFlag flag) {
+        return flags.contains(flag);
     }
 
-    public JNIType getType() {
-        return method.getParameterTypes()[parameter];
+    public JNIType getType32() {
+        return type.asType32(allowConversion);
     }
 
     public JNIType getType64() {
-        return method.getParameterTypes64()[parameter];
+        return type.asType64(allowConversion);
+    }
+
+    public JNIClass getTypeClass() {
+        ReflectType type = (ReflectType) getType32();
+        return new ReflectClass(type.getWrappedClass());
     }
 
     public int getParameter() {
         return parameter;
-    }
-
-    public void setCast(String str) {
-        setParam("cast", str);
     }
 
 }

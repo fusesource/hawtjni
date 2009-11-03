@@ -1,12 +1,11 @@
 /*******************************************************************************
+ * Copyright (c) 2009 Progress Software, Inc.
  * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.runtime;
 
@@ -14,6 +13,10 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class Library {
 
     static final String SLASH = System.getProperty("file.separator");
@@ -29,6 +32,10 @@ public class Library {
     String platform;
     int bitModel;
     
+    public Library(String name, int majorVersion, int minorVersion, int revision) {
+        this(name, majorVersion, minorVersion, revision, jvmPlatform(), jvmBitModel());
+    }
+
     public Library(String name, int majorVersion, int minorVersion, int revision, String platform) {
         this(name, majorVersion, minorVersion, revision, platform, jvmBitModel());
     }
@@ -42,6 +49,19 @@ public class Library {
         this.bitModel=bitModel;
     }
 
+    private static String jvmPlatform() {
+        String family = System.getProperty("os.family");
+        if( "mac".equals(family) ) {
+            return "osx";
+        }
+        String name = System.getProperty("os.name");
+        if( "linux".equals(name) ) {
+            return "linux";
+        }
+        return family;
+    }
+    
+    
     private static int jvmBitModel() {
         String prop = System.getProperty("sun.arch.data.model"); 
         if (prop == null) {
@@ -138,8 +158,7 @@ public class Library {
          * Try loading library from the tmp directory if library path is not
          * specified
          */
-        String fileName1 = mappedName1;
-        String fileName2 = mappedName2;
+        String fileName = mappedName1;
         
         /* Try extracting and loading library from the jar */
         if (path == null) {
@@ -153,15 +172,14 @@ public class Library {
             } else {
                 /* fall back to using the tmp directory */
                 if (bitModel==64) {
-                    fileName1 = mapLibraryName(libName1 + SUFFIX_64);
-                    fileName2 = mapLibraryName(libName2 + SUFFIX_64);
+                    fileName = mapLibraryName(libName1 + SUFFIX_64);
                 }
             }
             
             ClassLoader classLoader = Library.class.getClassLoader();
             URL resource = classLoader.getResource(mappedName1);
             if( resource!=null ) {
-                String fullPath = path + SLASH + fileName1;
+                String fullPath = path + SLASH + fileName;
                 File file = new File(fullPath);
                 if( !file.exists() ) {
                     extract(fullPath, resource, reasons);
@@ -172,7 +190,7 @@ public class Library {
             }
             resource = classLoader.getResource(mappedName2);
             if( resource!=null ) {
-                String fullPath = path + SLASH + fileName1;
+                String fullPath = path + SLASH + fileName;
                 File file = new File(fullPath);
                 if( !file.exists() ) {
                     extract(fullPath, resource, reasons);

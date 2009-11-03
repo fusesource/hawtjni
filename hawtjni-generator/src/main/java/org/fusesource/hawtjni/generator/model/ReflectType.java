@@ -1,22 +1,41 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2009 Progress Software, Inc.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
-
-
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class ReflectType implements JNIType {
-    Class<?> clazz;
+    
+    private Class<?> clazz;
 
     public ReflectType(Class<?> clazz) {
         this.clazz = clazz;
+    }
+
+    public int hashCode() {
+        return clazz.hashCode();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof ReflectType))
+            return false;
+        return ((ReflectType) obj).clazz == clazz;
+    }
+    
+    public Class<?> getWrappedClass() {
+        return clazz;
     }
 
     public ReflectType asType32(boolean allowConversion) {
@@ -45,14 +64,6 @@ public class ReflectType implements JNIType {
                 return new ReflectType(double[].class);
         }
         return this;
-    }
-
-    public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (!(obj instanceof ReflectType))
-            return false;
-        return ((ReflectType) obj).clazz == clazz;
     }
 
     public JNIType getComponentType() {
@@ -205,10 +216,6 @@ public class ReflectType implements JNIType {
         }
         String sig = getSimpleName();
         return struct ? sig : sig + " *";
-    }
-
-    public int hashCode() {
-        return clazz.hashCode();
     }
 
     public boolean isArray() {

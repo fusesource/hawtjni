@@ -1,26 +1,27 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2009 Progress Software, Inc.
+ * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package test;
 
-import org.fusesource.hawtjni.runtime.Jni;
+import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
-import org.fusesource.hawtjni.runtime.JniVT;
+import org.fusesource.hawtjni.runtime.JniMethod;
 import org.fusesource.hawtjni.runtime.Library;
+import org.fusesource.hawtjni.runtime.T32;
 
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 @JniClass
 public class Platform {
     
-    public static final String PLATFORM = "osx";
-
-    private static Library library = new Library("hawtjni-example", 1, 0, 0, PLATFORM);
+    private static Library library = new Library("hawtjni-example", 1, 0, 0);
 	static {
 	    library.load();
 	}
@@ -34,12 +35,12 @@ public class Platform {
     }
 
 	
-	@Jni("cast=(JAVA_PTR_CAST)")
-    public static final native @JniVT long malloc (@JniVT long size);
+	@JniMethod(cast="JAVA_PTR_CAST")
+    public static final native @T32 long malloc (@T32 long size);
     
-    public static final native void free (@Jni("cast=(NATIVE_PTR_CAST)") @JniVT long ptr);
+    public static final native void free (@JniArg(cast="NATIVE_PTR_CAST") @T32 long ptr);
     
-    public static final native  @JniVT long open (String file, int flags, int mode);
+    public static final native @T32 long open (String file, int flags, int mode);
     
     
 }

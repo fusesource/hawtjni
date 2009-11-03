@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2009 Progress Software, Inc.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
@@ -16,6 +16,10 @@ import java.util.*;
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIMethod;
 
+/**
+ * 
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public abstract class CleanupClass extends JNIGenerator {
 
     String classSourcePath;
@@ -26,7 +30,7 @@ public abstract class CleanupClass extends JNIGenerator {
     int usedCount, unusedCount;
 
     String[] getArgNames(JNIMethod method) {
-        int n_args = method.getParameters().length;
+        int n_args = method.getParameters().size();
         if (n_args == 0)
             return new String[0];
         String name = method.getName();

@@ -48,6 +48,7 @@
             <id>generate</id>
             <goals>
               <goal>generate</goal>
+              <goal>package</goal>
             </goals>
           </execution>
         </executions>        
@@ -65,7 +66,6 @@
             <configuration>
               
               <transformers>
-
                 <!-- Make an executable jar -->
                 <transformer implementation="org.fusesource.mvnplugins.uberize.transformer.ManifestEditor">
                   <manifestEntries>
@@ -74,7 +74,6 @@
                     <Implementation-Version>${pom.version}</Implementation-Version>
                   </manifestEntries>
                 </transformer>
-
               </transformers>
             </configuration>
           </execution>
@@ -84,70 +83,5 @@
     </plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>mac</id>
-      <activation>
-        <os><family>mac</family></os>
-      </activation>
-      <build>
-        <plugins>
-          
-          <!-- Use the xcode project to build the jni lib -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.1</version>
-            <executions>
-              <execution>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <executable>/usr/bin/xcodebuild</executable>
-                  <workingDirectory>${basedir}</workingDirectory>
-                  <arguments>
-                    <argument>-project</argument>
-                    <argument>${project.artifactId}-osx.xcodeproj</argument>
-                    <argument>-target</argument>
-                    <argument>jnilib</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          
-          <!-- Copy the jni lib in as a resource of the jar (so that the jar can extract the lib) -->
-          <plugin>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>2.4.1</version>
-            <executions>
-              <execution>
-                <id>copy-jni-libs</id>
-                <phase>process-test-sources</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${basedir}/target/classes</outputDirectory>
-                  <resources>          
-                    <resource>
-                      <directory>target/xcode/release</directory>
-                      <includes>
-                        <include>*.jnilib</include>
-                      </includes>
-                      <filtering>false</filtering>
-                    </resource>
-                  </resources>              
-                </configuration>            
-              </execution>
-            </executions>
-          </plugin>
-          
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
   
 </project>

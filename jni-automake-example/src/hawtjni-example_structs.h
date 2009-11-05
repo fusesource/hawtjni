@@ -1,3 +1,0 @@
-
-#include "hawtjni-example.h"
-

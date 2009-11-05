@@ -17,14 +17,9 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-lib_LTLIBRARIES = libhawtjni-example.la
-# libhawtjni-example_la_CFLAGS = 
-# libhawtjni-example_la_LDFLAGS = 
+lib_LTLIBRARIES = lib@PROJECT_NAME@.la
+# lib@PROJECT_NAME_UNDER_SCORE@_la_CFLAGS = 
+# lib@PROJECT_NAME_UNDER_SCORE@_la_LDFLAGS = 
 
-libhawtjni_example_la_SOURCES= \
-	src/hawtjni-example.c \
-  src/hawtjni-example_stats.c \
-  src/hawtjni-example_structs.c \
-  src/hawtjni.c 
-
+lib@PROJECT_NAME_UNDER_SCORE@_la_SOURCES =@PROJECT_SOURCES@
 

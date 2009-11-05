@@ -19,10 +19,10 @@
 ## Initialization macros.
 ## --------------------------------
 AC_PREREQ([2.61])
-AC_INIT([hawtjni-example], [1.0])
+AC_INIT([@PROJECT_NAME@], [@VERSION@])
 AC_CONFIG_AUX_DIR([autotools])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([src/hawtjni-example.c])
+AC_CONFIG_SRCDIR([@FIRST_SOURCE_FILE@])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CANONICAL_HOST
 AC_CANONICAL_SYSTEM
@@ -39,18 +39,11 @@ AC_PROG_INSTALL
 ## API Checks
 ## -----------------------------------------------
 
+# You can do API checks like:
 # AC_CHECK_LIB([c], [main])
 # AC_CHECK_LIB([ncurses], [initscr])
 # AC_CHECK_LIB([pthread], [pthread_create])
 # AC_CHECK_LIB([rt], [aio_suspend])
-# AC_FUNC_MALLOC
-# AC_CHECK_FUNCS([open \
-# close \
-# ])
-# if test "x$debug" = xyes; then
-#   AC_DEFINE([FLM_DEBUG], [], 
-#     [Define to enable FLAIM debug features])
-# fi
 
 WITH_OSX_UNIVERSAL
 WITH_JNI_JDK

@@ -145,7 +145,7 @@ public class PackageMojo extends AbstractMojo {
             File packageFile = new File(new File(project.getBuild().getDirectory()), packageName+".zip");
             archiver.setDestFile( packageFile);
             archiver.setIncludeEmptyDirs(true);
-            archiver.addDirectory(packageDirectory, packageName);
+            archiver.addDirectory(packageDirectory, packageName+"/");
             archiver.createArchive();
             
             projectHelper.attachArtifact( project, "zip", classifier, packageFile );

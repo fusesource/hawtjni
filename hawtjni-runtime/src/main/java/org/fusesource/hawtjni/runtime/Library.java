@@ -9,7 +9,10 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.runtime;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -22,45 +25,55 @@ public class Library {
     static final String SLASH = System.getProperty("file.separator");
 
     static final String SUFFIX_64 = "-64"; 
-    static final String DIR_32 = "hawtjni-lib32";
-    static final String DIR_64 = "hawtjni-lib64";
+    static final String DIR_32 = "lib32";
+    static final String DIR_64 = "lib64";
 
-    String name;
-    int majorVersion = 1;
-    int minorVersion = 0;
-    int revision = 0;
-    String platform;
-    int bitModel;
+    final private String name;
+    final private String version;
+    final private ClassLoader classLoader;
     
-    public Library(String name, int majorVersion, int minorVersion, int revision) {
-        this(name, majorVersion, minorVersion, revision, jvmPlatform(), jvmBitModel());
-    }
-
-    public Library(String name, int majorVersion, int minorVersion, int revision, String platform) {
-        this(name, majorVersion, minorVersion, revision, platform, jvmBitModel());
+    public Library(String name) {
+        this(name, null, null);
     }
     
-    public Library(String name, int majorVersion, int minorVersion, int revision, String platform, int bitModel) {
+    public Library(String name, Class<?> clazz) {
+        this(name, version(clazz), clazz.getClassLoader());
+    }
+    
+    public Library(String name, String version) {
+        this(name, version, null);
+    }
+    
+    public Library(String name, String version, ClassLoader classLoader) {
+        if( name == null ) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
         this.name = name;
-        this.majorVersion = majorVersion;
-        this.minorVersion = minorVersion;
-        this.revision = revision;
-        this.platform = platform;
-        this.bitModel=bitModel;
+        this.version = version;
+        this.classLoader= classLoader;
+    }
+    
+    private static String version(Class<?> clazz) {
+        try {
+            return clazz.getPackage().getImplementationVersion();
+        } catch (Throwable e) {
+        }
+        return null;
     }
 
     private static String jvmPlatform() {
-        String family = System.getProperty("os.family");
-        if( "mac".equals(family) ) {
-            return "osx";
-        }
-        String name = System.getProperty("os.name");
-        if( "linux".equals(name) ) {
+        String name = System.getProperty("os.name").toLowerCase().trim();
+        if( name.startsWith("linux") ) {
             return "linux";
         }
-        return family;
+        if( name.startsWith("mac os x") ) {
+            return "osx";
+        }
+        if( name.startsWith("win") ) {
+            return "windows";
+        }
+        return name.replaceAll("\\W+", "_");
     }
-    
     
     private static int jvmBitModel() {
         String prop = System.getProperty("sun.arch.data.model"); 
@@ -103,109 +116,89 @@ public class Library {
      */
     private void loadLibrary(boolean mapName) {
         
-        int jvmBitModel = jvmBitModel();
-        if ( jvmBitModel > 0 ) {
-            if ( jvmBitModel != bitModel ) { 
-                throw new UnsatisfiedLinkError("Cannot load "+bitModel+"-bit libraries on "+jvmBitModel+"-bit JVM"); 
-            }
+        /* Perhaps a custom version is specified */
+        String version = System.getProperty("lib."+name+".version"); 
+        if (version == null) {
+            version = this.version; 
         }
+        ArrayList<String> errors = new ArrayList<String>();
 
-        /* Compute the library name and mapped name */
-        String libName1, libName2, mappedName1, mappedName2;
-        if (mapName) {
-            String version = System.getProperty(name+".version"); 
-            if (version == null) {
-                version = "" + majorVersion; 
-                /* Force 3 digits in minor version number */
-                if (minorVersion < 10) {
-                    version += "00"; 
-                } else {
-                    if (minorVersion < 100)
-                        version += "0"; 
-                }
-                version += minorVersion;
-                /* No "r" until first revision */
-                if (revision > 0)
-                    version += "r" + revision; 
-            }
-            libName1 = name + "-" + platform + "-" + version;  //$NON-NLS-2$
-            libName2 = name + "-" + platform; 
-            mappedName1 = mapLibraryName(libName1);
-            mappedName2 = mapLibraryName(libName2);
-        } else {
-            libName1 = libName2 = mappedName1 = mappedName2 = name;
-        }
-
-        ArrayList<String> reasons = new ArrayList<String>();
-
-        /* Try loading library from library path */
-        String path = System.getProperty(name+".library.path"); 
-        if (path != null) {
-            path = new File(path).getAbsolutePath();
-            if (load(path + SLASH + mappedName1, reasons))
+        /* Try loading library from a custom library path */
+        String customPath = System.getProperty("lib."+name+".library.path");
+        if (customPath != null) {
+            if( version!=null && load(errors, file(customPath, map(name + "-" + version))) )
                 return;
-            if (mapName && load(path + SLASH + mappedName2, reasons))
+            if( load(errors, file(customPath, map(name))) )
                 return;
         }
 
         /* Try loading library from java library path */
-        if (load(libName1, reasons))
+        if( version!=null && load(errors, file(map(name + "-" + version))) ) 
+            return;        
+        if( load(errors, file(map(name))) )
             return;
-        if (mapName && load(libName2, reasons))
-            return;
-
-        /*
-         * Try loading library from the tmp directory if library path is not
-         * specified
-         */
-        String fileName = mappedName1;
         
-        /* Try extracting and loading library from the jar */
-        if (path == null) {
-            path = System.getProperty("java.io.tmpdir"); 
-            File dir = new File(path, bitModel==64 ? DIR_64 : DIR_32);
-            boolean make = false;
-            if ((dir.exists() && dir.isDirectory()) || (make = dir.mkdir())) {
-                path = dir.getAbsolutePath();
-                if (make)
-                    chmod("777", path); 
-            } else {
-                /* fall back to using the tmp directory */
-                if (bitModel==64) {
-                    fileName = mapLibraryName(libName1 + SUFFIX_64);
-                }
-            }
-            
-            ClassLoader classLoader = Library.class.getClassLoader();
-            URL resource = classLoader.getResource(mappedName1);
-            if( resource!=null ) {
-                String fullPath = path + SLASH + fileName;
-                File file = new File(fullPath);
-                if( !file.exists() ) {
-                    extract(fullPath, resource, reasons);
-                }
-                if( load(fullPath, reasons) ) {
-                    return;
-                }
-            }
-            resource = classLoader.getResource(mappedName2);
-            if( resource!=null ) {
-                String fullPath = path + SLASH + fileName;
-                File file = new File(fullPath);
-                if( !file.exists() ) {
-                    extract(fullPath, resource, reasons);
-                }
-                if( load(fullPath, reasons) ) {
-                    return;
-                }
-            }
+        
+        /* Try extracting the library from the jar */
+        if( classLoader!=null ) {
+            // For cases where you are packing multiple platform native libs into 1 jar
+            String resourcePath = "META-INF/native/"+jvmPlatform()+"/"+jvmBitModel()+"/"+map(name);
+            if( exractAndLoad(errors, version, customPath, resourcePath) ) 
+                return;
+            // For the simpler case where only 1 platform lib is getting packed into the jar
+            resourcePath = "META-INF/native/"+map(name);
+            if( exractAndLoad(errors, version, customPath, resourcePath) )
+                return;
         }
 
         /* Failed to find the library */
-        throw new UnsatisfiedLinkError("Could not load library. Reasons: " + reasons.toString()); 
+        throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
+    }
+    
+    private boolean exractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
+        URL resource = classLoader.getResource(resourcePath);
+        if( resource !=null ) {
+            
+            String libName = name;
+            if( version !=null) {
+                libName += "-" + version;
+            }
+            
+            if( customPath!=null ) {
+                // Try to extract it to the custom path...
+                File target = file(customPath, map(libName));
+                if( extract(errors, resource, target) ) {
+                    if( load(errors, target) ) {
+                        return true;
+                    }
+                }
+            }
+            
+            // Fall back to extracting to the tmp dir
+            customPath = System.getProperty("java.io.tmpdir");
+            File target = file(customPath, map(libName));
+            if( extract(errors, resource, target) ) {
+                if( load(errors, target) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    private String mapLibraryName(String libName) {
+    private File file(String ...paths) {
+        File rc = null ;
+        for (String path : paths) {
+            if( rc == null ) {
+                rc = new File(path);
+            } else {
+                rc = new File(rc, path);
+            }
+        }
+        return rc;
+    }
+    
+    private String map(String libName) {
         /*
          * libraries in the Macintosh use the extension .jnilib but the some
          * VMs map to .dylib.
@@ -218,27 +211,25 @@ public class Library {
         return libName;
     }
 
-    private boolean extract(String fileName, URL resource, ArrayList<String> message) {
+    private boolean extract(ArrayList<String> errors, URL source, File target) {
         FileOutputStream os = null;
         InputStream is = null;
-        File file = new File(fileName);
         boolean extracted = false;
         try {
-            if (!file.exists()) {
-                is = resource.openStream();
+            if (!target.exists()) {
+                is = source.openStream();
                 if (is != null) {
+                    byte[] buffer = new byte[4096];
+                    os = new FileOutputStream(target);
                     extracted = true;
                     int read;
-                    byte[] buffer = new byte[4096];
-                    os = new FileOutputStream(fileName);
                     while ((read = is.read(buffer)) != -1) {
                         os.write(buffer, 0, read);
                     }
                     os.close();
                     is.close();
-                    chmod("755", fileName);
-                    if (load(fileName, message))
-                        return true;
+                    chmod("755", target);
+                    return true;
                 }
             }
         } catch (Throwable e) {
@@ -252,31 +243,32 @@ public class Library {
                     is.close();
             } catch (IOException e1) {
             }
-            if (extracted && file.exists())
-                file.delete();
+            if (extracted && target.exists())
+                target.delete();
+            errors.add(e.getMessage());
         }
         return false;
     }
 
-    private void chmod(String permision, String path) {
-        if (platform.equals("win32"))
+    private void chmod(String permision, File path) {
+        if (jvmPlatform().equals("win32"))
             return; 
         try {
-            Runtime.getRuntime().exec(new String[] { "chmod", permision, path }).waitFor(); 
+            Runtime.getRuntime().exec(new String[] { "chmod", permision, path.getCanonicalPath() }).waitFor(); 
         } catch (Throwable e) {
         }
     }
 
-    private boolean load(String libName, ArrayList<String> reasons) {
+    private boolean load(ArrayList<String> errors, File lib) {
         try {
-            if (libName.indexOf(SLASH) != -1) {
-                System.load(libName);
+            if( lib.isFile() && lib.canRead() ) {
+                System.load(lib.getPath());
             } else {
-                System.loadLibrary(libName);
+                System.loadLibrary(lib.getPath());
             }
             return true;
         } catch (UnsatisfiedLinkError e) {
-            reasons.add(e.getMessage());
+            errors.add(e.getMessage());
         }
         return false;
     }

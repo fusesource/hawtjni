@@ -30,8 +30,10 @@ AC_CANONICAL_SYSTEM
 ## -----------------------------------------------
 ## Application Checks
 ## -----------------------------------------------
+
 LT_PREREQ([2.2])
-LT_INIT([dlopen])
+LT_INIT([disable-static])
+
 AC_PROG_CC
 AC_PROG_INSTALL
 
@@ -50,7 +52,7 @@ WITH_JNI_JDK
 
 CFLAGS="$CFLAGS $JNI_EXTRA_CFLAGS"
 AC_SUBST(CFLAGS)
-LDFLAGS="$LDFLAGS $JNI_EXTRA_LDFLAGS -avoid-version"
+LDFLAGS="$LDFLAGS $JNI_EXTRA_LDFLAGS -release @VERSION@"
 AC_SUBST(LDFLAGS)
 
 ## -----------------------------------------------------

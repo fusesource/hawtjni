@@ -20,7 +20,7 @@ import org.fusesource.hawtjni.runtime.Library;
 @JniClass
 public class Platform {
     
-    private static Library library = new Library("hawtjni-example", 1, 0, 0);
+    private static Library library = new Library("hawtjni-example", Platform.class);    
 	static {
 	    library.load();
 	}

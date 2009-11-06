@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # ---------------------------------------------------------------------------
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,7 +16,7 @@
 # limitations under the License.
 # ---------------------------------------------------------------------------
 
-function auto_clean {
+auto_clean() {
   AUTO_FILES="
   configure config.log config.status 
   autom4te.cache autotools aclocal.m4  libtool  
@@ -29,7 +29,7 @@ function auto_clean {
     rm -Rf $f
   done
 }
-function auto_reconf {
+auto_reconf() {  
   autoreconf --force --install -I m4  
 }
 

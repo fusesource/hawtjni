@@ -36,7 +36,7 @@ import org.fusesource.hawtjni.generator.ProgressMonitor;
  * @phase process-classes
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class GenerateMojo extends AbstractMojo {
+public class GenerateHawtJNIMojo extends AbstractMojo {
 
     /**
      * The maven project.

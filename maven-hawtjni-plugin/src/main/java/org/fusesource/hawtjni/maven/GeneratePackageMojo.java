@@ -45,7 +45,7 @@ import org.codehaus.plexus.util.FileUtils.FilterWrapper;
  * @phase prepare-package
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class PackageMojo extends AbstractMojo {
+public class GeneratePackageMojo extends AbstractMojo {
 
     /**
      * The maven project.

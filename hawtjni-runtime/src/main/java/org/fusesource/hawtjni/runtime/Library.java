@@ -61,21 +61,21 @@ public class Library {
         return null;
     }
 
-    private static String jvmPlatform() {
+    protected String jvmPlatform() {
         String name = System.getProperty("os.name").toLowerCase().trim();
         if( name.startsWith("linux") ) {
-            return "linux";
+            return "linux"+jvmBitModel();
         }
         if( name.startsWith("mac os x") ) {
-            return "osx";
+            return "osx"+jvmBitModel();
         }
         if( name.startsWith("win") ) {
-            return "windows";
+            return "windows"+jvmBitModel();
         }
-        return name.replaceAll("\\W+", "_");
+        return name.replaceAll("\\W+", "_")+jvmBitModel();
     }
     
-    private static int jvmBitModel() {
+    protected static int jvmBitModel() {
         String prop = System.getProperty("sun.arch.data.model"); 
         if (prop == null) {
             prop = System.getProperty("com.ibm.vm.bitmode");
@@ -142,7 +142,7 @@ public class Library {
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
             // For cases where you are packing multiple platform native libs into 1 jar
-            String resourcePath = "META-INF/native/"+jvmPlatform()+"/"+jvmBitModel()+"/"+map(name);
+            String resourcePath = "META-INF/native/"+jvmPlatform()+"/"+map(name);
             if( exractAndLoad(errors, version, customPath, resourcePath) ) 
                 return;
             // For the simpler case where only 1 platform lib is getting packed into the jar
@@ -251,7 +251,7 @@ public class Library {
     }
 
     private void chmod(String permision, File path) {
-        if (jvmPlatform().equals("win32"))
+        if (jvmPlatform().startsWith("windows"))
             return; 
         try {
             Runtime.getRuntime().exec(new String[] { "chmod", permision, path.getCanonicalPath() }).waitFor(); 

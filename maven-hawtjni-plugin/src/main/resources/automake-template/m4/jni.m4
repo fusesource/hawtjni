@@ -42,15 +42,31 @@ AC_DEFUN([WITH_JNI_JDK],
       fi
       CHECK_JNI_JDK([$withval], [], [AC_MSG_ERROR([JDK not found. Invalid --with-jni-jdk PATH])])
     ],[
-      AC_MSG_NOTICE([looking for JDK...])
-      AS_IF(test -n "$JAVA_HOME", [
+
+      if test -n "$JAVA_HOME" ; then 
+        AC_MSG_NOTICE([JAVA_HOME was set, checking to see if it's a JDK we can use...])
         CHECK_JNI_JDK([$JAVA_HOME], [], [])
+      fi
+
+			__JNI_GUESS=`which javac`
+      AS_IF(test -z "$JNI_JDK" && test -n "$__JNI_GUESS", [
+        AC_MSG_NOTICE([javac was on your path, checking to see if it's part of a JDK we can use...])
+			  # transitively resolve the symbolic links to javac
+				while file -h "$__JNI_GUESS" 2>/dev/null | grep " symbolic link to " >/dev/null; do
+				  __JNI_LINK=$( file -h $__JNI_GUESS | sed 's/.*symbolic link to //' | sed "s/'$//" | sed 's/^`//' )
+				  __JNI_GUESS=$(cd $(dirname $__JNI_GUESS); cd $(dirname $__JNI_LINK); echo "$(pwd)/$(basename $__JNI_LINK)")
+				done
+				# move 2 dirs up to the home dir...
+				__JNI_GUESS=$(dirname $(dirname $__JNI_GUESS))
+				CHECK_JNI_JDK([$__JNI_GUESS], [], [],[])
       ],[])
+
       AS_IF(test -z "$JNI_JDK", [
         case "$host_os" in
            darwin*) __JNI_GUESS="/System/Library/Frameworks/JavaVM.framework";;
                  *) __JNI_GUESS="/usr";;
         esac
+        AC_MSG_NOTICE([Taking a guess as to where your OS installs the JDK by default...])
         CHECK_JNI_JDK([$__JNI_GUESS], [], [AC_MSG_ERROR([JDK not found. Please use the --with-jni-jdk option])])
       ],[])
     ])

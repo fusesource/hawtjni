@@ -134,7 +134,7 @@ AC_DEFUN([CHECK_JNI_JDK],[
       AC_SUBST(JNI_JDK)
       AC_SUBST(JNI_EXTRA_CFLAGS)
       case $host_os in
-        *-darwin*)
+        darwin*)
             JNI_EXTRA_LDFLAGS="-shrext .jnilib -dynamiclib" ;;
       esac
       AC_SUBST(JNI_EXTRA_LDFLAGS)

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
-import static org.fusesource.hawtjni.generator.util.TextSupport.cast;
+import static org.fusesource.hawtjni.generator.util.TextSupport.*;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -18,6 +18,7 @@ import java.util.HashSet;
 
 import org.fusesource.hawtjni.runtime.FieldFlag;
 import org.fusesource.hawtjni.runtime.JniField;
+import org.fusesource.hawtjni.runtime.Pointer;
 import org.fusesource.hawtjni.runtime.T32;
 
 /**
@@ -86,7 +87,12 @@ public class ReflectField implements JNIField {
         return cast(rc);
     }
 
-
+    public boolean isPointer() {
+        if( annotation == null ) {
+            return false;
+        }
+        return annotation.pointer() == Pointer.DETERMINE_FROM_CAST ? getCast().endsWith("*)") : annotation.pointer()==Pointer.TRUE;
+    }
 
     public String getExclude() {
         return annotation == null ? "" : annotation.exclude();
@@ -110,4 +116,5 @@ public class ReflectField implements JNIField {
         
         allowConversion = this.field.getAnnotation(T32.class)!=null;
     }
+
 }

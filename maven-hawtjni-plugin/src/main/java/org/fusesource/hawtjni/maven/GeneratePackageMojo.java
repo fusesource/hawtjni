@@ -36,6 +36,11 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.FileUtils.FilterWrapper;
+import org.codehaus.plexus.util.cli.Arg;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.DefaultConsumer;
 
 /**
  * A Maven Mojo that allows you to generate a automake based build package for a
@@ -114,6 +119,27 @@ public class GeneratePackageMojo extends AbstractMojo {
      */
     private String encoding;
 
+    /**
+     * Should we skip executing the autogen.sh file.
+     * 
+     * @parameter default-value="false"
+     */
+    private boolean skipAutogen;
+    
+    /**
+     * Should we force executing the autogen.sh file.
+     * 
+     * @parameter default-value="false"
+     */
+    private boolean forceAutogen;
+    
+    /**
+     * Extra arguments you want to pass to the autogen.sh command.
+     * 
+     * @parameter
+     */
+    private List<Arg> autogenArgs;
+    
     private File targetSrcDir;
 
     public void execute() throws MojoExecutionException {
@@ -139,6 +165,18 @@ public class GeneratePackageMojo extends AbstractMojo {
             copyTemplateResource("autogen.sh", false);
             copyTemplateResource("m4/jni.m4", false);
             copyTemplateResource("m4/osx-universal.m4", false);
+            
+            File configure = new File(packageDirectory, "configure");
+            File autogen = new File(packageDirectory, "autogen.sh");
+            if( autogen.exists() && !skipAutogen ) {
+                if( !autogen.exists() ) {
+                    throw new MojoExecutionException("The autogen file does not exist: "+autogen);
+                }
+                if( !configure.exists() || forceAutogen ) {
+                    chmod("a+x", autogen);
+                    system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
+                }
+            }
             
             String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+classifier;
             Archiver archiver = archiverManager.getArchiver( "zip" );
@@ -220,4 +258,34 @@ public class GeneratePackageMojo extends AbstractMojo {
         };
         return new FilterWrapper[] { wrapper };
     }
+    
+    private void chmod(String permision, File path) {
+        if( !path.canExecute() ) {
+            try {
+                system(path.getParentFile(), new String[] { "chmod", permision, path.getCanonicalPath() });
+            } catch (Throwable e) {
+            }
+        }
+    }
+    
+    private int system(File wd, String[] command) throws CommandLineException {
+        return system(wd, command, null);
+    }
+    
+    private int system(File wd, String[] command, List<Arg> args) throws CommandLineException {
+        Commandline cli = new Commandline();
+        cli.setWorkingDirectory(wd);
+        for (String c : command) {
+            cli.createArg().setValue(c);
+        }
+        if( args!=null ) {
+            for (Arg arg : args) {
+                cli.addArg(arg);
+            }
+        }
+        getLog().info("executing: "+cli);
+        int rc = CommandLineUtils.executeCommandLine(cli, null, new DefaultConsumer(), new DefaultConsumer());
+        getLog().info("rc: "+rc);
+        return rc;
+    }    
 }

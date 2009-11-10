@@ -30,4 +30,6 @@ public interface JNIField {
     public String getAccessor();
     public String getCast();
     public String getExclude();
+
+    public boolean isPointer();
 }

@@ -21,8 +21,11 @@ import static java.lang.annotation.ElementType.*;
 @Target({FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JniField {
+
     String cast() default "";
     String accessor() default "";
     String exclude() default "";
     FieldFlag[] flags() default {};
+    Pointer pointer() default Pointer.DETERMINE_FROM_CAST;
+    
 }

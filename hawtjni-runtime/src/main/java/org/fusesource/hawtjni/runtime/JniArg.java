@@ -21,6 +21,8 @@ import static java.lang.annotation.ElementType.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JniArg {
     
-    String cast() default "";
     ArgFlag[] flags() default {};
+    String cast() default "";
+    Pointer pointer() default Pointer.DETERMINE_FROM_CAST;
+
 }

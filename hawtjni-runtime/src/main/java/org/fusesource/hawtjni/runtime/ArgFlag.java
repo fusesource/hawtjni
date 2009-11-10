@@ -67,13 +67,7 @@ public enum ArgFlag {
      * to be the literal NULL and output a warning if otherwise.
      */
     SENTINEL,
-    
-    /**
-     * Indicate that the native method's parameter is a 
-     * C or C++ pointer
-     */
-    POINTER,
-    
+        
     /**
      * Indicate that the native parameter is a C# managed object.
      */

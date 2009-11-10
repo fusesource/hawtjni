@@ -21,6 +21,7 @@
 #define INC_HAWTJNI_H
 
 #include "jni.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,7 +67,7 @@ extern int IS_JNI_1_2;
 #define F_DArray "[F"
 
 #else
-
+	
 /* int/long defines */
 #define GetIntLongField GetLongField
 #define SetIntLongField SetLongField
@@ -143,8 +144,22 @@ void throwOutOfMemory(JNIEnv *env);
 		return 0; \
 	}
 
+#ifndef JNI64
+	void ** hawtjni_malloc_pointer_array(JNIEnv *env, jlongArray array);
+	void hawtjni_free_pointer_array(JNIEnv *env, jlongArray array, void **elems, jint mode);
+#else
+  #ifdef __cplusplus
+	#define hawtjni_malloc_pointer_array(env, array) ( (void **)(intptr_t)env->GetLongArrayElements(array, NULL) )
+	#define hawtjni_free_pointer_array(env, array, elems, mode) ( env->ReleaseLongArrayElements(array, (jlong*)elems, mode) )
+  #else
+	#define hawtjni_malloc_pointer_array(env, source) ( (void **)(intptr_t)(*env)->GetLongArrayElements(env, source, NULL) )
+	#define hawtjni_free_pointer_array(env, array, elems, mode) ( (*env)->ReleaseLongArrayElements(env, array, (jlong*)elems, mode) )
+  #endif 
+#endif /* JNI64 */
+
 #ifdef __cplusplus
 }
 #endif 
+
 
 #endif /* ifndef INC_HAWTJNI_H */

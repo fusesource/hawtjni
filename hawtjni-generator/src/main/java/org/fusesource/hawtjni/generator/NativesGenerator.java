@@ -273,7 +273,13 @@ public class NativesGenerator extends JNIGenerator {
         if (paramType.isArray()) {
             JNIType componentType = paramType.getComponentType();
             if (componentType.isPrimitive()) {
-                if (critical) {
+                if( "long".equals( componentType.getName() ) && param.isPointer() ) {
+                    // This case is special as we may need to do pointer conversions..
+                    // if your on a 32 bit system but are keeping track of the pointers in a 64 bit long
+                    output("hawtjni_malloc_pointer_array(env, arg");
+                    output(iStr);
+                    output(")");
+                } else if (critical) {
                     if (isCPP) {
                         output("(");
                         output(componentType.getTypeSignature2(!paramType.equals(paramType64)));
@@ -351,7 +357,12 @@ public class NativesGenerator extends JNIGenerator {
             output(") ");
             JNIType componentType = paramType.getComponentType();
             if (componentType.isPrimitive()) {
-                if (critical) {
+                if( "long".equals( componentType.getName() ) && param.isPointer() ) {
+                    // This case is special as we may need to do pointer conversions..
+                    // if your on a 32 bit system but are keeping track of the pointers in a 64 bit long
+                    output("hawtjni_free_pointer_array(env, arg");
+                    output(iStr);
+                } else if (critical) {
                     if (isCPP) {
                         output("env->ReleasePrimitiveArrayCritical(arg");
                     } else {
@@ -464,7 +475,9 @@ public class NativesGenerator extends JNIGenerator {
             output("\t");
             if (paramType.isArray()) {
                 JNIType componentType = paramType.getComponentType();
-                if (componentType.isPrimitive()) {
+                if( "long".equals( componentType.getName() ) && param.isPointer() ) {
+                    output("void **lparg" + i+"=NULL;");
+                } else if (componentType.isPrimitive()) {
                     output(componentType.getTypeSignature2(!paramType.equals(paramType64)));
                     output(" *lparg" + i);
                     output("=NULL;");
@@ -594,6 +607,9 @@ public class NativesGenerator extends JNIGenerator {
                 output(", ");
             JNIParameter param = params.get(i);
             String cast = param.getCast();
+            if( param.isPointer() ) {
+                output("(intptr_t)");
+            }
             boolean isStruct = param.getFlag(ArgFlag.STRUCT);
             if (cast.length() > 2) {
                 cast = cast.substring(1, cast.length() - 1);
@@ -629,6 +645,9 @@ public class NativesGenerator extends JNIGenerator {
 
             String cast = method.getCast();
             if (cast != null) {
+                if( method.isPointer() ) {
+                    output("(intptr_t)");
+                }
                 output(cast);
             } else {
                 output("(");
@@ -658,6 +677,9 @@ public class NativesGenerator extends JNIGenerator {
                 if (param.getFlag(ArgFlag.STRUCT))
                     output("*");
                 output(param.getCast());
+                if( param.isPointer() ) {
+                    output("(intptr_t)");
+                }
                 if (param.getFlag(ArgFlag.CS_OBJECT))
                     output("TO_OBJECT(");
                 if (i == params.size() - 1 && param.getFlag(ArgFlag.SENTINEL)) {
@@ -699,9 +721,13 @@ public class NativesGenerator extends JNIGenerator {
             paramStart = 1;
         } else if (name.equalsIgnoreCase("call")) {
             output("(");
-            String cast = params.get(0).getCast();
+            JNIParameter param = params.get(0);
+            String cast = param.getCast();
             if (cast.length() != 0 && !cast.equals("()")) {
                 output(cast);
+                if( param.isPointer() ) {
+                    output("(intptr_t)");
+                }
             } else {
                 output("(");
                 output(returnType.getTypeSignature2(!returnType.equals(returnType64)));
@@ -736,6 +762,9 @@ public class NativesGenerator extends JNIGenerator {
             String cast = param.getCast();
             if (cast.length() != 0 && !cast.equals("()")) {
                 output(cast);
+                if( param.isPointer() ) {
+                    output("(intptr_t)");
+                }
             }
             if (param.getFlag(ArgFlag.CS_OBJECT)) {
                 output("TO_OBJECT(");
@@ -792,6 +821,9 @@ public class NativesGenerator extends JNIGenerator {
             String cast = param.getCast();
             if (cast.length() != 0 && !cast.equals("()")) {
                 output(cast);
+                if( param.isPointer() ) {
+                    output("(intptr_t)");
+                }
             } else {
                 output("(");
                 output(name.substring(0, name.indexOf("_")));
@@ -894,6 +926,9 @@ public class NativesGenerator extends JNIGenerator {
                 output(", ");
             JNIParameter param = params.get(i);
             String cast = param.getCast();
+            if( param.isPointer() ) {
+                output("(intptr_t)");
+            }
             if (cast != null && cast.length() != 0) {
                 if (cast.startsWith("("))
                     cast = cast.substring(1);

@@ -16,6 +16,7 @@ package org.fusesource.hawtjni.generator.util;
 public class TextSupport {
     
     static public String cast(String cast) {
+        cast = cast.trim();
         if (cast.length() > 0) {
             if (!cast.startsWith("("))
                 cast = "(" + cast;

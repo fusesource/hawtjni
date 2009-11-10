@@ -133,7 +133,15 @@ public abstract class JNIGenerator {
                 buffer.append("_");
                 break;
             default:
-                buffer.append(c);
+                if( 
+                   ('a' <= c && c <= 'z')
+                   || ('A' <= c && c <= 'Z')                        
+                   || ('0' <= c && c <= '9')                        
+                ) { 
+                    buffer.append(c);
+                } else {
+                    buffer.append(String.format("_0%04x",(int)c));
+                }
             }
         }
         return buffer.toString();

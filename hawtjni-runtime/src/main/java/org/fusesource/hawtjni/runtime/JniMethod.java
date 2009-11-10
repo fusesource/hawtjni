@@ -23,6 +23,7 @@ import static java.lang.annotation.ElementType.*;
 public @interface JniMethod {
     
     String cast() default "";
+    Pointer pointer() default Pointer.DETERMINE_FROM_CAST;
     String accessor() default "";
     MethodFlag[] flags() default {};
     String copy() default "";

@@ -313,6 +313,9 @@ public class StructsGenerator extends JNIGenerator {
                 output(accessor);
                 output(" = ");
                 output(field.getCast());
+                if( field.isPointer() ) {
+                    output("(intptr_t)");
+                }
                 if (isCPP) {
                     output("env->Get");
                 } else {
@@ -457,6 +460,8 @@ public class StructsGenerator extends JNIGenerator {
                 outputln("#ifndef _WIN32_WCE");
             }
             JNIType type = field.getType(), type64 = field.getType64();
+            boolean allowConversion = !type.equals(type64);
+            
             String typeName = type.getSimpleName();
             String accessor = field.getAccessor();
             if (accessor == null || accessor.length() == 0)
@@ -467,7 +472,7 @@ public class StructsGenerator extends JNIGenerator {
                 } else {
                     output("\t(*env)->Set");
                 }
-                output(type.getTypeSignature1(!type.equals(type64)));
+                output(type.getTypeSignature1(allowConversion));
                 if (isCPP) {
                     output("Field(lpObject, ");
                 } else {
@@ -476,19 +481,21 @@ public class StructsGenerator extends JNIGenerator {
                 output(field.getDeclaringClass().getSimpleName());
                 output("Fc.");
                 output(field.getName());
-                output(", (");
-                output(type.getTypeSignature2(!type.equals(type64)));
-                output(")lpStruct->");
-                output(accessor);
+                output(", ");
+                output("("+type.getTypeSignature2(allowConversion)+")");
+                if( field.isPointer() ) {
+                    output("(intptr_t)");
+                }
+                output("lpStruct->"+accessor);
                 output(");");
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
                 if (componentType.isPrimitive()) {
                     outputln("\t{");
                     output("\t");
-                    output(type.getTypeSignature2(!type.equals(type64)));
+                    output(type.getTypeSignature2(allowConversion));
                     output(" lpObject1 = (");
-                    output(type.getTypeSignature2(!type.equals(type64)));
+                    output(type.getTypeSignature2(allowConversion));
                     if (isCPP) {
                         output(")env->GetObjectField(lpObject, ");
                     } else {
@@ -517,7 +524,7 @@ public class StructsGenerator extends JNIGenerator {
                         output(")");
                     }
                     output(", (");
-                    output(type.getTypeSignature4(!type.equals(type64), false));
+                    output(type.getTypeSignature4(allowConversion, false));
                     output(")lpStruct->");
                     output(accessor);
                     outputln(");");

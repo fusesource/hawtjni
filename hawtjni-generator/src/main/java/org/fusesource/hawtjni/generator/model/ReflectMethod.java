@@ -24,6 +24,7 @@ import org.fusesource.hawtjni.runtime.ArgFlag;
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniMethod;
 import org.fusesource.hawtjni.runtime.MethodFlag;
+import org.fusesource.hawtjni.runtime.Pointer;
 import org.fusesource.hawtjni.runtime.T32;
 
 /**
@@ -120,6 +121,14 @@ public class ReflectMethod implements JNIMethod {
         lazyLoad();
         String rc = annotation == null ? "" : annotation.cast();
         return cast(rc);
+    }
+
+    public boolean isPointer() {
+        lazyLoad();
+        if( annotation == null ) {
+            return false;
+        }
+        return annotation.pointer() == Pointer.DETERMINE_FROM_CAST ? getCast().endsWith("*)") : annotation.pointer()==Pointer.TRUE;
     }
 
     public String getCopy() {

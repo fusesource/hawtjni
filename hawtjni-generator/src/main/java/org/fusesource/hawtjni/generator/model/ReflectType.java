@@ -75,9 +75,7 @@ public class ReflectType implements JNIType {
     }
 
     public String getSimpleName() {
-        String name = clazz.getName();
-        int index = name.lastIndexOf('.') + 1;
-        return name.substring(index, name.length());
+        return clazz.getSimpleName();
     }
 
     public String getTypeSignature(boolean define) {

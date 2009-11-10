@@ -51,4 +51,6 @@ public interface JNIMethod {
     public ArgFlag[][] getCallbackFlags();
 
     public String getCast();
+    
+    public boolean isPointer();
 }

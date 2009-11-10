@@ -17,16 +17,54 @@ import java.net.URL;
 import java.util.ArrayList;
 
 /**
+ * Used to optionally extract and load a JNI library.
+ * 
+ * It will search for the library in order at the following locations:
+ * <ol>
+ * <li> in the custom library path: If the "library.${name}.path" System property is set to a directory 
+ *   <ol>
+ *   <li> "${name}-${version}" if the version can be determined.
+ *   <li> "${name}"
+ *   </ol>
+ * <li> system library path: This is where the JVM looks for JNI libraries by default.
+ *   <ol>
+ *   <li> "${name}-${version}" if the version can be determined.
+ *   <li> "${name}"
+ *   </ol>
+ * <li> classpath path: If the JNI library can be found on the classpath, it will get extracted
+ * and and then loaded.  This way you can embed your JNI libraries into your packaged JAR files.
+ * They are looked up as resources in this order:
+ *   <ol>
+ *   <li> "META-INF/native/${platform}/${library}" : Store your library here if you want to embed more
+ *   than one platform JNI library in the jar.
+ *   <li> "META-INF/native/${library}": Store your library here if your JAR is only going to embedding one
+ *   platform library.
+ *   </ol>
+ * The file extraction is attempted until it succeeds in the following directories.
+ *   <ol>
+ *   <li> The directory pointed to by the "library.${name}.path" System property (if set)
+ *   <li> a temporary directory (uses the "java.io.tmpdir" System property)
+ *   </ol>
+ * </ol>
+ * 
+ * where: 
+ * <ul>
+ * <li>"${name}" is the name of library
+ * <li>"${version}" is the value of "library.${name}.version" System property if set.
+ *       Otherwise it is set to the ImplementationVersion property of the JAR's Manifest</li> 
+ * <li>"${os}" is your operating system, for example "osx", "linux", or "windows"</li> 
+ * <li>"${bit-model}" is "64" if the JVM process is a 64 bit process, otherwise it's "32" if the 
+ * JVM is a 32 bit process</li> 
+ * <li>"${platform}" is "${os}${bit-model}", for example "linux32" or "osx64" </li> 
+ * <li>"${library}": is the normal jni library name for the platform.  For example "${name}.dll" on
+ *     windows, "lib${name}.jnilib" on OS X, and "lib${name}.so" on linux</li> 
+ * </ul>
  * 
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class Library {
 
     static final String SLASH = System.getProperty("file.separator");
-
-    static final String SUFFIX_64 = "-64"; 
-    static final String DIR_32 = "lib32";
-    static final String DIR_64 = "lib64";
 
     final private String name;
     final private String version;
@@ -117,14 +155,14 @@ public class Library {
     private void loadLibrary(boolean mapName) {
         
         /* Perhaps a custom version is specified */
-        String version = System.getProperty("lib."+name+".version"); 
+        String version = System.getProperty("library."+name+".version"); 
         if (version == null) {
             version = this.version; 
         }
         ArrayList<String> errors = new ArrayList<String>();
 
         /* Try loading library from a custom library path */
-        String customPath = System.getProperty("lib."+name+".library.path");
+        String customPath = System.getProperty("library."+name+".path");
         if (customPath != null) {
             if( version!=null && load(errors, file(customPath, map(name + "-" + version))) )
                 return;
@@ -133,9 +171,9 @@ public class Library {
         }
 
         /* Try loading library from java library path */
-        if( version!=null && load(errors, file(map(name + "-" + version))) ) 
+        if( version!=null && load(errors, name + "-" + version) ) 
             return;        
-        if( load(errors, file(map(name))) )
+        if( load(errors, name ) )
             return;
         
         
@@ -261,11 +299,17 @@ public class Library {
 
     private boolean load(ArrayList<String> errors, File lib) {
         try {
-            if( lib.isFile() && lib.canRead() ) {
-                System.load(lib.getPath());
-            } else {
-                System.loadLibrary(lib.getPath());
-            }
+            System.load(lib.getPath());
+            return true;
+        } catch (UnsatisfiedLinkError e) {
+            errors.add(e.getMessage());
+        }
+        return false;
+    }
+    
+    private boolean load(ArrayList<String> errors, String lib) {
+        try {
+            System.loadLibrary(lib);
             return true;
         } catch (UnsatisfiedLinkError e) {
             errors.add(e.getMessage());

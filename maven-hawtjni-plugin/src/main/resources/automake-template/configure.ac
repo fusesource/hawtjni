@@ -30,12 +30,9 @@ AC_CANONICAL_SYSTEM
 ## -----------------------------------------------
 ## Application Checks
 ## -----------------------------------------------
-
-LT_PREREQ([2.2])
-LT_INIT([disable-static])
-
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL([disable-static])
 
 ## -----------------------------------------------
 ## API Checks

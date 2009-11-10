@@ -178,10 +178,11 @@ public class Platform {
     public static final native int strlen(
             @JniArg(cast="char *")long s);
     
-    public static final native int foo_sizeof ();
     @JniClass(flags={ClassFlag.STRUCT})
     static public class foo {
-        public static final int SIZEOF = Platform.foo_sizeof();
+        
+        public static final native int foo_sizeof ();
+        public static final int SIZEOF = foo_sizeof();
 
         public int a;
         

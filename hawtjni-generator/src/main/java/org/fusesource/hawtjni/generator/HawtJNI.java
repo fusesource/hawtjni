@@ -289,7 +289,8 @@ public class HawtJNI {
             ReflectClass rc = new ReflectClass(clazz);
             if( rc.getFlag(ClassFlag.STRUCT) ) {
                 structs.add(rc);
-            } else {
+            }
+            if( !rc.getNativeMethods().isEmpty() ) {
                 jni.add(rc);
             }
         }

@@ -11,6 +11,8 @@ package test;
 import static org.fusesource.hawtjni.runtime.ArgFlag.CRITICAL;
 import static org.fusesource.hawtjni.runtime.ArgFlag.NO_IN;
 import static org.fusesource.hawtjni.runtime.ArgFlag.NO_OUT;
+import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
 import static org.fusesource.hawtjni.runtime.Pointer.FALSE;
 
 import org.fusesource.hawtjni.runtime.ClassFlag;
@@ -30,14 +32,21 @@ public class Platform {
     private static Library library = new Library("hawtjni-example", Platform.class);    
 	static {
         library.load();
+        init();
 	}
 
     public static final void main(String args[]) {
+
+        System.out.println("Checking Operating System Constants:");
+        System.out.println(" O_RDONLY: "+O_RDONLY);
+        System.out.println(" O_WRONLY: "+O_WRONLY);
+        System.out.println("   O_RDWR: "+O_RDWR);
+        System.out.println("");
+
+        System.out.println("Allocating c structures on the heap...");
         int COUNT = 10;
-        
         // We track memory pointers with longs.
-        long []ptrArray = new long[COUNT];
-        
+        long []ptrArray = new long[COUNT];        
         long last=0;
         for( int i=0; i < COUNT; i++ ) {
             // Allocate heap space of the structure..
@@ -61,19 +70,31 @@ public class Platform {
         }
         
         // Display a couple of structures...
+        System.out.println("Dump of the first 2 structures:");
         print_foo(ptrArray[0]);
         print_foo(ptrArray[1]);
         
-        // Pass a pointer array as an argument.. 
+        System.out.println("Passing a pointer array to a c function...");
         long rc = foowork(ptrArray, COUNT);
-        System.out.println("foowork result: "+rc);
+        System.out.println("Function result (expecting 55): "+rc);
         
         for( int i=0; i < COUNT; i++ ) {
-            // free up allocated memory.
+            System.out.println("freein up allocated memory.");
             free(ptrArray[i]);
         }
     }
 
+    // Example of how to load constants.
+    @JniMethod(flags={CONSTANT_INITIALIZER})
+    private static final native void init();
+
+    @JniField(flags={CONSTANT})
+    public static int O_RDONLY;
+    @JniField(flags={CONSTANT})
+    public static int O_WRONLY;
+    @JniField(flags={CONSTANT})
+    public static int O_RDWR;
+    
     @JniMethod(cast="void *")
     public static final native long malloc(
             @JniArg(cast="size_t") long size);

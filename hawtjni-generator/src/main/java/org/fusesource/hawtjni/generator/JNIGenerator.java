@@ -167,13 +167,17 @@ public abstract class JNIGenerator {
                 break;
             }
         }
+        generate(classes);
+        output.flush();
+    }
+
+    protected void generate(ArrayList<JNIClass> classes) {
         for (JNIClass clazz : classes) {
             if (clazz.getGenerate())
                 generate(clazz);
             if (progress != null)
                 progress.step();
         }
-        output.flush();
     }
 
     public boolean getCPP() {

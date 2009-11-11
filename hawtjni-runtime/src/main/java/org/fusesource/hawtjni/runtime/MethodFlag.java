@@ -32,7 +32,7 @@ public enum MethodFlag {
      * variable instead of a function. This omits () from the generated 
      * code.
      */
-    GLOBAL,
+    CONSTANT,
     
     /**
      * Indicate that the C function should be casted to a prototype 
@@ -101,4 +101,11 @@ public enum MethodFlag {
      * collection.
      */
     ADDER,
+
+    /**
+     * Indicate that this method will be the constant initializer for
+     * the class.  When called, it will set all the static constant fields
+     * to the values defined in your platform.
+     */
+    CONSTANT_INITIALIZER,
 }

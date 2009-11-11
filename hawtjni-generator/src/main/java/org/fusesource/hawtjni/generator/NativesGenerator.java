@@ -10,17 +10,21 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
+import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
+
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
+import org.fusesource.hawtjni.generator.model.JNIField;
 import org.fusesource.hawtjni.generator.model.JNIMethod;
 import org.fusesource.hawtjni.generator.model.JNIParameter;
 import org.fusesource.hawtjni.generator.model.JNIType;
 import org.fusesource.hawtjni.runtime.ArgFlag;
 import org.fusesource.hawtjni.runtime.ClassFlag;
+import org.fusesource.hawtjni.runtime.FieldFlag;
 import org.fusesource.hawtjni.runtime.MethodFlag;
 
 /**
@@ -45,17 +49,6 @@ public class NativesGenerator extends JNIGenerator {
         outputln("#include \"" + outputName + "_structs.h\"");
         outputln("#include \"" + outputName + "_stats.h\"");
         outputln();
-    }
-
-    public void generate(JNIClass clazz, String methodName) {
-        ArrayList<JNIMethod> result = new ArrayList<JNIMethod>();
-        List<JNIMethod> methods = clazz.getDeclaredMethods();
-        for (JNIMethod method : methods) {
-            if (method.getName().startsWith(methodName)) {
-                result.add(method);
-            }
-        }
-        generate(result);
     }
 
     public void generate(JNIClass clazz) {
@@ -174,13 +167,163 @@ public class NativesGenerator extends JNIGenerator {
         outputln(";");
         outputln("}");
     }
+    
+    private void generateConstantsInitializer(JNIMethod method) {
+        JNIClass clazz = method.getDeclaringClass();
+        ArrayList<JNIField> constants = getConstantFields(clazz);
+        if( constants.isEmpty() ) {
+            return;
+        }
+        
+        outputln("JNIEXPORT void JNICALL "+clazz.getSimpleName()+"_NATIVE("+toC(method.getName())+")(JNIEnv *env, jclass that)");
+        outputln("{");
+        outputln("\tjfieldID field;");
+        for (JNIField field : constants) {
 
+            String exclude = field.getExclude();
+            if (exclude.length() != 0) {
+                outputln(exclude);
+            }
+            boolean noWinCE = field.getFlag(FieldFlag.NO_WINCE);
+            if (noWinCE) {
+                outputln("#ifndef _WIN32_WCE");
+            }
+            JNIType type = field.getType(), type64 = field.getType64();
+            boolean allowConversion = !type.equals(type64);
+            
+            String typeName = type.getSimpleName();
+            String accessor = field.getAccessor();
+            if (accessor == null || accessor.length() == 0)
+                accessor = field.getName();
+            
+            output("\tfield = ");
+            if (isCPP) {
+                output("env->GetStaticFieldID(");
+            } else {
+                output("(*env)->GetStaticFieldID(env, ");
+            }
+            outputln("that, \""+field.getName()+"\", \""+type.getTypeSignature(allowConversion)+"\");");
+            
+            if (type.isPrimitive()) {
+                if (isCPP) {
+                    output("\tenv->SetStatic");
+                } else {
+                    output("\t(*env)->SetStatic");
+                }
+                output(type.getTypeSignature1(allowConversion));
+                if (isCPP) {
+                    output("Field(");
+                } else {
+                    output("Field(env, ");
+                }
+                output("that, field, ");
+                output("("+type.getTypeSignature2(allowConversion)+")");
+                if( field.isPointer() ) {
+                    output("(intptr_t)");
+                }
+                output(accessor);
+                output(");");
+                
+            } else if (type.isArray()) {
+                JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
+                if (componentType.isPrimitive()) {
+                    outputln("\t{");
+                    output("\t");
+                    output(type.getTypeSignature2(allowConversion));
+                    output(" lpObject1 = (");
+                    output(type.getTypeSignature2(allowConversion));
+                    if (isCPP) {
+                        output(")env->GetStaticObjectField(that, ");
+                    } else {
+                        output(")(*env)->GetStaticObjectField(env, that, ");
+                    }
+                    output(field.getDeclaringClass().getSimpleName());
+                    output("field");
+                    outputln(");");
+                    if (isCPP) {
+                        output("\tenv->Set");
+                    } else {
+                        output("\t(*env)->Set");
+                    }
+                    output(componentType.getTypeSignature1(!componentType.equals(componentType64)));
+                    if (isCPP) {
+                        output("ArrayRegion(lpObject1, 0, sizeof(");
+                    } else {
+                        output("ArrayRegion(env, lpObject1, 0, sizeof(");
+                    }
+                    output(accessor);
+                    output(")");
+                    if (!componentType.isType("byte")) {
+                        output(" / sizeof(");
+                        output(componentType.getTypeSignature2(!componentType.equals(componentType64)));
+                        output(")");
+                    }
+                    output(", (");
+                    output(type.getTypeSignature4(allowConversion, false));
+                    output(")");
+                    output(accessor);
+                    outputln(");");
+                    output("\t}");
+                } else {
+                    throw new Error("not done");
+                }
+            } else {
+                outputln("\t{");
+                output("\tjobject lpObject1 = (*env)->GetStaticObjectField(env, that, ");
+                output(field.getDeclaringClass().getSimpleName());
+                output("Fc.");
+                output(field.getName());
+                outputln(");");
+                output("\tif (lpObject1 != NULL) set");
+                output(typeName);
+                output("Fields(env, lpObject1, &lpStruct->");
+                output(accessor);
+                outputln(");");
+                output("\t}");
+            }
+            outputln();
+            if (noWinCE) {
+                outputln("#endif");
+            }
+            if (exclude.length() != 0) {
+                outputln("#endif");
+            }
+        }
+        outputln("   return;");
+        outputln("}");
+
+    }
+    
+    private ArrayList<JNIField> getConstantFields(JNIClass clazz) {
+        ArrayList<JNIField> rc = new ArrayList<JNIField>();
+        List<JNIField> fields = clazz.getDeclaredFields();
+        for (JNIField field : fields) {
+            int mods = field.getModifiers();
+            if ((mods & Modifier.PUBLIC) != 0 && (mods & Modifier.STATIC) != 0 && field.getFlag(FieldFlag.CONSTANT)) {
+                rc.add(field);
+            }
+        }
+        return rc;
+    }
+    
     public void generate(JNIMethod method) {
         if (method.getFlag(MethodFlag.NO_GEN))
             return;
+        
         JNIType returnType = method.getReturnType32(), returnType64 = method.getReturnType64();
+
+        if( method.getFlag(CONSTANT_INITIALIZER)) {
+            if( returnType.isType("void") && method.getParameters().isEmpty() ) {
+                generateConstantsInitializer(method);
+            } else {
+                output("#error Warning: invalid CONSTANT_INITIALIZER tagged method. It must be void and take no arguments: ");
+                outputln(method.toString());
+            }
+            return;
+        }
+        
         if (!(returnType.isType("void") || returnType.isPrimitive() || isSystemClass(returnType) || returnType.isType("java.lang.String"))) {
-            output("Warning: bad return type. :");
+            output("#error Warning: bad return type. :");
             outputln(method.toString());
             return;
         }
@@ -664,7 +807,7 @@ public class NativesGenerator extends JNIGenerator {
     }
 
     void generateFunctionCallRightSide(JNIMethod method, List<JNIParameter> params, int paramStart) {
-        if (!method.getFlag(MethodFlag.GLOBAL)) {
+        if (!method.getFlag(MethodFlag.CONSTANT)) {
             output("(");
             if (method.getFlag(MethodFlag.JNI)) {
                 if (!isCPP)

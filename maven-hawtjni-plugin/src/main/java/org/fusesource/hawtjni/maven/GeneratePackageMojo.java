@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -165,6 +166,9 @@ public class GeneratePackageMojo extends AbstractMojo {
             copyTemplateResource("autogen.sh", false);
             copyTemplateResource("m4/jni.m4", false);
             copyTemplateResource("m4/osx-universal.m4", false);
+
+            // To support windows based builds..
+            copyTemplateResource("vs2008.vcproj", true);
             
             File configure = new File(packageDirectory, "configure");
             File autogen = new File(packageDirectory, "autogen.sh");
@@ -199,7 +203,7 @@ public class GeneratePackageMojo extends AbstractMojo {
             if( target.isFile() && target.canRead() ) {
                 return;
             }
-            URL source = getClass().getClassLoader().getResource("automake-template/" + file);
+            URL source = getClass().getClassLoader().getResource("project-template/" + file);
             File tmp = FileUtils.createTempFile("tmp", "txt", new File(project.getBuild().getDirectory()));
             try {
                 FileUtils.copyURLToFile(source, tmp);
@@ -231,6 +235,7 @@ public class GeneratePackageMojo extends AbstractMojo {
         files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.cpp", null, false));
         files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.cxx", null, false));
         String sources = "";
+        String xml_sources = "";
         boolean first = true;
         for (String f : files) {
             if( !first ) {
@@ -240,11 +245,15 @@ public class GeneratePackageMojo extends AbstractMojo {
                 first=false;
             }
             sources += "  src/"+f;
+            
+            xml_sources+="      <File RelativePath=\"src/"+ (f.replace("/", "\\")) +"\"/>\n";
         }
         
         values.put("PROJECT_SOURCES", sources);
+        values.put("PROJECT_XML_SOURCES", xml_sources);
         
         
+
         
         FileUtils.FilterWrapper wrapper = new FileUtils.FilterWrapper() {
             public Reader getReader(Reader reader) {

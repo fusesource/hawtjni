@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -241,18 +240,16 @@ public class GeneratePackageMojo extends AbstractMojo {
             if( !first ) {
                 sources += "\\\n";
             } else {
-                values.put("FIRST_SOURCE_FILE", "src/"+f);
+                values.put("FIRST_SOURCE_FILE", "src/"+f.replace('\\', '/'));
                 first=false;
             }
             sources += "  src/"+f;
             
-            xml_sources+="      <File RelativePath=\"src/"+ (f.replace("/", "\\")) +"\"/>\n";
+            xml_sources+="      <File RelativePath=\".\\src\\"+ (f.replace('/', '\\')) +"\"/>\n";
         }
         
         values.put("PROJECT_SOURCES", sources);
         values.put("PROJECT_XML_SOURCES", xml_sources);
-        
-        
 
         
         FileUtils.FilterWrapper wrapper = new FileUtils.FilterWrapper() {

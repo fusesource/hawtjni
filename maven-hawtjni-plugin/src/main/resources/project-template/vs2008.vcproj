@@ -6,7 +6,7 @@
   
   <Configurations>
   
-    <Configuration Name="Debug|Win32" OutputDirectory="$(ProjectDir)$(ConfigurationName)" IntermediateDirectory="$(ConfigurationName)" ConfigurationType="2" CharacterSet="1">
+    <Configuration Name="debug|Win32" OutputDirectory="$(ProjectDir)$(ConfigurationName)" IntermediateDirectory="$(ConfigurationName)" ConfigurationType="2" CharacterSet="1">
       <Tool Name="VCPreBuildEventTool"/>
       <Tool Name="VCCustomBuildTool"/>
       <Tool Name="VCXMLDataGeneratorTool"/>
@@ -33,7 +33,7 @@
       <Tool Name="VCPostBuildEventTool"/>
     </Configuration>
     
-    <Configuration Name="Release|Win32" OutputDirectory="$(ProjectDir)$(ConfigurationName)" IntermediateDirectory="$(ConfigurationName)" ConfigurationType="2" CharacterSet="1" WholeProgramOptimization="1">
+    <Configuration Name="release|Win32" OutputDirectory="$(ProjectDir)$(ConfigurationName)" IntermediateDirectory="$(ConfigurationName)" ConfigurationType="2" CharacterSet="1" WholeProgramOptimization="1">
       <Tool Name="VCPreBuildEventTool"/>
       <Tool Name="VCCustomBuildTool"/>
       <Tool Name="VCXMLDataGeneratorTool"/>

@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 void print_foo(struct foo *arg) {
-   printf("foo@%p: { a: %d, b: %zd, c: \"%s\", prev: @%p}\n", arg, arg->a, arg->b, arg->c, arg->prev); 
+   printf("foo@%p: { a: %d, b: %d, c: \"%s\", prev: @%p}\n", arg, arg->a, (int)arg->b, arg->c, arg->prev);
 }
 
 long foowork(struct foo **arg, int count) {

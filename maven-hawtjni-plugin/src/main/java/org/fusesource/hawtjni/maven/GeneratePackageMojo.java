@@ -160,6 +160,7 @@ public class GeneratePackageMojo extends AbstractMojo {
                 FileUtils.copyDirectoryStructure(resources, packageDirectory);
             }
             
+            copyTemplateResource("readme.md", false);
             copyTemplateResource("configure.ac", true);
             copyTemplateResource("Makefile.am", true);
             copyTemplateResource("autogen.sh", false);

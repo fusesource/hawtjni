@@ -248,6 +248,11 @@ public class HawtJNI {
         progress("Generating: "+file);
         generateFromResource("hawtjni.c", file);
 
+        file = new File(nativeOutput, "windows");
+        file.mkdirs();
+        file = new File(file, "stdint.h");
+        progress("Generating: "+file);
+        generateFromResource("windows/stdint.h", file);
         
         progress("Done.");
     }

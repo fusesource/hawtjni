@@ -179,19 +179,29 @@ public class Library {
         
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
-            // For cases where you are packing multiple platform native libs into 1 jar
-            String resourcePath = "META-INF/native/"+jvmPlatform()+"/"+map(name);
-            if( exractAndLoad(errors, version, customPath, resourcePath) ) 
+            if( exractAndLoad(errors, version, customPath, getPlatformSpecifcResorucePath()) ) 
                 return;
             // For the simpler case where only 1 platform lib is getting packed into the jar
-            resourcePath = "META-INF/native/"+map(name);
-            if( exractAndLoad(errors, version, customPath, resourcePath) )
+            if( exractAndLoad(errors, version, customPath, getResorucePath()) )
                 return;
         }
 
         /* Failed to find the library */
         throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
     }
+
+    public String getPlatformSpecifcResorucePath() {
+        return "META-INF/native/"+jvmPlatform()+"/"+map(name);
+    }
+
+    public String getResorucePath() {
+        return "META-INF/native/"+map(name);
+    }
+
+    public String getLibraryFileName() {
+        return map(name);
+    }
+
     
     private boolean exractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
         URL resource = classLoader.getResource(resourcePath);

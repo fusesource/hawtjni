@@ -32,11 +32,11 @@ import org.fusesource.hawtjni.generator.ProgressMonitor;
 /**
  * A Maven Mojo that allows you to generate JNI code using HawtJNI.
  * 
- * @goal generate
+ * @goal source-generate
  * @phase process-classes
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class GenerateHawtJNIMojo extends AbstractMojo {
+public class HawtJNIGenerateMojo extends AbstractMojo {
 
     /**
      * The maven project.
@@ -48,12 +48,11 @@ public class GenerateHawtJNIMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
-     * The directory where the generated native files will be placed.
+     * The directory where the generated native source files are located.
      * 
-     * @parameter default-value=
-     *            "${project.build.directory}/generated-sources/hawtjni/native"
+     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-src"
      */
-    private File nativeOutput;
+    private File generatedNativeSourceDirectory;
 
     /**
      * The base name of the library, used to determine generated file names.
@@ -98,7 +97,7 @@ public class GenerateHawtJNIMojo extends AbstractMojo {
         generator.setClasspaths(getClasspath());
         generator.setName(name);
         generator.setCopyright(copyright);
-        generator.setNativeOutput(nativeOutput);
+        generator.setNativeOutput(generatedNativeSourceDirectory);
         generator.setPackages(packages);
         generator.setProgress(new ProgressMonitor() {
             public void step() {

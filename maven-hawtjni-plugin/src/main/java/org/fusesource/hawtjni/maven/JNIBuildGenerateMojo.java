@@ -28,9 +28,6 @@ import java.util.Map;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-import org.codehaus.plexus.archiver.Archiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
@@ -46,11 +43,11 @@ import org.codehaus.plexus.util.cli.DefaultConsumer;
  * A Maven Mojo that allows you to generate a automake based build package for a
  * JNI module.
  * 
- * @goal package
- * @phase prepare-package
+ * @goal build-generate
+ * @phase process-classes
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class GeneratePackageMojo extends AbstractMojo {
+public class JNIBuildGenerateMojo extends AbstractMojo {
 
     /**
      * The maven project.
@@ -62,42 +59,6 @@ public class GeneratePackageMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
-     * @component
-     * @required
-     * @readonly
-     */
-    private ArchiverManager archiverManager;
-    
-    /**
-     * @component
-     * @required
-     * @readonly
-     */
-    private MavenProjectHelper projectHelper;    
-    
-    /**
-     * The directory where the generated native files are located..
-     * 
-     * @parameter default-value="${project.build.directory}/native-package"
-     */
-    private File packageDirectory;
-    
-    /**
-     * The classifier of the package archive that will be created.
-     * 
-     * @parameter default-value="native-src"
-     */
-    private String classifier;
-    
-
-    /**
-     * The directory where the generated native files are located..
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native"
-     */
-    private File nativeSrc;
-
-    /**
      * The base name of the library, used to determine generated file names.
      * 
      * @parameter default-value="${project.artifactId}"
@@ -105,12 +66,26 @@ public class GeneratePackageMojo extends AbstractMojo {
     private String name;
 
     /**
+     * The directory where the generated build package is located..
+     * 
+     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-package"
+     */
+    private File packageDirectory;
+    
+    /**
+     * The directory where the generated native source files are located.
+     * 
+     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-src"
+     */
+    private File generatedNativeSourceDirectory;
+
+    /**
      * The list of additional files to be included in the package will be
      * placed.
      * 
      * @parameter default-value="${basedir}/src/main/native-package"
      */
-    private File resources;
+    private File customPackageDirectory;
 
     /**
      * The text encoding of the files.
@@ -152,12 +127,12 @@ public class GeneratePackageMojo extends AbstractMojo {
             targetSrcDir = new File(packageDirectory, "src");
             targetSrcDir.mkdirs();
 
-            if( nativeSrc!=null && nativeSrc.isDirectory() ) {
-                FileUtils.copyDirectoryStructure(nativeSrc, targetSrcDir);
+            if( generatedNativeSourceDirectory!=null && generatedNativeSourceDirectory.isDirectory() ) {
+                FileUtils.copyDirectoryStructure(generatedNativeSourceDirectory, targetSrcDir);
             }
             
-            if( resources!=null && resources.isDirectory() ) {
-                FileUtils.copyDirectoryStructure(resources, packageDirectory);
+            if( customPackageDirectory!=null && customPackageDirectory.isDirectory() ) {
+                FileUtils.copyDirectoryStructure(customPackageDirectory, packageDirectory);
             }
             
             copyTemplateResource("readme.md", false);
@@ -181,16 +156,6 @@ public class GeneratePackageMojo extends AbstractMojo {
                     system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
                 }
             }
-            
-            String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+classifier;
-            Archiver archiver = archiverManager.getArchiver( "zip" );
-            File packageFile = new File(new File(project.getBuild().getDirectory()), packageName+".zip");
-            archiver.setDestFile( packageFile);
-            archiver.setIncludeEmptyDirs(true);
-            archiver.addDirectory(packageDirectory, packageName+"/");
-            archiver.createArchive();
-            
-            projectHelper.attachArtifact( project, "zip", classifier, packageFile );
             
         } catch (Exception e) {
             throw new MojoExecutionException("packageing failed: "+e, e);

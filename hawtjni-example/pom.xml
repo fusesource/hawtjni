@@ -45,10 +45,11 @@
         <version>1.0-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>generate</id>
             <goals>
-              <goal>generate</goal>
-              <goal>package</goal>
+              <goal>source-generate</goal>
+              <goal>build-generate</goal>
+              <goal>build-make</goal>
+              <goal>build-package</goal>
             </goals>
             <configuration>
               <copyright><![CDATA[

@@ -19,25 +19,38 @@ package org.fusesource.hawtjni.maven;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.cli.Arg;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.DefaultConsumer;
+import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.fusesource.hawtjni.runtime.Library;
 
 /**
  * A Maven Mojo that allows you to build an automake based package.
  * 
  * @goal build-make
- * @phase process-classes
+ * @phase generate-test-resources
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class JNIBuildMakeMojo extends AbstractMojo {
+
+    /**
+     * The maven project.
+     * 
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    protected MavenProject project;
 
     /**
      * The base name of the library, used to determine generated file names.
@@ -54,10 +67,9 @@ public class JNIBuildMakeMojo extends AbstractMojo {
     private File packageDirectory;
 
     /**
-     * The output directory where the built JNI library will placed.  This defaults
-     * to the test classes directory so that the JNI library can be tested.
+     * The output directory where the built JNI library will placed.
      * 
-     * @parameter default-value="${project.build.testOutputDirectory}"
+     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/classes"
      */
     private File classesDirectory;
 
@@ -105,6 +117,13 @@ public class JNIBuildMakeMojo extends AbstractMojo {
     private boolean forceConfigure;
     
     /**
+     * Should we display all the native build output?
+     * 
+     * @parameter default-value="false"
+     */
+    private boolean verbose;
+
+    /**
      * Extra arguments you want to pass to the configure command.
      * 
      * @parameter
@@ -119,6 +138,12 @@ public class JNIBuildMakeMojo extends AbstractMojo {
             } else {
                 configureBasedBuild(pd);
             }
+            
+            getLog().info("Adding test resource root: "+classesDirectory.getAbsolutePath());
+            Resource testResource = new Resource();
+            testResource.setDirectory(classesDirectory.getAbsolutePath());
+            this.project.addTestResource(testResource); //();
+            
         } catch (Exception e) {
             throw new MojoExecutionException("make failed: "+e, e);
         } 
@@ -213,8 +238,42 @@ public class JNIBuildMakeMojo extends AbstractMojo {
             }
         }
         getLog().info("executing: "+cli);
-        int rc = CommandLineUtils.executeCommandLine(cli, null, new DefaultConsumer(), new DefaultConsumer());
-        getLog().info("rc: "+rc);
+        
+        StreamConsumer consumer = new StreamConsumer() {
+            public void consumeLine(String line) {
+                getLog().info(line);
+            }
+        };
+        if( !verbose ) {
+            consumer = new StringStreamConsumer();
+        }
+        int rc = CommandLineUtils.executeCommandLine(cli, null, consumer, consumer);
+        if( rc!=0 ) {
+            if( !verbose ) {
+                // We only display output if the command fails..
+                String output = ((StringStreamConsumer)consumer).getOutput();
+                if( output.length()>0 ) {
+                    String nl = System.getProperty( "line.separator");
+                    String[] lines = output.split(Pattern.quote(nl));
+                    for (String line : lines) {
+                        getLog().info(line);
+                    }
+                }
+            }
+            getLog().info("rc: "+rc);
+        } else {
+            if( !verbose ) {
+                String output = ((StringStreamConsumer)consumer).getOutput();
+                if( output.length()>0 ) {
+                    String nl = System.getProperty( "line.separator");
+                    String[] lines = output.split(Pattern.quote(nl));
+                    for (String line : lines) {
+                        getLog().debug(line);
+                    }
+                }
+            }
+            getLog().debug("rc: "+rc);
+        }
         return rc;
     }
 }

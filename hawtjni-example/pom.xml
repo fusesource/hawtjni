@@ -35,10 +35,32 @@
       <artifactId>hawtjni-runtime</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>      
+      <scope>test</scope>
+    </dependency>
+        
   </dependencies>
   
   <build>
     <plugins>
+      
+      <!-- the older clean plugin has trouble deleting directories with symlinks in them -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.3</version>
+      </plugin>
+        
       <plugin>
         <groupId>org.fusesource.hawtjni</groupId>
         <artifactId>maven-hawtjni-plugin</artifactId>

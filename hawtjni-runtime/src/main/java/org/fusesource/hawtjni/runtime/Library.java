@@ -69,6 +69,7 @@ public class Library {
     final private String name;
     final private String version;
     final private ClassLoader classLoader;
+    private boolean loaded;
     
     public Library(String name) {
         this(name, null, null);
@@ -125,35 +126,17 @@ public class Library {
     }
 
     /**
-     * Loads the shared library that matches the version of the Java code which
-     * is currently running. shared libraries follow an encoding scheme
-     * where the major, minor and revision numbers are embedded in the library
-     * name and this along with <code>name</code> is used to load the library.
-     * If this fails, <code>name</code> is used in another attempt to load the
-     * library, this time ignoring the version encoding scheme.
      * 
-     * @param name
-     *            the name of the library to load
      */
-    public void load() {
-        loadLibrary(true);
+    synchronized public void load() {
+        if( loaded ) {
+            return;
+        }
+        doLoad();
+        loaded = true;
     }
-
-    /**
-     * Loads the shared library that matches the version of the Java code which
-     * is currently running. shared libraries follow an encoding scheme
-     * where the major, minor and revision numbers are embedded in the library
-     * name and this along with <code>name</code> is used to load the library.
-     * If this fails, <code>name</code> is used in another attempt to load the
-     * library, this time ignoring the version encoding scheme.
-     * 
-     * @param name
-     *            the name of the library to load
-     * @param mapName
-     *            true if the name should be mapped, false otherwise
-     */
-    private void loadLibrary(boolean mapName) {
-        
+    
+    private void doLoad() {
         /* Perhaps a custom version is specified */
         String version = System.getProperty("library."+name+".version"); 
         if (version == null) {
@@ -164,7 +147,7 @@ public class Library {
         /* Try loading library from a custom library path */
         String customPath = System.getProperty("library."+name+".path");
         if (customPath != null) {
-            if( version!=null && load(errors, file(customPath, map(name + "-" + version))) )
+            if( version!=null && load(errors, file(customPath, map(name + "-" + version))) ) 
                 return;
             if( load(errors, file(customPath, map(name))) )
                 return;
@@ -190,15 +173,15 @@ public class Library {
         throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
     }
 
-    public String getPlatformSpecifcResorucePath() {
+    final public String getPlatformSpecifcResorucePath() {
         return "META-INF/native/"+jvmPlatform()+"/"+map(name);
     }
 
-    public String getResorucePath() {
+    final public String getResorucePath() {
         return "META-INF/native/"+map(name);
     }
 
-    public String getLibraryFileName() {
+    final public String getLibraryFileName() {
         return map(name);
     }
 
@@ -262,14 +245,14 @@ public class Library {
     private boolean extract(ArrayList<String> errors, URL source, File target) {
         FileOutputStream os = null;
         InputStream is = null;
-        boolean extracted = false;
+        boolean extracting = false;
         try {
-            if (!target.exists()) {
+            if (!target.exists() || isStale(source, target) ) {
                 is = source.openStream();
                 if (is != null) {
                     byte[] buffer = new byte[4096];
                     os = new FileOutputStream(target);
-                    extracted = true;
+                    extracting = true;
                     int read;
                     while ((read = is.read(buffer)) != -1) {
                         os.write(buffer, 0, read);
@@ -277,7 +260,6 @@ public class Library {
                     os.close();
                     is.close();
                     chmod("755", target);
-                    return true;
                 }
             }
         } catch (Throwable e) {
@@ -291,9 +273,23 @@ public class Library {
                     is.close();
             } catch (IOException e1) {
             }
-            if (extracted && target.exists())
+            if (extracting && target.exists())
                 target.delete();
             errors.add(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isStale(URL source, File target) {
+        File sourceFile=null;
+        if( source.getProtocol().equals("file") ) {
+            sourceFile = new File(source.getFile());
+        }
+        if( sourceFile!=null && sourceFile.exists() ) {
+            if( sourceFile.lastModified() > target.lastModified() ) {
+                return true;
+            }
         }
         return false;
     }

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,7 +38,8 @@ import org.codehaus.plexus.util.cli.Arg;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.DefaultConsumer;
+import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 
 /**
  * A Maven Mojo that allows you to generate a automake based build package for a
@@ -107,7 +109,14 @@ public class JNIBuildGenerateMojo extends AbstractMojo {
      * @parameter default-value="false"
      */
     private boolean forceAutogen;
-    
+
+    /**
+     * Should we display all the native build output?
+     * 
+     * @parameter default-value="false"
+     */
+    private boolean verbose;
+
     /**
      * Extra arguments you want to pass to the autogen.sh command.
      * 
@@ -256,8 +265,42 @@ public class JNIBuildGenerateMojo extends AbstractMojo {
             }
         }
         getLog().info("executing: "+cli);
-        int rc = CommandLineUtils.executeCommandLine(cli, null, new DefaultConsumer(), new DefaultConsumer());
-        getLog().info("rc: "+rc);
+        
+        StreamConsumer consumer = new StreamConsumer() {
+            public void consumeLine(String line) {
+                getLog().info(line);
+            }
+        };
+        if( !verbose ) {
+            consumer = new StringStreamConsumer();
+        }
+        int rc = CommandLineUtils.executeCommandLine(cli, null, consumer, consumer);
+        if( rc!=0 ) {
+            if( !verbose ) {
+                // We only display output if the command fails..
+                String output = ((StringStreamConsumer)consumer).getOutput();
+                if( output.length()>0 ) {
+                    String nl = System.getProperty( "line.separator");
+                    String[] lines = output.split(Pattern.quote(nl));
+                    for (String line : lines) {
+                        getLog().info(line);
+                    }
+                }
+            }
+            getLog().info("rc: "+rc);
+        } else {
+            if( !verbose ) {
+                String output = ((StringStreamConsumer)consumer).getOutput();
+                if( output.length()>0 ) {
+                    String nl = System.getProperty( "line.separator");
+                    String[] lines = output.split(Pattern.quote(nl));
+                    for (String line : lines) {
+                        getLog().debug(line);
+                    }
+                }
+            }
+            getLog().debug("rc: "+rc);
+        }
         return rc;
-    }    
+    }
 }

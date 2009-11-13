@@ -17,28 +17,20 @@
 package org.fusesource.hawtjni.maven;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Pattern;
 
-import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.cli.Arg;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.StreamConsumer;
-import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
-import org.fusesource.hawtjni.runtime.Library;
+import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.archiver.Archiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
 /**
- * A Maven Mojo that allows you to build an automake based package.
+ * A Maven Mojo that allows you to generate a automake based build package for a
+ * JNI module.
  * 
- * @goal build-make
- * @phase generate-test-resources
+ * @goal build-package
+ * @phase package
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class JNIBuildPackageMojo extends AbstractMojo {
@@ -53,227 +45,47 @@ public class JNIBuildPackageMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
-     * The base name of the library, used to determine generated file names.
-     * 
-     * @parameter default-value="${project.artifactId}"
+     * @component
+     * @required
+     * @readonly
      */
-    private String name;
+    private ArchiverManager archiverManager;
     
     /**
-     * Where the build package is located.
+     * @component
+     * @required
+     * @readonly
+     */
+    private MavenProjectHelper projectHelper;    
+    
+    /**
+     * The directory where the generated native files are located..
      * 
      * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-package"
      */
     private File packageDirectory;
-
-    /**
-     * The output directory where the built JNI library will placed.
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/classes"
-     */
-    private File classesDirectory;
-
-    /**
-     * The directory where the build will be produced.  It creates a native-build and native-dist directory
-     * under the specified directory.
-     * 
-     * @parameter default-value="${project.build.directory}"
-     */
-    private File buildDirectory;
-
-    /**
-     * Should we skip executing the autogen.sh file.
-     * 
-     * @parameter default-value="false"
-     */
-    private boolean skipAutogen;
     
     /**
-     * Should we force executing the autogen.sh file.
+     * The classifier of the package archive that will be created.
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="native-src"
      */
-    private boolean forceAutogen;
+    private String sourceClassifier;
     
-    /**
-     * Extra arguments you want to pass to the autogen.sh command.
-     * 
-     * @parameter
-     */
-    private List<Arg> autogenArgs;
-
-    /**
-     * Should we skip executing the configure command.
-     * 
-     * @parameter default-value="false"
-     */
-    private boolean skipConfigure;
-
-    /**
-     * Should we force executing the configure command.
-     * 
-     * @parameter default-value="false"
-     */
-    private boolean forceConfigure;
-    
-    /**
-     * Should we display all the native build output?
-     * 
-     * @parameter default-value="false"
-     */
-    private boolean verbose;
-
-    /**
-     * Extra arguments you want to pass to the configure command.
-     * 
-     * @parameter
-     */
-    private List<Arg> configureArgs;
-
     public void execute() throws MojoExecutionException {
         try {
-            File pd = new File(buildDirectory, "native-build");
-            if ( isWindows() ) {
-                throw new MojoExecutionException("Windows builds not supported yet.");
-            } else {
-                configureBasedBuild(pd);
-            }
-            
-            getLog().info("Adding test resource root: "+classesDirectory.getAbsolutePath());
-            Resource testResource = new Resource();
-            testResource.setDirectory(classesDirectory.getAbsolutePath());
-            this.project.addTestResource(testResource); //();
+            String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+sourceClassifier;
+            Archiver archiver = archiverManager.getArchiver( "zip" );
+            File packageFile = new File(new File(project.getBuild().getDirectory()), packageName+".zip");
+            archiver.setDestFile( packageFile);
+            archiver.setIncludeEmptyDirs(true);
+            archiver.addDirectory(packageDirectory, packageName+"/");
+            archiver.createArchive();
+            projectHelper.attachArtifact( project, "zip", sourceClassifier, packageFile );
             
         } catch (Exception e) {
-            throw new MojoExecutionException("make failed: "+e, e);
+            throw new MojoExecutionException("packageing failed: "+e, e);
         } 
     }
 
-    private void configureBasedBuild(File buildDir) throws IOException, MojoExecutionException, CommandLineException {
-        File distDirectory = new File(buildDirectory, "native-dist");
-        File configure = new File(buildDir, "configure");
-        File autogen = new File(buildDir, "autogen.sh");
-        File makefile = new File(buildDir, "Makefile");
-
-        new File(distDirectory, "lib").mkdirs();
-        FileUtils.copyDirectoryStructure(packageDirectory, buildDir);
-        
-        if( autogen.exists() && !skipAutogen ) {
-            if( !autogen.exists() ) {
-                throw new MojoExecutionException("The autogen file does not exist: "+autogen);
-            }
-            if( !configure.exists() || forceAutogen ) {
-                chmod("a+x", autogen);
-                int rc = system(buildDir, new String[] {"./autogen.sh"}, autogenArgs);
-                if( rc != 0 ) {
-                    throw new MojoExecutionException("./autogen.sh failed with exit code: "+rc);
-                }
-            }
-        }
-        
-        if( configure.exists() && !skipConfigure ) {
-            if( !configure.exists() ) {
-                throw new MojoExecutionException("The configure file does not exist: "+configure);
-            }
-            if( !makefile.exists() || forceConfigure ) {
-                chmod("a+x", configure);
-                int rc = system(buildDir, new String[]{"./configure", "--disable-ccache", "--prefix="+distDirectory.getCanonicalPath()}, configureArgs);
-                if( rc != 0 ) {
-                    throw new MojoExecutionException("./configure failed with exit code: "+rc);
-                }
-            }
-        }
-        
-        
-        File autotools = new File(buildDir, "autotools");
-        File[] listFiles = autotools.listFiles();
-        if( listFiles!=null ) {
-            for (File file : listFiles) {
-                chmod("a+x", file);
-            }
-        }
-        
-        int rc = system(buildDir, new String[]{"make", "install"});
-        if( rc != 0 ) {
-            throw new MojoExecutionException("make based build failed with exit code: "+rc);
-        }
-        
-        Library library = new Library(name);
-        
-        File libFile = new File(new File(distDirectory, "lib"), library.getLibraryFileName());
-        if( !libFile.exists() ) {
-            throw new MojoExecutionException("Make based build did not generate: "+libFile);
-        }
-        File target=FileUtils.resolveFile(classesDirectory, library.getPlatformSpecifcResorucePath());
-        FileUtils.copyFile(libFile, target);
-    }
-
-    private boolean isWindows() {
-        String name = System.getProperty("os.name").toLowerCase().trim();
-        return name.startsWith("win");
-    }
-
-    private void chmod(String permision, File path) {
-        if( !path.canExecute() ) {
-            try {
-                system(path.getParentFile(), new String[] { "chmod", permision, path.getCanonicalPath() });
-            } catch (Throwable e) {
-            }
-        }
-    }
-    
-    private int system(File wd, String[] command) throws CommandLineException {
-        return system(wd, command, null);
-    }
-    
-    private int system(File wd, String[] command, List<Arg> args) throws CommandLineException {
-        Commandline cli = new Commandline();
-        cli.setWorkingDirectory(wd);
-        for (String c : command) {
-            cli.createArg().setValue(c);
-        }
-        if( args!=null ) {
-            for (Arg arg : args) {
-                cli.addArg(arg);
-            }
-        }
-        getLog().info("executing: "+cli);
-        
-        StreamConsumer consumer = new StreamConsumer() {
-            public void consumeLine(String line) {
-                getLog().info(line);
-            }
-        };
-        if( !verbose ) {
-            consumer = new StringStreamConsumer();
-        }
-        int rc = CommandLineUtils.executeCommandLine(cli, null, consumer, consumer);
-        if( rc!=0 ) {
-            if( !verbose ) {
-                // We only display output if the command fails..
-                String output = ((StringStreamConsumer)consumer).getOutput();
-                if( output.length()>0 ) {
-                    String nl = System.getProperty( "line.separator");
-                    String[] lines = output.split(Pattern.quote(nl));
-                    for (String line : lines) {
-                        getLog().info(line);
-                    }
-                }
-            }
-            getLog().info("rc: "+rc);
-        } else {
-            if( !verbose ) {
-                String output = ((StringStreamConsumer)consumer).getOutput();
-                if( output.length()>0 ) {
-                    String nl = System.getProperty( "line.separator");
-                    String[] lines = output.split(Pattern.quote(nl));
-                    for (String line : lines) {
-                        getLog().debug(line);
-                    }
-                }
-            }
-            getLog().debug("rc: "+rc);
-        }
-        return rc;
-    }
 }

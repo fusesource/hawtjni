@@ -203,12 +203,19 @@ public class Example {
     
     @JniClass(flags={ClassFlag.STRUCT})
     static public class foo {
+        
         static {
             LIBRARY.load();
+            init();
         }
         
-        public static final native int foo_sizeof ();
-        public static final int SIZEOF = foo_sizeof();
+        @JniMethod(flags={CONSTANT_INITIALIZER})
+        private static final native void init();
+
+//        public static final native int foo_sizeof ();
+        
+        @JniField(flags={CONSTANT}, accessor="sizeof(struct foo)")
+        public static int SIZEOF;
 
         public int a;
         

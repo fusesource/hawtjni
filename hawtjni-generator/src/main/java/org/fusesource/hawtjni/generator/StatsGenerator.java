@@ -204,12 +204,12 @@ public class StatsGenerator extends JNIGenerator {
                 outputln();
             }
             output("\t");
-            output(function);
+            output(method.getDeclaringClass().getSimpleName()+"_"+function);
             outputln("_FUNC,");
             if (!function.equals(function64)) {
                 outputln("#else");
                 output("\t");
-                output(function64);
+                output(method.getDeclaringClass().getSimpleName()+"_"+function64);
                 outputln("_FUNC,");
                 outputln("#endif");
             }

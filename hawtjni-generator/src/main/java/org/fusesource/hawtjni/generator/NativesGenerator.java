@@ -593,7 +593,7 @@ public class NativesGenerator extends JNIGenerator {
         output("_NATIVE_");
         output(enter ? "ENTER" : "EXIT");
         output("(env, that, ");
-        output(function);
+        output(method.getDeclaringClass().getSimpleName()+"_"+function);
         outputln("_FUNC);");
         if (!function.equals(function64)) {
             outputln("#else");
@@ -602,7 +602,7 @@ public class NativesGenerator extends JNIGenerator {
             output("_NATIVE_");
             output(enter ? "ENTER" : "EXIT");
             output("(env, that, ");
-            output(function64);
+            output(method.getDeclaringClass().getSimpleName()+"_"+function64);
             outputln("_FUNC);");
             outputln("#endif");
         }

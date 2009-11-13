@@ -145,9 +145,6 @@ public class StructsGenerator extends JNIGenerator {
         output("#define set");
         output(clazzName);
         outputln("Fields(a,b,c)");
-        output("#define ");
-        output(clazzName);
-        outputln("_sizeof() 0");
     }
 
     void generatePrototypes(JNIClass clazz) {
@@ -175,14 +172,6 @@ public class StructsGenerator extends JNIGenerator {
         }
         output(clazzName);
         outputln(" *lpStruct);");
-        output("#define ");
-        output(clazzName);
-        output("_sizeof() sizeof(");
-        if (clazz.getFlag(ClassFlag.STRUCT)) {
-            output("struct ");
-        }
-        output(clazzName);
-        outputln(")");
     }
 
     void generateFIDsStructure(JNIClass clazz) {

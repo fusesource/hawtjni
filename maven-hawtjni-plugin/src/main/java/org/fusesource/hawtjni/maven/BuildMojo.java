@@ -165,7 +165,7 @@ public class BuildMojo extends AbstractMojo {
         String configuration="release";
         if( "windows32".equals(library.getPlatform()) ) {
         	platform = "Win32";
-        } else if( "windows32".equals(library.getPlatform()) ) {
+        } else if( "windows64".equals(library.getPlatform()) ) {
         	platform = "x64";
         } else {
         	throw new MojoExecutionException("Usupported platform: "+library.getPlatform());

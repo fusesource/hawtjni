@@ -68,10 +68,10 @@
         <executions>
           <execution>
             <goals>
-              <goal>source-generate</goal>
-              <goal>build-generate</goal>
-              <goal>build-make</goal>
-              <goal>build-package</goal>
+              <goal>generate</goal>
+              <goal>build</goal>
+              <goal>package-jar</goal>
+              <goal>package-source</goal>
             </goals>
             <configuration>
               <copyright><![CDATA[

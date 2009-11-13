@@ -26,14 +26,15 @@ import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
 /**
- * A Maven Mojo that allows you to generate a automake based build package for a
- * JNI module.
+ * This goal creates a source zip file of the native build
+ * module and attaches it to the build so that it can get 
+ * deployed.
  * 
- * @goal build-package
+ * @goal package-source
  * @phase package
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class JNIBuildPackageMojo extends AbstractMojo {
+public class PackageSourceMojo extends AbstractMojo {
 
     /**
      * The maven project.

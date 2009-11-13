@@ -35,13 +35,16 @@ import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.fusesource.hawtjni.runtime.Library;
 
 /**
- * A Maven Mojo that allows you to build an automake based package.
+ * This goal builds the JNI module which was previously
+ * generated with the generate goal.  It adds the JNI module
+ * to the test resource path so that unit tests can load 
+ * the freshly built JNI library.
  * 
- * @goal build-make
+ * @goal build
  * @phase generate-test-resources
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class JNIBuildMakeMojo extends AbstractMojo {
+public class BuildMojo extends AbstractMojo {
 
     /**
      * The maven project.
@@ -60,18 +63,22 @@ public class JNIBuildMakeMojo extends AbstractMojo {
     private String name;
     
     /**
-     * Where the build package is located.
+     * Where the unpacked build package is located.
      * 
      * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-package"
      */
     private File packageDirectory;
 
     /**
-     * The output directory where the built JNI library will placed.
+     * The output directory where the built JNI library will placed.  This directory will be added
+     * to as a test resource path so that unit tests can verify the built JNI library.
      * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/classes"
+     * The library will placed under the META-INF/native/${platform} directory that the HawtJNI
+     * Library uses to find JNI libraries as classpath resources.
+     * 
+     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/lib"
      */
-    private File classesDirectory;
+    private File libDirectory;
 
     /**
      * The directory where the build will be produced.  It creates a native-build and native-dist directory
@@ -139,9 +146,9 @@ public class JNIBuildMakeMojo extends AbstractMojo {
                 configureBasedBuild(pd);
             }
             
-            getLog().info("Adding test resource root: "+classesDirectory.getAbsolutePath());
+            getLog().info("Adding test resource root: "+libDirectory.getAbsolutePath());
             Resource testResource = new Resource();
-            testResource.setDirectory(classesDirectory.getAbsolutePath());
+            testResource.setDirectory(libDirectory.getAbsolutePath());
             this.project.addTestResource(testResource); //();
             
         } catch (Exception e) {
@@ -204,7 +211,7 @@ public class JNIBuildMakeMojo extends AbstractMojo {
         if( !libFile.exists() ) {
             throw new MojoExecutionException("Make based build did not generate: "+libFile);
         }
-        File target=FileUtils.resolveFile(classesDirectory, library.getPlatformSpecifcResorucePath());
+        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResorucePath());
         FileUtils.copyFile(libFile, target);
     }
 

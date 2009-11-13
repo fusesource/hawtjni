@@ -13,8 +13,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * Used to optionally extract and load a JNI library.
@@ -100,21 +102,21 @@ public class Library {
         return null;
     }
 
-    protected String jvmPlatform() {
+    public String getPlatform() {
         String name = System.getProperty("os.name").toLowerCase().trim();
         if( name.startsWith("linux") ) {
-            return "linux"+jvmBitModel();
+            return "linux"+getBitModel();
         }
         if( name.startsWith("mac os x") ) {
-            return "osx"+jvmBitModel();
+            return "osx"+getBitModel();
         }
         if( name.startsWith("win") ) {
-            return "windows"+jvmBitModel();
+            return "windows"+getBitModel();
         }
-        return name.replaceAll("\\W+", "_")+jvmBitModel();
+        return name.replaceAll("\\W+", "_")+getBitModel();
     }
     
-    protected static int jvmBitModel() {
+    protected static int getBitModel() {
         String prop = System.getProperty("sun.arch.data.model"); 
         if (prop == null) {
             prop = System.getProperty("com.ibm.vm.bitmode");
@@ -174,7 +176,7 @@ public class Library {
     }
 
     final public String getPlatformSpecifcResorucePath() {
-        return "META-INF/native/"+jvmPlatform()+"/"+map(name);
+        return "META-INF/native/"+getPlatform()+"/"+map(name);
     }
 
     final public String getResorucePath() {
@@ -282,6 +284,17 @@ public class Library {
     }
 
     private boolean isStale(URL source, File target) {
+        
+        if( source.getProtocol().equals("jar") ) {
+            // unwrap the jar protocol...
+            try {
+                String parts[] = source.getFile().split(Pattern.quote("!"));
+                source = new URL(parts[0]);
+            } catch (MalformedURLException e) {
+                return false;
+            }
+        }
+        
         File sourceFile=null;
         if( source.getProtocol().equals("file") ) {
             sourceFile = new File(source.getFile());
@@ -295,7 +308,7 @@ public class Library {
     }
 
     private void chmod(String permision, File path) {
-        if (jvmPlatform().startsWith("windows"))
+        if (getPlatform().startsWith("windows"))
             return; 
         try {
             Runtime.getRuntime().exec(new String[] { "chmod", permision, path.getCanonicalPath() }).waitFor(); 

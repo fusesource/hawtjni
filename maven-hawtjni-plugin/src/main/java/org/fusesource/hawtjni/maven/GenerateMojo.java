@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -40,16 +42,20 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
+import org.fusesource.hawtjni.generator.HawtJNI;
+import org.fusesource.hawtjni.generator.ProgressMonitor;
 
 /**
- * A Maven Mojo that allows you to generate a automake based build package for a
- * JNI module.
+ * This goal generates the native source code and a
+ * autoconf/msbuild based build system needed to 
+ * build a JNI library for any HawtJNI annotated
+ * classes in your maven project.
  * 
- * @goal build-generate
+ * @goal generate
  * @phase process-classes
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class JNIBuildGenerateMojo extends AbstractMojo {
+public class GenerateMojo extends AbstractMojo {
 
     /**
      * The maven project.
@@ -61,6 +67,13 @@ public class JNIBuildGenerateMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
+     * The directory where the generated native source files are located.
+     * 
+     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-src"
+     */
+    private File generatedNativeSourceDirectory;
+
+    /**
      * The base name of the library, used to determine generated file names.
      * 
      * @parameter default-value="${project.artifactId}"
@@ -68,19 +81,34 @@ public class JNIBuildGenerateMojo extends AbstractMojo {
     private String name;
 
     /**
+     * The copyright header template that will be added to the generated source files.
+     * Use the '%END_YEAR%' token to have it replaced with the current year.  
+     * 
+     * @parameter default-value=""
+     */
+    private String copyright;
+
+    /**
+     * Restrict looking for JNI classes to the specified package.
+     *  
+     * @parameter
+     */
+    private List<String> packages = new ArrayList<String>();
+
+    /**
+     * The directory where the java classes files are located.
+     * 
+     * @parameter default-value="${project.build.outputDirectory}"
+     */
+    private File classesDirectory;
+    
+    /**
      * The directory where the generated build package is located..
      * 
      * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-package"
      */
     private File packageDirectory;
     
-    /**
-     * The directory where the generated native source files are located.
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-src"
-     */
-    private File generatedNativeSourceDirectory;
-
     /**
      * The list of additional files to be included in the package will be
      * placed.
@@ -125,9 +153,37 @@ public class JNIBuildGenerateMojo extends AbstractMojo {
     private List<Arg> autogenArgs;
     
     private File targetSrcDir;
+    
 
     public void execute() throws MojoExecutionException {
-        
+        generateNativeSourceFiles();
+        generateBuildSystem(); 
+    }
+
+    private void generateNativeSourceFiles() throws MojoExecutionException {
+        HawtJNI generator = new HawtJNI();
+        generator.setClasspaths(getClasspath());
+        generator.setName(name);
+        generator.setCopyright(copyright);
+        generator.setNativeOutput(generatedNativeSourceDirectory);
+        generator.setPackages(packages);
+        generator.setProgress(new ProgressMonitor() {
+            public void step() {
+            }
+            public void setTotal(int total) {
+            }
+            public void setMessage(String message) {
+                getLog().info(message);
+            }
+        });
+        try {
+            generator.generate();
+        } catch (Exception e) {
+            throw new MojoExecutionException("Native source code generation failed: "+e, e);
+        }
+    }
+
+    private void generateBuildSystem() throws MojoExecutionException {
         try {
             
             FileUtils.deleteDirectory(packageDirectory);
@@ -167,8 +223,24 @@ public class JNIBuildGenerateMojo extends AbstractMojo {
             }
             
         } catch (Exception e) {
-            throw new MojoExecutionException("packageing failed: "+e, e);
-        } 
+            throw new MojoExecutionException("Native build system generation failed: "+e, e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private ArrayList<String> getClasspath() throws MojoExecutionException {
+        ArrayList<String> artifacts = new ArrayList<String>();
+        try {
+            artifacts.add(classesDirectory.getCanonicalPath());
+            for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
+                File file = artifact.getFile();
+                    getLog().info("Including: " + file);
+                    artifacts.add(file.getCanonicalPath());
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not determine project classath.", e);
+        }
+        return artifacts;
     }
 
     private void copyTemplateResource(String file, boolean filter) throws MojoExecutionException {
@@ -303,4 +375,5 @@ public class JNIBuildGenerateMojo extends AbstractMojo {
         }
         return rc;
     }
+
 }

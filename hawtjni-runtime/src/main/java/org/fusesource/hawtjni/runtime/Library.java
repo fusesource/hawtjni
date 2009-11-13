@@ -164,7 +164,7 @@ public class Library {
         
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
-            if( exractAndLoad(errors, version, customPath, getPlatformSpecifcResorucePath()) ) 
+            if( exractAndLoad(errors, version, customPath, getPlatformSpecifcResourcePath()) ) 
                 return;
             // For the simpler case where only 1 platform lib is getting packed into the jar
             if( exractAndLoad(errors, version, customPath, getResorucePath()) )
@@ -175,7 +175,7 @@ public class Library {
         throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
     }
 
-    final public String getPlatformSpecifcResorucePath() {
+    final public String getPlatformSpecifcResourcePath() {
         return "META-INF/native/"+getPlatform()+"/"+map(name);
     }
 

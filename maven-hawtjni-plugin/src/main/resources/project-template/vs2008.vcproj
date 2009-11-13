@@ -1,39 +1,23 @@
 <?xml version="1.0" encoding="Windows-1252"?>
-<VisualStudioProject ProjectType="Visual C++" Version="9.00" Name="@PROJECT_NAME@" RootNamespace="@PROJECT_NAME@" Keyword="Win32Proj" TargetFrameworkVersion="196613">
+<VisualStudioProject ProjectType="Visual C++" Version="9.00"
+    Name="@PROJECT_NAME@" RootNamespace="@PROJECT_NAME@"
+	TargetFrameworkVersion="131072">
   
-  <Platforms><Platform Name="Win32"/></Platforms>
+  <Platforms>
+    <Platform Name="Win32"/>
+    <Platform Name="x64"/>
+  </Platforms>
+
   <ToolFiles></ToolFiles>
   
   <Configurations>
   
-    <Configuration Name="debug|Win32" OutputDirectory="$(ProjectDir)$(ConfigurationName)" IntermediateDirectory="$(ConfigurationName)" ConfigurationType="2" CharacterSet="1">
-      <Tool Name="VCPreBuildEventTool"/>
-      <Tool Name="VCCustomBuildTool"/>
-      <Tool Name="VCXMLDataGeneratorTool"/>
-      <Tool Name="VCWebServiceProxyGeneratorTool"/>
-      <Tool Name="VCMIDLTool"/>
-      <Tool Name="VCCLCompilerTool" 
-            AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include&quot;;&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(ProjectDir)\src\windows&quot;" 
-            Optimization="0" FavorSizeOrSpeed="1" 
-            PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL" 
-            MinimalRebuild="true" 
-            ExceptionHandling="0" BasicRuntimeChecks="3" RuntimeLibrary="3" RuntimeTypeInfo="false" 
-            UsePrecompiledHeader="0" WarningLevel="3" DebugInformationFormat="4" 
-            CallingConvention="2" CompileAs="1"/>
-      <Tool Name="VCManagedResourceCompilerTool"/>
-      <Tool Name="VCResourceCompilerTool"/>
-      <Tool Name="VCPreLinkEventTool"/>
-      <Tool Name="VCLinkerTool" LinkIncremental="2" GenerateDebugInformation="true" SubSystem="2" TargetMachine="1"/>
-      <Tool Name="VCALinkTool"/>
-      <Tool Name="VCManifestTool"/>
-      <Tool Name="VCXDCMakeTool"/>
-      <Tool Name="VCBscMakeTool"/>
-      <Tool Name="VCFxCopTool"/>
-      <Tool Name="VCAppVerifierTool"/>
-      <Tool Name="VCPostBuildEventTool"/>
-    </Configuration>
-    
-    <Configuration Name="release|Win32" OutputDirectory="$(ProjectDir)$(ConfigurationName)" IntermediateDirectory="$(ConfigurationName)" ConfigurationType="2" CharacterSet="1" WholeProgramOptimization="1">
+      <Configuration Name="release|Win32" 
+    	OutputDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/lib" 
+    	IntermediateDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/obj" 
+    	ConfigurationType="2" CharacterSet="1" 
+    	WholeProgramOptimization="1">
+    	
       <Tool Name="VCPreBuildEventTool"/>
       <Tool Name="VCCustomBuildTool"/>
       <Tool Name="VCXMLDataGeneratorTool"/>
@@ -42,14 +26,19 @@
       <Tool Name="VCCLCompilerTool" 
             AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include&quot;;&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(ProjectDir)\src\windows&quot;" 
             Optimization="2" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" 
-            PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL" 
+            PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS" 
             ExceptionHandling="0" RuntimeLibrary="2" EnableFunctionLevelLinking="true" RuntimeTypeInfo="false" 
             UsePrecompiledHeader="0" WarningLevel="3" DebugInformationFormat="3" 
             CallingConvention="2" CompileAs="1"/>
       <Tool Name="VCManagedResourceCompilerTool"/>
       <Tool Name="VCResourceCompilerTool"/>
       <Tool Name="VCPreLinkEventTool"/>
-      <Tool Name="VCLinkerTool" LinkIncremental="1" GenerateDebugInformation="true" SubSystem="2" OptimizeReferences="2" EnableCOMDATFolding="2" TargetMachine="1"/>
+      <Tool Name="VCLinkerTool" 
+      		LinkIncremental="1" 
+      		GenerateDebugInformation="true" 
+      		SubSystem="2" OptimizeReferences="2"
+      		EnableCOMDATFolding="2" 
+      		TargetMachine="1"/>
       <Tool Name="VCALinkTool"/>
       <Tool Name="VCManifestTool"/>
       <Tool Name="VCXDCMakeTool"/>
@@ -59,7 +48,114 @@
       <Tool Name="VCPostBuildEventTool"/>
     </Configuration>
     
+    <Configuration Name="release|x64" 
+    	OutputDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/lib" 
+    	IntermediateDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/obj" 
+    	ConfigurationType="2" CharacterSet="1" 
+    	WholeProgramOptimization="1">
+    	
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCWebServiceProxyGeneratorTool"/>
+      <Tool Name="VCMIDLTool"/>
+      <Tool Name="VCCLCompilerTool" 
+            AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include&quot;;&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(ProjectDir)\src\windows&quot;" 
+            Optimization="2" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" 
+            PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS" 
+            ExceptionHandling="0" RuntimeLibrary="2" EnableFunctionLevelLinking="true" RuntimeTypeInfo="false" 
+            UsePrecompiledHeader="0" WarningLevel="3" DebugInformationFormat="3" 
+            CallingConvention="2" CompileAs="1"/>
+      <Tool Name="VCManagedResourceCompilerTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCLinkerTool" 
+      		LinkIncremental="1" 
+      		GenerateDebugInformation="true" 
+      		SubSystem="2" OptimizeReferences="2"
+      		EnableCOMDATFolding="2" 
+      		TargetMachine="17"/>
+      <Tool Name="VCALinkTool"/>
+      <Tool Name="VCManifestTool"/>
+      <Tool Name="VCXDCMakeTool"/>
+      <Tool Name="VCBscMakeTool"/>
+      <Tool Name="VCFxCopTool"/>
+      <Tool Name="VCAppVerifierTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+    </Configuration>
+    
+    <Configuration Name="debug|Win32" 
+    	OutputDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/lib" 
+    	IntermediateDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/obj" 
+    	ConfigurationType="2" CharacterSet="1">
+    	
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCWebServiceProxyGeneratorTool"/>
+      <Tool Name="VCMIDLTool"/>
+      <Tool Name="VCCLCompilerTool" 
+            AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include&quot;;&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(ProjectDir)\src\windows&quot;" 
+            Optimization="0" FavorSizeOrSpeed="1" 
+            PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS" 
+            MinimalRebuild="true" 
+            ExceptionHandling="0" BasicRuntimeChecks="3" RuntimeLibrary="3" RuntimeTypeInfo="false" 
+            UsePrecompiledHeader="0" WarningLevel="3" DebugInformationFormat="4" 
+            CallingConvention="2" CompileAs="1"/>
+      <Tool Name="VCManagedResourceCompilerTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCLinkerTool" 
+      		LinkIncremental="2" 
+      		GenerateDebugInformation="true" 
+      		SubSystem="2" 
+      		TargetMachine="1"/>
+      <Tool Name="VCALinkTool"/>
+      <Tool Name="VCManifestTool"/>
+      <Tool Name="VCXDCMakeTool"/>
+      <Tool Name="VCBscMakeTool"/>
+      <Tool Name="VCFxCopTool"/>
+      <Tool Name="VCAppVerifierTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+    </Configuration>
+    
+    <Configuration Name="debug|x64" 
+    	OutputDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/lib" 
+    	IntermediateDirectory="$(ProjectDir)/target/$(PlatformName)-$(ConfigurationName)/obj" 
+    	ConfigurationType="2" CharacterSet="1">
+    	
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCWebServiceProxyGeneratorTool"/>
+      <Tool Name="VCMIDLTool"/>
+      <Tool Name="VCCLCompilerTool" 
+            AdditionalIncludeDirectories="&quot;$(JAVA_HOME)\include&quot;;&quot;$(JAVA_HOME)\include\win32&quot;;&quot;$(ProjectDir)\src\windows&quot;" 
+            Optimization="0" FavorSizeOrSpeed="1" 
+            PreprocessorDefinitions="WIN64;_DEBUG;_WINDOWS" 
+            MinimalRebuild="true" 
+            ExceptionHandling="0" BasicRuntimeChecks="3" RuntimeLibrary="3" RuntimeTypeInfo="false" 
+            UsePrecompiledHeader="0" WarningLevel="3" DebugInformationFormat="4" 
+            CallingConvention="2" CompileAs="1"/>
+      <Tool Name="VCManagedResourceCompilerTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCLinkerTool" 
+      		LinkIncremental="2" 
+      		GenerateDebugInformation="true" 
+      		SubSystem="2" 
+      		TargetMachine="17"/>
+      <Tool Name="VCALinkTool"/>
+      <Tool Name="VCManifestTool"/>
+      <Tool Name="VCXDCMakeTool"/>
+      <Tool Name="VCBscMakeTool"/>
+      <Tool Name="VCFxCopTool"/>
+      <Tool Name="VCAppVerifierTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+    </Configuration>
+
   </Configurations>
+  
   <References/>
   <Files>
     <Filter Name="Source Files" Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx">

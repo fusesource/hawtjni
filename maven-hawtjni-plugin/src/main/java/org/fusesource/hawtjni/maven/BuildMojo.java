@@ -19,7 +19,6 @@ package org.fusesource.hawtjni.maven;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
@@ -28,10 +27,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.cli.Arg;
 import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.StreamConsumer;
-import org.codehaus.plexus.util.cli.CommandLineUtils.StringStreamConsumer;
 import org.fusesource.hawtjni.runtime.Library;
 
 /**
@@ -137,13 +132,20 @@ public class BuildMojo extends AbstractMojo {
      */
     private List<Arg> configureArgs;
 
+    private final CLI cli = new CLI();
+
     public void execute() throws MojoExecutionException {
+    	cli.verbose = verbose;
+    	cli.log = getLog();
         try {
-            File pd = new File(buildDirectory, "native-build");
-            if ( isWindows() ) {
-                throw new MojoExecutionException("Windows builds not supported yet.");
+            File buildDir = new File(buildDirectory, "native-build");
+            buildDir.mkdirs();
+            FileUtils.copyDirectoryStructure(packageDirectory, buildDir);
+            
+            if ( CLI.IS_WINDOWS ) {
+                vsBasedBuild(buildDir);
             } else {
-                configureBasedBuild(pd);
+                configureBasedBuild(buildDir);
             }
             
             getLog().info("Adding test resource root: "+libDirectory.getAbsolutePath());
@@ -156,22 +158,51 @@ public class BuildMojo extends AbstractMojo {
         } 
     }
 
-    private void configureBasedBuild(File buildDir) throws IOException, MojoExecutionException, CommandLineException {
-        File distDirectory = new File(buildDirectory, "native-dist");
+    private void vsBasedBuild(File buildDir) throws CommandLineException, MojoExecutionException, IOException {
+    	
+        Library library = new Library(name);
+        String platform;
+        String configuration="release";
+        if( "windows32".equals(library.getPlatform()) ) {
+        	platform = "Win32";
+        } else if( "windows64".equals(library.getPlatform()) ) {
+        	platform = "x64";
+        } else {
+        	throw new MojoExecutionException("Usupported platform: "+library.getPlatform());
+        }
+    	
+        //TODO: look into supporting cross compilation 
+        int rc = cli.system(buildDir, new String[]{"vcbuild", "/platform:"+platform, "vs2008.vcproj", configuration});
+        if( rc != 0 ) {
+            throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
+        }        
+        
+        File libFile=FileUtils.resolveFile(buildDir, "target/"+platform+"-"+configuration+"/lib/"+library.getLibraryFileName());
+        if( !libFile.exists() ) {
+            throw new MojoExecutionException("vcbuild did not generate: "+libFile);
+        }        
+
+        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResourcePath());
+        FileUtils.copyFile(libFile, target);
+	}
+
+    
+	private void configureBasedBuild(File buildDir) throws IOException, MojoExecutionException, CommandLineException {
         File configure = new File(buildDir, "configure");
         File autogen = new File(buildDir, "autogen.sh");
         File makefile = new File(buildDir, "Makefile");
-
-        new File(distDirectory, "lib").mkdirs();
-        FileUtils.copyDirectoryStructure(packageDirectory, buildDir);
+        
+        File distDirectory = new File(buildDir, "target");
+        File distLibDirectory = new File(distDirectory, "lib");
+		distLibDirectory.mkdirs();
         
         if( autogen.exists() && !skipAutogen ) {
             if( !autogen.exists() ) {
                 throw new MojoExecutionException("The autogen file does not exist: "+autogen);
             }
             if( !configure.exists() || forceAutogen ) {
-                chmod("a+x", autogen);
-                int rc = system(buildDir, new String[] {"./autogen.sh"}, autogenArgs);
+                cli.chmod("a+x", autogen);
+                int rc = cli.system(buildDir, new String[] {"./autogen.sh"}, autogenArgs);
                 if( rc != 0 ) {
                     throw new MojoExecutionException("./autogen.sh failed with exit code: "+rc);
                 }
@@ -183,8 +214,8 @@ public class BuildMojo extends AbstractMojo {
                 throw new MojoExecutionException("The configure file does not exist: "+configure);
             }
             if( !makefile.exists() || forceConfigure ) {
-                chmod("a+x", configure);
-                int rc = system(buildDir, new String[]{"./configure", "--disable-ccache", "--prefix="+distDirectory.getCanonicalPath()}, configureArgs);
+                cli.chmod("a+x", configure);
+                int rc = cli.system(buildDir, new String[]{"./configure", "--disable-ccache", "--prefix="+distDirectory.getCanonicalPath()}, configureArgs);
                 if( rc != 0 ) {
                     throw new MojoExecutionException("./configure failed with exit code: "+rc);
                 }
@@ -196,91 +227,23 @@ public class BuildMojo extends AbstractMojo {
         File[] listFiles = autotools.listFiles();
         if( listFiles!=null ) {
             for (File file : listFiles) {
-                chmod("a+x", file);
+                cli.chmod("a+x", file);
             }
         }
         
-        int rc = system(buildDir, new String[]{"make", "install"});
+        int rc = cli.system(buildDir, new String[]{"make", "install"});
         if( rc != 0 ) {
             throw new MojoExecutionException("make based build failed with exit code: "+rc);
         }
         
         Library library = new Library(name);
         
-        File libFile = new File(new File(distDirectory, "lib"), library.getLibraryFileName());
+        File libFile = new File(distLibDirectory, library.getLibraryFileName());
         if( !libFile.exists() ) {
             throw new MojoExecutionException("Make based build did not generate: "+libFile);
         }
-        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResorucePath());
+        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResourcePath());
         FileUtils.copyFile(libFile, target);
     }
 
-    private boolean isWindows() {
-        String name = System.getProperty("os.name").toLowerCase().trim();
-        return name.startsWith("win");
-    }
-
-    private void chmod(String permision, File path) {
-        if( !path.canExecute() ) {
-            try {
-                system(path.getParentFile(), new String[] { "chmod", permision, path.getCanonicalPath() });
-            } catch (Throwable e) {
-            }
-        }
-    }
-    
-    private int system(File wd, String[] command) throws CommandLineException {
-        return system(wd, command, null);
-    }
-    
-    private int system(File wd, String[] command, List<Arg> args) throws CommandLineException {
-        Commandline cli = new Commandline();
-        cli.setWorkingDirectory(wd);
-        for (String c : command) {
-            cli.createArg().setValue(c);
-        }
-        if( args!=null ) {
-            for (Arg arg : args) {
-                cli.addArg(arg);
-            }
-        }
-        getLog().info("executing: "+cli);
-        
-        StreamConsumer consumer = new StreamConsumer() {
-            public void consumeLine(String line) {
-                getLog().info(line);
-            }
-        };
-        if( !verbose ) {
-            consumer = new StringStreamConsumer();
-        }
-        int rc = CommandLineUtils.executeCommandLine(cli, null, consumer, consumer);
-        if( rc!=0 ) {
-            if( !verbose ) {
-                // We only display output if the command fails..
-                String output = ((StringStreamConsumer)consumer).getOutput();
-                if( output.length()>0 ) {
-                    String nl = System.getProperty( "line.separator");
-                    String[] lines = output.split(Pattern.quote(nl));
-                    for (String line : lines) {
-                        getLog().info(line);
-                    }
-                }
-            }
-            getLog().info("rc: "+rc);
-        } else {
-            if( !verbose ) {
-                String output = ((StringStreamConsumer)consumer).getOutput();
-                if( output.length()>0 ) {
-                    String nl = System.getProperty( "line.separator");
-                    String[] lines = output.split(Pattern.quote(nl));
-                    for (String line : lines) {
-                        getLog().debug(line);
-                    }
-                }
-            }
-            getLog().debug("rc: "+rc);
-        }
-        return rc;
-    }
 }

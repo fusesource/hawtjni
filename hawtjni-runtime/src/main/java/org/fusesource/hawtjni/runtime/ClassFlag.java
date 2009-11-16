@@ -29,4 +29,12 @@ public enum ClassFlag {
      * Indicate that this class will define a structure
      */
     STRUCT,
+    
+    /**
+     * Indicate that the struct should get zeroed out before
+     * setting any of it's fields.  Comes in handy when 
+     * you don't map all the struct fields to java fields but
+     * still want the un mapped fields initialized. 
+     */
+    ZERO_OUT,
 }

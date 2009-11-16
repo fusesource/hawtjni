@@ -269,8 +269,6 @@ public class Example {
             return "foo [a=" + a + ", b=" + b + ", c=" + Arrays.toString(c) + ", c5=" + c5 + ", prev=" + prev + "]";
         }
         
-        
-        
     }    
     
     public static final native void memmove (

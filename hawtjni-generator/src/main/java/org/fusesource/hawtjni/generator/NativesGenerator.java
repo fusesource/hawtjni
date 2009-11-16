@@ -299,7 +299,7 @@ public class NativesGenerator extends JNIGenerator {
         List<JNIField> fields = clazz.getDeclaredFields();
         for (JNIField field : fields) {
             int mods = field.getModifiers();
-            if ((mods & Modifier.PUBLIC) != 0 && (mods & Modifier.STATIC) != 0 && field.getFlag(FieldFlag.CONSTANT)) {
+            if ( (mods & Modifier.STATIC) != 0 && field.getFlag(FieldFlag.CONSTANT)) {
                 rc.add(field);
             }
         }

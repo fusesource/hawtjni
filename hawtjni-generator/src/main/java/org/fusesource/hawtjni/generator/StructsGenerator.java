@@ -65,7 +65,7 @@ public class StructsGenerator extends JNIGenerator {
         List<JNIField> fields = clazz.getDeclaredFields();
         for (JNIField field : fields) {
             int mods = field.getModifiers();
-            if ((mods & Modifier.PUBLIC) != 0 && (mods & Modifier.STATIC) == 0) {
+            if ( (mods & Modifier.STATIC) == 0 && (mods & Modifier.TRANSIENT) == 0) {
                 rc.add(field);
             }
         }
@@ -412,6 +412,9 @@ public class StructsGenerator extends JNIGenerator {
         output("Fc.cached) cache");
         output(clazzName);
         outputln("Fields(env, lpObject);");
+        if( clazz.getFlag(ClassFlag.ZERO_OUT) ) {
+            outputln("memset(lpStruct, 0, sizeof(struct "+clazzName+"));");
+        }
         generateGetFields(clazz);
         outputln("\treturn lpStruct;");
         outputln("}");

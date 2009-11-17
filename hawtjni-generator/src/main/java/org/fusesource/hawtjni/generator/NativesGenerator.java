@@ -175,7 +175,6 @@ public class NativesGenerator extends JNIGenerator {
         
         outputln("JNIEXPORT void JNICALL "+clazz.getSimpleName()+"_NATIVE("+toC(method.getName())+")(JNIEnv *env, jclass that)");
         outputln("{");
-        outputln("\tjfieldID field;");
         for (JNIField field : constants) {
 
             String conditional = field.getConditional();
@@ -190,27 +189,9 @@ public class NativesGenerator extends JNIGenerator {
             if (accessor == null || accessor.length() == 0)
                 accessor = field.getName();
             
-            output("\tfield = ");
-            if (isCPP) {
-                output("env->GetStaticFieldID(");
-            } else {
-                output("(*env)->GetStaticFieldID(env, ");
-            }
-            outputln("that, \""+field.getName()+"\", \""+type.getTypeSignature(allowConversion)+"\");");
-            
+            String fieldId = "(*env)->GetStaticFieldID(env, that, \""+field.getName()+"\", \""+type.getTypeSignature(allowConversion)+"\")";
             if (type.isPrimitive()) {
-                if (isCPP) {
-                    output("\tenv->SetStatic");
-                } else {
-                    output("\t(*env)->SetStatic");
-                }
-                output(type.getTypeSignature1(allowConversion));
-                if (isCPP) {
-                    output("Field(");
-                } else {
-                    output("Field(env, ");
-                }
-                output("that, field, ");
+                output("\t(*env)->SetStatic"+type.getTypeSignature1(allowConversion)+"Field(env, that, "+fieldId +", ");
                 output("("+type.getTypeSignature2(allowConversion)+")");
                 if( field.isPointer() ) {
                     output("(intptr_t)");
@@ -232,7 +213,7 @@ public class NativesGenerator extends JNIGenerator {
                         output(")(*env)->GetStaticObjectField(env, that, ");
                     }
                     output(field.getDeclaringClass().getSimpleName());
-                    output("field");
+                    output(fieldId);
                     outputln(");");
                     if (isCPP) {
                         output("\tenv->Set");

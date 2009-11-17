@@ -43,7 +43,7 @@ public interface JNIMethod {
 
     public String getAccessor();
 
-    public String getExclude();
+    public String getConditional();
 
     public String getCopy();
 

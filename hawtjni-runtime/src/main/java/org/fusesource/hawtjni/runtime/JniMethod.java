@@ -27,7 +27,7 @@ public @interface JniMethod {
     String accessor() default "";
     MethodFlag[] flags() default {};
     String copy() default "";
-    String exclude() default "";
+    String conditional() default "";
     
     JniArg[] callbackArgs() default {};
 }

@@ -141,9 +141,9 @@ public class ReflectMethod implements JNIMethod {
         return annotation == null ? "" : annotation.accessor();
     }
 
-    public String getExclude() {
+    public String getConditional() {
         lazyLoad();
-        return annotation == null ? "" : annotation.exclude();
+        return annotation == null ? "" : annotation.conditional();
     }
     
     public boolean isNativeUnique() {

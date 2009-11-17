@@ -21,12 +21,6 @@ public enum FieldFlag {
     NO_GEN,
     
     /**
-     * Indicate that the item should be #ifdef out in the Windows CE 
-     * platform, but not in the regular win32 platform. 
-     */
-    NO_WINCE,
-    
-    /**
      * Indicate that the field represents a constant or global 
      * variable.  It is expected that the java field will be declared
      * static.

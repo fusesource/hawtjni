@@ -23,5 +23,5 @@ public @interface JniClass {
     
     ClassFlag[] flags() default {};
 
-    String exclude() default "";
+    String conditional() default "";
 }

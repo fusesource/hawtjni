@@ -19,7 +19,6 @@ import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIField;
 import org.fusesource.hawtjni.generator.model.JNIType;
 import org.fusesource.hawtjni.runtime.ClassFlag;
-import org.fusesource.hawtjni.runtime.FieldFlag;
 
 /**
  * 
@@ -72,21 +71,21 @@ public class StructsGenerator extends JNIGenerator {
         return rc;
     }
 
-    void generateExcludes(JNIClass[] classes) {
-        HashSet<String> excludes = new HashSet<String>();
+    void getConditional(JNIClass[] classes) {
+        HashSet<String> conditionals = new HashSet<String>();
         for (JNIClass clazz : classes) {
-            String exclude = clazz.getExclude();
-            if (exclude.length() != 0) {
-                excludes.add(exclude);
+            String conditional = clazz.getConditional();
+            if (conditional.length() != 0) {
+                conditionals.add(conditional);
             }
         }
-        for (String string : excludes) {
-            String exclude = (String) string;
-            outputln(exclude);
+        for (String string : conditionals) {
+            String conditional = (String) string;
+            outputln(conditional);
             for (int i = 0; i < classes.length; i++) {
                 JNIClass clazz = classes[i];
-                String classExclude = clazz.getExclude();
-                if (exclude.equals(classExclude)) {
+                String classExclude = clazz.getConditional();
+                if (conditional.equals(classExclude)) {
                     output("#define NO_");
                     outputln(clazz.getSimpleName());
                 }
@@ -284,13 +283,9 @@ public class StructsGenerator extends JNIGenerator {
         for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
-            String exclude = field.getExclude();
-            if (exclude.length() != 0) {
-                outputln(exclude);
-            }
-            boolean noWinCE = field.getFlag(FieldFlag.NO_WINCE);
-            if (noWinCE) {
-                outputln("#ifndef _WIN32_WCE");
+            String conditional = field.getConditional();
+            if (conditional.length() != 0) {
+                outputln(conditional);
             }
             JNIType type = field.getType(), type64 = field.getType64();
             String typeName = type.getSimpleName();
@@ -383,10 +378,7 @@ public class StructsGenerator extends JNIGenerator {
                 output("\t}");
             }
             outputln();
-            if (noWinCE) {
-                outputln("#endif");
-            }
-            if (exclude.length() != 0) {
+            if (conditional.length() != 0) {
                 outputln("#endif");
             }
         }
@@ -443,13 +435,9 @@ public class StructsGenerator extends JNIGenerator {
         for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
-            String exclude = field.getExclude();
-            if (exclude.length() != 0) {
-                outputln(exclude);
-            }
-            boolean noWinCE = field.getFlag(FieldFlag.NO_WINCE);
-            if (noWinCE) {
-                outputln("#ifndef _WIN32_WCE");
+            String conditional = field.getConditional();
+            if (conditional.length() != 0) {
+                outputln(conditional);
             }
             JNIType type = field.getType(), type64 = field.getType64();
             boolean allowConversion = !type.equals(type64);
@@ -539,10 +527,7 @@ public class StructsGenerator extends JNIGenerator {
                 output("\t}");
             }
             outputln();
-            if (noWinCE) {
-                outputln("#endif");
-            }
-            if (exclude.length() != 0) {
+            if (conditional.length() != 0) {
                 outputln("#endif");
             }
         }

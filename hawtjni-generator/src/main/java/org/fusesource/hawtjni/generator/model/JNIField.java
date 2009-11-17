@@ -29,7 +29,7 @@ public interface JNIField {
     public JNIClass getDeclaringClass();
     public String getAccessor();
     public String getCast();
-    public String getExclude();
+    public String getConditional();
 
     public boolean isPointer();
 }

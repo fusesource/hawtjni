@@ -32,5 +32,5 @@ public interface JNIClass {
     
 
     public boolean getGenerate();
-    public String getExclude();
+    public String getConditional();
 }

@@ -89,9 +89,9 @@ public class ReflectClass implements JNIClass {
         return rc;
     }
 
-    public String getExclude() {
+    public String getConditional() {
         lazyLoad();
-        return annotation == null ? "" : annotation.exclude();
+        return annotation == null ? "" : annotation.conditional();
     }
 
     public boolean getGenerate() {

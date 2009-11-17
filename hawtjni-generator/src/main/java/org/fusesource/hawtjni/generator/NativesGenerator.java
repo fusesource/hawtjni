@@ -180,13 +180,9 @@ public class NativesGenerator extends JNIGenerator {
         outputln("\tjfieldID field;");
         for (JNIField field : constants) {
 
-            String exclude = field.getExclude();
-            if (exclude.length() != 0) {
-                outputln(exclude);
-            }
-            boolean noWinCE = field.getFlag(FieldFlag.NO_WINCE);
-            if (noWinCE) {
-                outputln("#ifndef _WIN32_WCE");
+            String conditional = field.getConditional();
+            if (conditional.length() != 0) {
+                outputln(conditional);
             }
             JNIType type = field.getType(), type64 = field.getType64();
             boolean allowConversion = !type.equals(type64);
@@ -282,10 +278,7 @@ public class NativesGenerator extends JNIGenerator {
                 output("\t}");
             }
             outputln();
-            if (noWinCE) {
-                outputln("#endif");
-            }
-            if (exclude.length() != 0) {
+            if (conditional.length() != 0) {
                 outputln("#endif");
             }
         }
@@ -371,7 +364,7 @@ public class NativesGenerator extends JNIGenerator {
         for (JNIMethod method : methods) {
             if ((method.getModifiers() & Modifier.NATIVE) == 0)
                 continue;
-            String exclude = method.getExclude();
+            String exclude = method.getConditional();
             if (exclude.length() != 0) {
                 excludes.add(exclude);
             }
@@ -381,7 +374,7 @@ public class NativesGenerator extends JNIGenerator {
             for (JNIMethod method : methods) {
                 if ((method.getModifiers() & Modifier.NATIVE) == 0)
                     continue;
-                String methodExclude = method.getExclude();
+                String methodExclude = method.getConditional();
                 if (exclude.equals(methodExclude)) {
                     output("#define NO_");
                     outputln(getFunctionName(method));

@@ -94,8 +94,8 @@ public class ReflectField implements JNIField {
         return annotation.pointer() == Pointer.DETERMINE_FROM_CAST ? getCast().endsWith("*)") : annotation.pointer()==Pointer.TRUE;
     }
 
-    public String getExclude() {
-        return annotation == null ? "" : annotation.exclude();
+    public String getConditional() {
+        return annotation == null ? "" : annotation.conditional();
     }
 
     public boolean getFlag(FieldFlag flag) {

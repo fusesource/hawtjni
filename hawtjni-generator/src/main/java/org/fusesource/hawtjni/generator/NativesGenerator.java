@@ -10,11 +10,8 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.generator;
 
-import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
-
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
@@ -26,6 +23,8 @@ import org.fusesource.hawtjni.runtime.ArgFlag;
 import org.fusesource.hawtjni.runtime.ClassFlag;
 import org.fusesource.hawtjni.runtime.FieldFlag;
 import org.fusesource.hawtjni.runtime.MethodFlag;
+
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * 
@@ -58,7 +57,6 @@ public class NativesGenerator extends JNIGenerator {
         }
         sortMethods(methods);
         generateNativeMacro(clazz);
-        generateExcludes(methods);
         generate(methods);
     }
 
@@ -320,9 +318,14 @@ public class NativesGenerator extends JNIGenerator {
             outputln(method.toString());
             return;
         }
+        
+        String conditional = method.getConditional();
+        if (conditional.length() != 0) {
+            outputln(conditional);
+        }
+        
         List<JNIParameter> params = method.getParameters();
         String function = getFunctionName(method), function64 = getFunctionName(method, method.getParameterTypes64());
-        generateSourceStart(function, function64);
         boolean sameFunction = function.equals(function64);
         if (!sameFunction) {
             output("#ifndef ");
@@ -351,38 +354,14 @@ public class NativesGenerator extends JNIGenerator {
             outputln("#endif");
         }
         generateFunctionBody(method, function, function64, params, returnType, returnType64);
-        generateSourceEnd(function);
+        if (conditional.length() != 0) {
+            outputln("#endif");
+        }
         outputln();
     }
 
     public void setEnterExitMacro(boolean enterExitMacro) {
         this.enterExitMacro = enterExitMacro;
-    }
-
-    void generateExcludes(List<JNIMethod> methods) {
-        HashSet<String> excludes = new HashSet<String>();
-        for (JNIMethod method : methods) {
-            if ((method.getModifiers() & Modifier.NATIVE) == 0)
-                continue;
-            String exclude = method.getConditional();
-            if (exclude.length() != 0) {
-                excludes.add(exclude);
-            }
-        }
-        for (String exclude : excludes) {
-            outputln(exclude);
-            for (JNIMethod method : methods) {
-                if ((method.getModifiers() & Modifier.NATIVE) == 0)
-                    continue;
-                String methodExclude = method.getConditional();
-                if (exclude.equals(methodExclude)) {
-                    output("#define NO_");
-                    outputln(getFunctionName(method));
-                }
-            }
-            outputln("#endif");
-            outputln();
-        }
     }
 
     void generateNativeMacro(JNIClass clazz) {
@@ -1165,27 +1144,6 @@ public class NativesGenerator extends JNIGenerator {
         output(")");
         if (!singleLine)
             outputln();
-    }
-
-    void generateSourceStart(String function, String function64) {
-        if (function.equals(function64)) {
-            output("#ifndef NO_");
-            outputln(function);
-        } else {
-            output("#if (!defined(NO_");
-            output(function);
-            output(") && !defined(");
-            output(JNI64);
-            output(")) || (!defined(NO_");
-            output(function64);
-            output(") && defined(");
-            output(JNI64);
-            outputln("))");
-        }
-    }
-
-    void generateSourceEnd(String function) {
-        outputln("#endif");
     }
 
     boolean isCritical(JNIParameter param) {

@@ -12,7 +12,6 @@ package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
@@ -71,30 +70,6 @@ public class StructsGenerator extends JNIGenerator {
         return rc;
     }
 
-    void getConditional(JNIClass[] classes) {
-        HashSet<String> conditionals = new HashSet<String>();
-        for (JNIClass clazz : classes) {
-            String conditional = clazz.getConditional();
-            if (conditional.length() != 0) {
-                conditionals.add(conditional);
-            }
-        }
-        for (String string : conditionals) {
-            String conditional = (String) string;
-            outputln(conditional);
-            for (int i = 0; i < classes.length; i++) {
-                JNIClass clazz = classes[i];
-                String classExclude = clazz.getConditional();
-                if (conditional.equals(classExclude)) {
-                    output("#define NO_");
-                    outputln(clazz.getSimpleName());
-                }
-            }
-            outputln("#endif");
-            outputln();
-        }
-    }
-
     void generateHeaderFile(JNIClass clazz) {
         generateSourceStart(clazz);
         generatePrototypes(clazz);
@@ -115,13 +90,17 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     void generateSourceStart(JNIClass clazz) {
-        String clazzName = clazz.getSimpleName();
-        output("#ifndef NO_");
-        outputln(clazzName);
+        String conditional = clazz.getConditional();
+        if (conditional.length() != 0) {
+            outputln(conditional);
+        }
     }
 
     void generateSourceEnd(JNIClass clazz) {
-        outputln("#endif");
+        String conditional = clazz.getConditional();
+        if (conditional.length() != 0) {
+            outputln("#endif");
+        }
     }
 
     void generateGlobalVar(JNIClass clazz) {
@@ -133,6 +112,12 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     void generateBlankMacros(JNIClass clazz) {
+        
+        String conditional = clazz.getConditional();
+        if (conditional.length() == 0) {
+            return;
+        }
+        
         String clazzName = clazz.getSimpleName();
         outputln("#else");
         output("#define cache");

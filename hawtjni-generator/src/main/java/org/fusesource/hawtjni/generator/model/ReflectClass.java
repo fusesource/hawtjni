@@ -95,7 +95,7 @@ public class ReflectClass implements JNIClass {
     }
 
     public boolean getGenerate() {
-        return !getFlag(ClassFlag.NO_GEN);
+        return !getFlag(ClassFlag.CLASS_SKIP);
     }
     
     public boolean getFlag(ClassFlag flag) {

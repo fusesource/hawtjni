@@ -18,7 +18,7 @@ public enum FieldFlag {
      * Indicate that the item should not be generated. For example, 
      * custom natives are coded by hand. 
      */
-    NO_GEN,
+    FIELD_SKIP,
     
     /**
      * Indicate that the field represents a constant or global 

@@ -73,7 +73,7 @@ public class NativesGenerator extends JNIGenerator {
 
     boolean isStruct(ArgFlag flags[]) {
         for (ArgFlag flag : flags) {
-            if (flag.equals(ArgFlag.STRUCT))
+            if (flag.equals(ArgFlag.BY_VALUE))
                 return true;
         }
         return false;
@@ -279,7 +279,7 @@ public class NativesGenerator extends JNIGenerator {
     }
     
     public void generate(JNIMethod method) {
-        if (method.getFlag(MethodFlag.NO_GEN))
+        if (method.getFlag(MethodFlag.METHOD_SKIP))
             return;
         
         JNIType returnType = method.getReturnType32(), returnType64 = method.getReturnType64();
@@ -706,7 +706,7 @@ public class NativesGenerator extends JNIGenerator {
             if( param.isPointer() ) {
                 output("(intptr_t)");
             }
-            boolean isStruct = param.getFlag(ArgFlag.STRUCT);
+            boolean isStruct = param.getFlag(ArgFlag.BY_VALUE);
             if (cast.length() > 2) {
                 cast = cast.substring(1, cast.length() - 1);
                 if (isStruct) {
@@ -760,7 +760,7 @@ public class NativesGenerator extends JNIGenerator {
     }
 
     void generateFunctionCallRightSide(JNIMethod method, List<JNIParameter> params, int paramStart) {
-        if (!method.getFlag(MethodFlag.CONSTANT)) {
+        if (!method.getFlag(MethodFlag.CONSTANT_GETTER)) {
             output("(");
             if (method.getFlag(MethodFlag.JNI)) {
                 if (!isCPP)
@@ -770,7 +770,7 @@ public class NativesGenerator extends JNIGenerator {
                 JNIParameter param = params.get(i);
                 if (i != paramStart)
                     output(", ");
-                if (param.getFlag(ArgFlag.STRUCT))
+                if (param.getFlag(ArgFlag.BY_VALUE))
                     output("*");
                 output(param.getCast());
                 if( param.isPointer() ) {
@@ -853,7 +853,7 @@ public class NativesGenerator extends JNIGenerator {
             }
             output("(");
             JNIParameter param = params.get(0);
-            if (param.getFlag(ArgFlag.STRUCT))
+            if (param.getFlag(ArgFlag.BY_VALUE))
                 output("*");
             String cast = param.getCast();
             if (cast.length() != 0 && !cast.equals("()")) {
@@ -957,7 +957,7 @@ public class NativesGenerator extends JNIGenerator {
                                 output("struct ");
                             }
                         }
-                        output(paramType.getTypeSignature4(!paramType.equals(paramType64), param.getFlag(ArgFlag.STRUCT)));
+                        output(paramType.getTypeSignature4(!paramType.equals(paramType64), param.getFlag(ArgFlag.BY_VALUE)));
                     }
                 }
                 output("))");
@@ -1039,7 +1039,7 @@ public class NativesGenerator extends JNIGenerator {
                         output("struct ");
                     }
                 }
-                output(paramType.getTypeSignature4(!paramType.equals(paramType64), param.getFlag(ArgFlag.STRUCT)));
+                output(paramType.getTypeSignature4(!paramType.equals(paramType64), param.getFlag(ArgFlag.BY_VALUE)));
             }
         }
         output("))");

@@ -18,7 +18,7 @@ public enum ClassFlag {
      * Indicate that the item should not be generated. For example, 
      * custom natives are coded by hand. 
      */
-    NO_GEN,
+    CLASS_SKIP,
     
     /**
      * Indicate that the platform source is in C++
@@ -34,7 +34,7 @@ public enum ClassFlag {
      * Indicate that the struct should get zeroed out before
      * setting any of it's fields.  Comes in handy when 
      * you don't map all the struct fields to java fields but
-     * still want the un mapped fields initialized. 
+     * still want the fields that are not mapped initialized. 
      */
     ZERO_OUT,
 }

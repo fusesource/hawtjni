@@ -18,7 +18,7 @@ public enum MethodFlag {
      * Indicate that the item should not be generated. For example, 
      * custom natives are coded by hand. 
      */
-    NO_GEN,
+    METHOD_SKIP,
     
     /**
      * Indicate that a native method should be looked up dynamically. It 
@@ -32,7 +32,7 @@ public enum MethodFlag {
      * variable instead of a function. This omits () from the generated 
      * code.
      */
-    CONSTANT,
+    CONSTANT_GETTER,
     
     /**
      * Indicate that the C function should be casted to a prototype 

@@ -51,7 +51,7 @@ public enum ArgFlag {
      * instead of by reference. This dereferences the parameter by 
      * prepending *. The parameter must not be NULL.
      */
-    STRUCT,
+    BY_VALUE,
     
     /**
      * Indicate that GetStringChars()should be used instead of 

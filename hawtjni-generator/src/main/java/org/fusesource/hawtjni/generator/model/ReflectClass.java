@@ -91,7 +91,7 @@ public class ReflectClass implements JNIClass {
 
     public String getConditional() {
         lazyLoad();
-        return annotation == null ? "" : annotation.conditional();
+        return annotation == null ? null : emptyFilter(annotation.conditional());
     }
 
     public boolean getGenerate() {
@@ -106,6 +106,11 @@ public class ReflectClass implements JNIClass {
     ///////////////////////////////////////////////////////////////////
     // Helper methods
     ///////////////////////////////////////////////////////////////////
+    static public String emptyFilter(String value) {
+        if( value==null || value.length()==0 )
+            return null;
+        return value;
+    }
 
     private void lazyLoad() {
         if (fields != null)

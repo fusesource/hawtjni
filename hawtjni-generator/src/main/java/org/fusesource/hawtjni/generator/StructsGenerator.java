@@ -91,14 +91,13 @@ public class StructsGenerator extends JNIGenerator {
 
     void generateSourceStart(JNIClass clazz) {
         String conditional = clazz.getConditional();
-        if (conditional.length() != 0) {
-            outputln(conditional);
+        if (conditional!=null) {
+            outputln("#if "+conditional);
         }
     }
 
     void generateSourceEnd(JNIClass clazz) {
-        String conditional = clazz.getConditional();
-        if (conditional.length() != 0) {
+        if (clazz.getConditional()!=null) {
             outputln("#endif");
         }
     }
@@ -113,8 +112,7 @@ public class StructsGenerator extends JNIGenerator {
 
     void generateBlankMacros(JNIClass clazz) {
         
-        String conditional = clazz.getConditional();
-        if (conditional.length() == 0) {
+        if (clazz.getConditional()==null) {
             return;
         }
         
@@ -269,8 +267,8 @@ public class StructsGenerator extends JNIGenerator {
             if (ignoreField(field))
                 continue;
             String conditional = field.getConditional();
-            if (conditional.length() != 0) {
-                outputln(conditional);
+            if (conditional!=null) {
+                outputln("#if "+conditional);
             }
             JNIType type = field.getType(), type64 = field.getType64();
             String typeName = type.getSimpleName();
@@ -363,7 +361,7 @@ public class StructsGenerator extends JNIGenerator {
                 output("\t}");
             }
             outputln();
-            if (conditional.length() != 0) {
+            if (conditional!=null) {
                 outputln("#endif");
             }
         }
@@ -421,8 +419,8 @@ public class StructsGenerator extends JNIGenerator {
             if (ignoreField(field))
                 continue;
             String conditional = field.getConditional();
-            if (conditional.length() != 0) {
-                outputln(conditional);
+            if (conditional!=null) {
+                outputln("#if "+conditional);
             }
             JNIType type = field.getType(), type64 = field.getType64();
             boolean allowConversion = !type.equals(type64);
@@ -512,7 +510,7 @@ public class StructsGenerator extends JNIGenerator {
                 output("\t}");
             }
             outputln();
-            if (conditional.length() != 0) {
+            if (conditional!=null) {
                 outputln("#endif");
             }
         }

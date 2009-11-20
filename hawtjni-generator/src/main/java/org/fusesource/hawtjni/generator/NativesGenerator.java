@@ -178,8 +178,8 @@ public class NativesGenerator extends JNIGenerator {
         for (JNIField field : constants) {
 
             String conditional = field.getConditional();
-            if (conditional.length() != 0) {
-                outputln(conditional);
+            if (conditional!=null) {
+                outputln("#if "+conditional);
             }
             JNIType type = field.getType(), type64 = field.getType64();
             boolean allowConversion = !type.equals(type64);
@@ -257,7 +257,7 @@ public class NativesGenerator extends JNIGenerator {
                 output("\t}");
             }
             outputln();
-            if (conditional.length() != 0) {
+            if (conditional!=null) {
                 outputln("#endif");
             }
         }
@@ -301,8 +301,8 @@ public class NativesGenerator extends JNIGenerator {
         }
         
         String conditional = method.getConditional();
-        if (conditional.length() != 0) {
-            outputln(conditional);
+        if (conditional!=null) {
+            outputln("#if "+conditional);
         }
         
         List<JNIParameter> params = method.getParameters();
@@ -335,7 +335,7 @@ public class NativesGenerator extends JNIGenerator {
             outputln("#endif");
         }
         generateFunctionBody(method, function, function64, params, returnType, returnType64);
-        if (conditional.length() != 0) {
+        if (conditional!=null) {
             outputln("#endif");
         }
         outputln();

@@ -143,7 +143,17 @@ public class ReflectMethod implements JNIMethod {
 
     public String getConditional() {
         lazyLoad();
-        return annotation == null ? "" : annotation.conditional();
+        
+        String parentConditional = getDeclaringClass().getConditional();
+        String myConditional = annotation == null ? null : emptyFilter(annotation.conditional());
+        if( parentConditional!=null ) {
+            if( myConditional!=null ) {
+                return parentConditional+" && "+myConditional;
+            } else {
+                return parentConditional;
+            }
+        }
+        return myConditional;
     }
     
     public boolean isNativeUnique() {
@@ -184,7 +194,12 @@ public class ReflectMethod implements JNIMethod {
     ///////////////////////////////////////////////////////////////////
     // Helper methods
     ///////////////////////////////////////////////////////////////////
-
+    static public String emptyFilter(String value) {
+        if( value==null || value.length()==0 )
+            return null;
+        return value;
+    }
+    
     private void lazyLoad() {
         if( flags!=null ) {
             return;

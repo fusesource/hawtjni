@@ -195,7 +195,7 @@ public class HawtJNI {
     }
 
     public void generate() throws UsageException, IOException {
-        progress("Initializing...");
+        progress("Analyzing classes...");
         
         ArrayList<JNIClass> natives = new ArrayList<JNIClass>();
         ArrayList<JNIClass> structs = new ArrayList<JNIClass>();
@@ -220,38 +220,31 @@ public class HawtJNI {
         File file;
         nativeOutput.mkdirs();
         
+        progress("Generating...");
         file = nativeFile(".c");
-        progress("Generating: "+file);
         generate(new NativesGenerator(), natives, file);
 
         file = nativeFile("_stats.h");
-        progress("Generating: "+file);
         generate(new StatsGenerator(true), natives, file);
         
         file = nativeFile("_stats.c");
-        progress("Generating: "+file);
         generate(new StatsGenerator(false), natives, file);
 
         file = nativeFile("_structs.h");
-        progress("Generating: "+file);
         generate(new StructsGenerator(true), structs, file);
         
         file = nativeFile("_structs.c");
-        progress("Generating: "+file);
         generate(new StructsGenerator(false), structs, file);
         
         file = new File(nativeOutput, "hawtjni.h");
-        progress("Generating: "+file);
         generateFromResource("hawtjni.h", file);
         
         file = new File(nativeOutput, "hawtjni.c");
-        progress("Generating: "+file);
         generateFromResource("hawtjni.c", file);
 
         file = new File(nativeOutput, "windows");
         file.mkdirs();
         file = new File(file, "stdint.h");
-        progress("Generating: "+file);
         generateFromResource("windows/stdint.h", file);
         
         progress("Done.");
@@ -420,7 +413,9 @@ public class HawtJNI {
         gen.setOutput(new PrintStream(out));
         gen.generate();
         if (out.size() > 0) {
-            FileSupport.write(out.toByteArray(), target);
+            if( FileSupport.write(out.toByteArray(), target) ) {
+                progress("Wrote: "+target);
+            }
         }
     }
 
@@ -438,7 +433,9 @@ public class HawtJNI {
         ps.print(JNIGenerator.fixDelimiter(getCopyright()));
         ps.print(JNIGenerator.fixDelimiter(content));
         ps.close();
-        FileSupport.write(out.toByteArray(), target);
+        if( FileSupport.write(out.toByteArray(), target) ) {
+            progress("Wrote: "+target);
+        }
     }
     
     @SuppressWarnings("unchecked")

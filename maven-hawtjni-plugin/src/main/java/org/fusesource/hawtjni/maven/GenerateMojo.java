@@ -182,46 +182,40 @@ public class GenerateMojo extends AbstractMojo {
 
     private void generateBuildSystem() throws MojoExecutionException {
         try {
-            
-            FileUtils.deleteDirectory(packageDirectory);
             packageDirectory.mkdirs();
             new File(packageDirectory, "m4").mkdirs();
             targetSrcDir = new File(packageDirectory, "src");
             targetSrcDir.mkdirs();
 
-            if( generatedNativeSourceDirectory!=null && generatedNativeSourceDirectory.isDirectory() ) {
-                FileUtils.copyDirectoryStructure(generatedNativeSourceDirectory, targetSrcDir);
-            }
-            
             if( customPackageDirectory!=null && customPackageDirectory.isDirectory() ) {
-                FileUtils.copyDirectoryStructure(customPackageDirectory, packageDirectory);
+                FileUtils.copyDirectoryStructureIfModified(customPackageDirectory, packageDirectory);
+            }
+
+            if( generatedNativeSourceDirectory!=null && generatedNativeSourceDirectory.isDirectory() ) {
+                FileUtils.copyDirectoryStructureIfModified(generatedNativeSourceDirectory, targetSrcDir);
             }
             
             copyTemplateResource("readme.md", false);
             copyTemplateResource("configure.ac", true);
             copyTemplateResource("Makefile.am", true);
-            copyTemplateResource("autogen.sh", false);
             copyTemplateResource("m4/jni.m4", false);
             copyTemplateResource("m4/osx-universal.m4", false);
 
             // To support windows based builds..
             copyTemplateResource("vs2008.vcproj", true);
                         
-            File configure = new File(packageDirectory, "configure");
             File autogen = new File(packageDirectory, "autogen.sh");
-            if( autogen.exists() && !skipAutogen ) {
-                if( !autogen.exists() ) {
-                    throw new MojoExecutionException("The autogen file does not exist: "+autogen);
-                }
-                if( CLI.IS_WINDOWS ) {
-                	getLog().warn("Cannot generate the configure script on windows based systems.");
-                } else {
-	                if( !configure.exists() || forceAutogen ) {
-	                    cli.chmod("a+x", autogen);
-	                    cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
-	                }
+            File configure = new File(packageDirectory, "configure");
+            if( !autogen.exists() ) {
+                copyTemplateResource("autogen.sh", false);
+                cli.chmod("a+x", autogen);
+            }
+            if( !skipAutogen ) {
+                if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {
+                    cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
                 }
             }
+            
             
         } catch (Exception e) {
             throw new MojoExecutionException("Native build system generation failed: "+e, e);

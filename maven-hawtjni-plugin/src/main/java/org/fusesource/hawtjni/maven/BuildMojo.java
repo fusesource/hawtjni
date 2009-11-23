@@ -140,7 +140,7 @@ public class BuildMojo extends AbstractMojo {
         try {
             File buildDir = new File(buildDirectory, "native-build");
             buildDir.mkdirs();
-            FileUtils.copyDirectoryStructure(packageDirectory, buildDir);
+            FileUtils.copyDirectoryStructureIfModified(packageDirectory, buildDir);
             
             if ( CLI.IS_WINDOWS ) {
                 vsBasedBuild(buildDir);
@@ -197,11 +197,10 @@ public class BuildMojo extends AbstractMojo {
 		distLibDirectory.mkdirs();
         
         if( autogen.exists() && !skipAutogen ) {
-            if( !autogen.exists() ) {
-                throw new MojoExecutionException("The autogen file does not exist: "+autogen);
-            }
-            if( !configure.exists() || forceAutogen ) {
-                cli.chmod("a+x", autogen);
+            if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {
+                if( !autogen.canExecute() ) {
+                    cli.chmod("a+x", autogen);
+                }
                 int rc = cli.system(buildDir, new String[] {"./autogen.sh"}, autogenArgs);
                 if( rc != 0 ) {
                     throw new MojoExecutionException("./autogen.sh failed with exit code: "+rc);
@@ -210,24 +209,25 @@ public class BuildMojo extends AbstractMojo {
         }
         
         if( configure.exists() && !skipConfigure ) {
-            if( !configure.exists() ) {
-                throw new MojoExecutionException("The configure file does not exist: "+configure);
-            }
             if( !makefile.exists() || forceConfigure ) {
-                cli.chmod("a+x", configure);
+                
+                File autotools = new File(buildDir, "autotools");
+                File[] listFiles = autotools.listFiles();
+                if( listFiles!=null ) {
+                    for (File file : listFiles) {
+                        if( !file.canExecute() ) {
+                            cli.chmod("a+x", file);
+                        }
+                    }
+                }
+                
+                if( !configure.canExecute() ) {
+                    cli.chmod("a+x", configure);
+                }
                 int rc = cli.system(buildDir, new String[]{"./configure", "--disable-ccache", "--prefix="+distDirectory.getCanonicalPath()}, configureArgs);
                 if( rc != 0 ) {
                     throw new MojoExecutionException("./configure failed with exit code: "+rc);
                 }
-            }
-        }
-        
-        
-        File autotools = new File(buildDir, "autotools");
-        File[] listFiles = autotools.listFiles();
-        if( listFiles!=null ) {
-            for (File file : listFiles) {
-                cli.chmod("a+x", file);
             }
         }
         

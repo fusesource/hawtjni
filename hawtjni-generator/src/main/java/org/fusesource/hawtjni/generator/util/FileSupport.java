@@ -26,7 +26,7 @@ import java.io.OutputStream;
  */
 public class FileSupport {
 
-    public static void write(byte[] bytes, File file) throws IOException {
+    public static boolean write(byte[] bytes, File file) throws IOException {
         if( !equals(bytes, file) ) {
             FileOutputStream out = new FileOutputStream(file);
             try {
@@ -34,7 +34,9 @@ public class FileSupport {
             } finally {
                 out.close();
             }
+            return true;
         }
+        return false;
     }
 
     public static void copy(InputStream is, OutputStream os) throws IOException {

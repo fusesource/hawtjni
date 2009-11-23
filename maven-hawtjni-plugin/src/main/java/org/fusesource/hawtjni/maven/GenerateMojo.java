@@ -229,8 +229,8 @@ public class GenerateMojo extends AbstractMojo {
             artifacts.add(classesDirectory.getCanonicalPath());
             for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
                 File file = artifact.getFile();
-                    getLog().info("Including: " + file);
-                    artifacts.add(file.getCanonicalPath());
+                getLog().debug("Including: " + file);
+                artifacts.add(file.getCanonicalPath());
             }
         } catch (IOException e) {
             throw new MojoExecutionException("Could not determine project classath.", e);

@@ -44,6 +44,7 @@ public class NativesGenerator extends JNIGenerator {
 
     public void generateIncludes() {
         String outputName = getOutputName();
+        outputln("#include \"" + outputName + ".h\"");
         outputln("#include \"hawtjni.h\"");
         outputln("#include \"" + outputName + "_structs.h\"");
         outputln("#include \"" + outputName + "_stats.h\"");

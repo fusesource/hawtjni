@@ -41,6 +41,7 @@ public class StructsGenerator extends JNIGenerator {
         if (header) {
             outputln("#include \""+getOutputName()+".h\"");
         } else {
+            outputln("#include \""+getOutputName()+".h\"");
             outputln("#include \"hawtjni.h\"");
             outputln("#include \""+getOutputName()+"_structs.h\"");
         }

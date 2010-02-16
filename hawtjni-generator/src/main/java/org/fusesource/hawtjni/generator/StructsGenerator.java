@@ -135,14 +135,14 @@ public class StructsGenerator extends JNIGenerator {
         output("void cache");
         output(clazzName);
         outputln("Fields(JNIEnv *env, jobject lpObject);");
-        if (clazz.getFlag(ClassFlag.STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);
         output(" *get");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(ClassFlag.STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);
@@ -150,7 +150,7 @@ public class StructsGenerator extends JNIGenerator {
         output("void set");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(ClassFlag.STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);
@@ -370,14 +370,14 @@ public class StructsGenerator extends JNIGenerator {
 
     void generateGetFunction(JNIClass clazz) {
         String clazzName = clazz.getSimpleName();
-        if (clazz.getFlag(ClassFlag.STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);
         output(" *get");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(ClassFlag.STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);
@@ -522,7 +522,7 @@ public class StructsGenerator extends JNIGenerator {
         output("void set");
         output(clazzName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
-        if (clazz.getFlag(ClassFlag.STRUCT)) {
+        if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);

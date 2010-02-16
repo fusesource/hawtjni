@@ -589,7 +589,7 @@ public class NativesGenerator extends JNIGenerator {
                 }
                 output("= NULL;");
             } else {
-                if (param.getTypeClass().getFlag(ClassFlag.STRUCT)) {
+                if (param.getTypeClass().getFlag(ClassFlag.STRUCT) && !param.getTypeClass().getFlag(ClassFlag.TYPEDEF)) {
                     output("struct ");
                 }
                 output(paramType.getSimpleName());
@@ -954,7 +954,7 @@ public class NativesGenerator extends JNIGenerator {
                     } else {
                         JNIType paramType = param.getType32(), paramType64 = param.getType64();
                         if (!(paramType.isPrimitive() || paramType.isArray())) {
-                            if (param.getTypeClass().getFlag(ClassFlag.STRUCT)) {
+                            if (param.getTypeClass().getFlag(ClassFlag.STRUCT) && !param.getTypeClass().getFlag(ClassFlag.TYPEDEF)) {
                                 output("struct ");
                             }
                         }
@@ -1036,7 +1036,7 @@ public class NativesGenerator extends JNIGenerator {
                 paramType = param.getType32();
                 paramType64 = param.getType64();
                 if (!(paramType.isPrimitive() || paramType.isArray())) {
-                    if (param.getTypeClass().getFlag(ClassFlag.STRUCT)) {
+                    if (param.getTypeClass().getFlag(ClassFlag.STRUCT) && !param.getTypeClass().getFlag(ClassFlag.TYPEDEF)) {
                         output("struct ");
                     }
                 }

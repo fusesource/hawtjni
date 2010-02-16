@@ -31,6 +31,12 @@ public enum ClassFlag {
     STRUCT,
     
     /**
+     * Indicate that structure name is a typedef (It should 
+     * not be prefixed with 'struct' to reference it.)
+     */
+    TYPEDEF,
+
+    /**
      * Indicate that the struct should get zeroed out before
      * setting any of it's fields.  Comes in handy when 
      * you don't map all the struct fields to java fields but

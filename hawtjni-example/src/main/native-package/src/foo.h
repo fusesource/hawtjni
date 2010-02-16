@@ -18,6 +18,11 @@ struct foo {
    struct foo *prev;            	
 };
 
+typedef struct _point {
+   int    x;
+   int    y;
+} point;
+
 void print_foo(struct foo *arg);
 long foowork(struct foo **arg, int count);
 

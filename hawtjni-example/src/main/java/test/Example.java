@@ -284,4 +284,20 @@ public class Example {
     public static final native void print_foo(@JniArg(cast="struct foo *")long ptr);
     public static final native long foowork (@JniArg(cast="struct foo **") long[] foos, int count);
 
+    @JniClass(flags={ClassFlag.STRUCT, ClassFlag.TYPEDEF})
+    static public class point {
+        static {
+            LIBRARY.load();
+            init();
+        }
+        
+        @JniMethod(flags={CONSTANT_INITIALIZER})
+        private static final native void init();
+
+        @JniField(flags={CONSTANT}, accessor="sizeof(point)")
+        public static int SIZEOF;
+
+        public int x;
+        public int y;
+    }    
 }

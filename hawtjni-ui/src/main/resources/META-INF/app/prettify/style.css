@@ -1,0 +1,30 @@
+body, pre {
+	padding: 0px;
+	margin: 0px;
+}
+
+div#info {
+	position:fixed;
+	top:0px;
+	left:0px;
+	padding:10px;
+	width:100%;
+	border-bottom: 2px solid;
+	overflow: hidden;
+	background-color:#ddd;
+}
+
+div#location {
+	padding-top: 10px;
+	font-size: 60%;
+	font-family: Helvetica, Arial, sans-serif; 
+}
+
+div#source {
+	padding: 10px;
+	padding-top:40px;
+}
+div.lines {
+	float:left;
+}
+pre.prettyprint { border: 0px; }

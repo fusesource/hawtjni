@@ -37,15 +37,10 @@ AC_PROG_LIBTOOL([disable-static])
 ## -----------------------------------------------
 ## API Checks
 ## -----------------------------------------------
-
-# You can do API checks like:
-# AC_CHECK_LIB([c], [main])
-# AC_CHECK_LIB([ncurses], [initscr])
-# AC_CHECK_LIB([pthread], [pthread_create])
-# AC_CHECK_LIB([rt], [aio_suspend])
-
 WITH_OSX_UNIVERSAL
 WITH_JNI_JDK
+
+CUSTOM_M4_SETUP
 
 CFLAGS="$CFLAGS $JNI_EXTRA_CFLAGS"
 AC_SUBST(CFLAGS)

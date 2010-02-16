@@ -198,6 +198,7 @@ public class GenerateMojo extends AbstractMojo {
             copyTemplateResource("readme.md", false);
             copyTemplateResource("configure.ac", true);
             copyTemplateResource("Makefile.am", true);
+            copyTemplateResource("m4/custom.m4", false);
             copyTemplateResource("m4/jni.m4", false);
             copyTemplateResource("m4/osx-universal.m4", false);
 

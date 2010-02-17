@@ -22,7 +22,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.codehaus.plexus.archiver.Archiver;
+import org.codehaus.plexus.archiver.jar.JarArchiver;
+import org.codehaus.plexus.archiver.jar.Manifest;
+import org.codehaus.plexus.archiver.jar.Manifest.Attribute;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.fusesource.hawtjni.runtime.Library;
 
@@ -88,21 +90,49 @@ public class PackageJarMojo extends AbstractMojo {
      */
     private String jarClassifier;
     
+    /**
+     * The osname to use in the OSGi bundle meta data.
+     * 
+     * @parameter
+     */
+    private String osgiOSName;
+
+    /**
+     * The processor to use in the OSGi bundle meta data.
+     * 
+     * @parameter
+     */
+    private String osgiProcessor;
+    
     public void execute() throws MojoExecutionException {
         try {
             
+            Library library = new Library(name);
             if( jarClassifier == null ) {
-                Library library = new Library(name);
                 jarClassifier = library.getPlatform();
             }
             
             String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+jarClassifier;
-            Archiver archiver = archiverManager.getArchiver( "jar" );
+            JarArchiver archiver = (JarArchiver) archiverManager.getArchiver( "jar" );
             
             File packageFile = new File(new File(project.getBuild().getDirectory()), packageName+".jar");
             archiver.setDestFile( packageFile);
             archiver.setIncludeEmptyDirs(true);
             archiver.addDirectory(libDirectory);
+            
+            String osname = getOsgiOSName(library);
+            String processor = getOsgiProcessor(library);
+            if( osname!=null && processor!=null ) {
+                Manifest manifest = new Manifest();
+                manifest.addConfiguredAttribute( new Attribute("Bundle-SymbolicName", project.getArtifactId()+"-"+jarClassifier));
+                manifest.addConfiguredAttribute( new Attribute("Bundle-Name", name+" for "+osname+" on "+processor));
+                manifest.addConfiguredAttribute( new Attribute("Bundle-NativeCode", library.getPlatformSpecifcResourcePath()+";osname="+osname+";processor="+processor+",*"));
+                manifest.addConfiguredAttribute( new Attribute("Bundle-Version", project.getVersion()));
+                manifest.addConfiguredAttribute( new Attribute("Bundle-ManifestVersion", "2"));
+                manifest.addConfiguredAttribute( new Attribute("Bundle-Description", project.getDescription()));
+                archiver.addConfiguredManifest( manifest );
+            }
+            
             archiver.createArchive();
             
             projectHelper.attachArtifact( project, "jar", jarClassifier, packageFile );
@@ -112,4 +142,36 @@ public class PackageJarMojo extends AbstractMojo {
         } 
     }
 
+    public String getOsgiOSName(Library library) {
+        if( osgiOSName == null ) {
+            String name = System.getProperty("os.name");
+            String trimmed = name.toLowerCase().trim();
+            if( trimmed.startsWith("linux") ) {
+                return "Linux";
+            }
+            if( trimmed.startsWith("windows") ) {
+                return "Win23";
+            }
+            if( trimmed.startsWith("mac os x") ) {
+                return "MacOS";
+            }
+            return name;
+        }
+        return osgiOSName;
+    }
+
+    public String getOsgiProcessor(Library library) {
+        if( osgiProcessor == null ) {
+            String name = System.getProperty("os.arch");
+            String trimmed = name.toLowerCase().trim();
+            if( trimmed.equals("x86_64") ) {
+                return "x86-64";
+            }
+            if( trimmed.equals("i386") ) {
+                return "x86";
+            }
+            return name;
+        }
+        return osgiProcessor;
+    }
 }

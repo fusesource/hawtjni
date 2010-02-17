@@ -23,7 +23,7 @@
   project_issue_url: 'http://fusesource.com/issues/browse/HAWTJNI'
   project_forums_url: 'http://fusesource.com/forums'
   project_wiki_url: 'http://fusesource.com/wiki/display/HAWTJNI'
-  project_logo: "/images/project-logo.gif"
+  project_logo: "/images/project-logo.png"
   project_version: "1.0-SNAPSHOT"
 
   # -------------------------------------------------------------------

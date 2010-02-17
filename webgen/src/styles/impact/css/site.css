@@ -15,7 +15,22 @@ h1, h2, h3, h4, h5, h6 {
     overflow: visible;
     color: #993333;
 }
-
+thead {
+  color: #eee;
+  background: #222;
+  padding:0px; margin:0px;
+}
+table {
+  width: 100%; 
+  background: #eee;
+  font-size: 90%;
+}
+th {
+  padding:3px;
+}
+td {
+  padding:2px;
+}
 /*
 h1 {
 	margin-top: 0em;
@@ -84,6 +99,8 @@ img {
     width: 100%; text-align:center; 
     color: black; font-size: 10pt; 
 }
+
+
 
 #spot a:hover {text-decoration: none; }
 
@@ -160,4 +177,3 @@ img {
   font-family: HelveticaNeue,"Helvetica Neue",Helvetica,Arial,Verdana,sans-serif; 
   margin-top:0px;
 }
-

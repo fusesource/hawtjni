@@ -150,7 +150,7 @@ public class PackageJarMojo extends AbstractMojo {
                 return "Linux";
             }
             if( trimmed.startsWith("windows") ) {
-                return "Win23";
+                return "Win32";
             }
             if( trimmed.startsWith("mac os x") ) {
                 return "MacOS";

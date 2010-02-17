@@ -299,5 +299,8 @@ public class Example {
 
         public int x;
         public int y;
-    }    
+    }
+    
+    public static final native void callmeback(@JniArg(cast="void *")long ptr);
+    
 }

@@ -26,4 +26,8 @@ typedef struct _point {
 void print_foo(struct foo *arg);
 long foowork(struct foo **arg, int count);
 
+
+long callmeback(void (*thecallback)(int number));
+
+
 #endif /* INCLUDED_FOO_H */

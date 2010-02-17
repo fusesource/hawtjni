@@ -136,7 +136,6 @@ public class Callback {
         }
 
         /* Bind the address */
-        System.out.println("bind(this, "+object+", "+method+", "+signature+", "+argCount+", "+isStatic+", "+isArrayBased+", "+errorResult+");");
         address = bind(this, object, method, signature, argCount, isStatic, isArrayBased, errorResult);
     }
 

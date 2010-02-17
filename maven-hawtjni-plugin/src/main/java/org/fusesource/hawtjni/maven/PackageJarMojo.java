@@ -120,8 +120,8 @@ public class PackageJarMojo extends AbstractMojo {
             archiver.setIncludeEmptyDirs(true);
             archiver.addDirectory(libDirectory);
             
-            String osname = getOsgiOSName(library);
-            String processor = getOsgiProcessor(library);
+            String osname = getOsgiOSName();
+            String processor = getOsgiProcessor();
             if( osname!=null && processor!=null ) {
                 Manifest manifest = new Manifest();
                 manifest.addConfiguredAttribute( new Attribute("Bundle-SymbolicName", project.getArtifactId()+"-"+jarClassifier));
@@ -142,7 +142,7 @@ public class PackageJarMojo extends AbstractMojo {
         } 
     }
 
-    public String getOsgiOSName(Library library) {
+    public String getOsgiOSName() {
         if( osgiOSName == null ) {
             String name = System.getProperty("os.name");
             String trimmed = name.toLowerCase().trim();
@@ -160,7 +160,7 @@ public class PackageJarMojo extends AbstractMojo {
         return osgiOSName;
     }
 
-    public String getOsgiProcessor(Library library) {
+    public String getOsgiProcessor() {
         if( osgiProcessor == null ) {
             String name = System.getProperty("os.arch");
             String trimmed = name.toLowerCase().trim();

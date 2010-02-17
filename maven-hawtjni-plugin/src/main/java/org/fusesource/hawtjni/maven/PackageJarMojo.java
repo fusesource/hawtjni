@@ -30,10 +30,11 @@ import org.fusesource.hawtjni.runtime.Library;
 
 /**
  * This goal allows allows you to package the JNI library created by build goal
- * in a JAR which the HawtJNI runtime can unpack when the library needs to be loaded.
+ * in a JAR which the HawtJNI runtime can unpack when the library needs to be
+ * loaded.
  * 
- * This platform specific jar is attached with a classifier which matches the current 
- * platform.
+ * This platform specific jar is attached with a classifier which matches the
+ * current platform.
  * 
  * @goal package-jar
  * @phase package
@@ -63,33 +64,36 @@ public class PackageJarMojo extends AbstractMojo {
      * @readonly
      */
     private ArchiverManager archiverManager;
-    
+
     /**
      * @component
      * @required
      * @readonly
      */
-    private MavenProjectHelper projectHelper;    
-    
+    private MavenProjectHelper projectHelper;
+
     /**
-     * The output directory where the built JNI library will placed.  This directory will be added
-     * to as a test resource path so that unit tests can verify the built JNI library.
+     * The output directory where the built JNI library will placed. This
+     * directory will be added to as a test resource path so that unit tests can
+     * verify the built JNI library.
      * 
-     * The library will placed under the META-INF/native/${platform} directory that the HawtJNI
-     * Library uses to find JNI libraries as classpath resources.
+     * The library will placed under the META-INF/native/${platform} directory
+     * that the HawtJNI Library uses to find JNI libraries as classpath
+     * resources.
      * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/lib"
+     * @parameter 
+     *            default-value="${project.build.directory}/generated-sources/hawtjni/lib"
      */
     private File libDirectory;
-    
+
     /**
-     * The classifier of the jar will use.  If not specified it will be set to the platform
-     * string determined by the HawtJNI Library class.
+     * The classifier of the jar will use. If not specified it will be set to
+     * the platform string determined by the HawtJNI Library class.
      * 
      * @parameter
      */
     private String jarClassifier;
-    
+
     /**
      * The osname to use in the OSGi bundle meta data.
      * 
@@ -103,57 +107,79 @@ public class PackageJarMojo extends AbstractMojo {
      * @parameter
      */
     private String osgiProcessor;
-    
+
     public void execute() throws MojoExecutionException {
         try {
-            
+
             Library library = new Library(name);
-            if( jarClassifier == null ) {
+            if (jarClassifier == null) {
                 jarClassifier = library.getPlatform();
             }
-            
-            String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+jarClassifier;
-            JarArchiver archiver = (JarArchiver) archiverManager.getArchiver( "jar" );
-            
-            File packageFile = new File(new File(project.getBuild().getDirectory()), packageName+".jar");
-            archiver.setDestFile( packageFile);
+
+            String packageName = project.getArtifactId() + "-" + project.getVersion() + "-" + jarClassifier;
+            JarArchiver archiver = (JarArchiver) archiverManager.getArchiver("jar");
+
+            File packageFile = new File(new File(project.getBuild().getDirectory()), packageName + ".jar");
+            archiver.setDestFile(packageFile);
             archiver.setIncludeEmptyDirs(true);
             archiver.addDirectory(libDirectory);
-            
+
             String osname = getOsgiOSName();
             String processor = getOsgiProcessor();
-            if( osname!=null && processor!=null ) {
+            if (osname != null && processor != null) {
                 Manifest manifest = new Manifest();
-                manifest.addConfiguredAttribute( new Attribute("Bundle-SymbolicName", project.getArtifactId()+"-"+jarClassifier));
-                manifest.addConfiguredAttribute( new Attribute("Bundle-Name", name+" for "+osname+" on "+processor));
-                manifest.addConfiguredAttribute( new Attribute("Bundle-NativeCode", library.getPlatformSpecifcResourcePath()+";osname="+osname+";processor="+processor+",*"));
-                manifest.addConfiguredAttribute( new Attribute("Bundle-Version", project.getVersion()));
-                manifest.addConfiguredAttribute( new Attribute("Bundle-ManifestVersion", "2"));
-                manifest.addConfiguredAttribute( new Attribute("Bundle-Description", project.getDescription()));
-                archiver.addConfiguredManifest( manifest );
+                manifest.addConfiguredAttribute(new Attribute("Bundle-SymbolicName", project.getArtifactId() + "-" + jarClassifier));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-Name", name + " for " + osname + " on " + processor));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-NativeCode", library.getPlatformSpecifcResourcePath() + ";osname=" + osname + ";processor=" + processor
+                        + ",*"));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-Version", project.getVersion()));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-ManifestVersion", "2"));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-Description", project.getDescription()));
+                archiver.addConfiguredManifest(manifest);
             }
-            
+
             archiver.createArchive();
-            
-            projectHelper.attachArtifact( project, "jar", jarClassifier, packageFile );
-            
+
+            projectHelper.attachArtifact(project, "jar", jarClassifier, packageFile);
+
         } catch (Exception e) {
-            throw new MojoExecutionException("packageing failed: "+e, e);
-        } 
+            throw new MojoExecutionException("packageing failed: " + e, e);
+        }
     }
 
     public String getOsgiOSName() {
-        if( osgiOSName == null ) {
+        if (osgiOSName == null) {
             String name = System.getProperty("os.name");
+
             String trimmed = name.toLowerCase().trim();
-            if( trimmed.startsWith("linux") ) {
-                return "Linux";
-            }
-            if( trimmed.startsWith("windows") ) {
+            if (trimmed.startsWith("win")) {
                 return "Win32";
-            }
-            if( trimmed.startsWith("mac os x") ) {
+            } else if (trimmed.startsWith("linux")) {
+                return "Linux";
+            } else if (trimmed.startsWith("macos") || trimmed.startsWith("mac os")) {
                 return "MacOS";
+            } else if (trimmed.startsWith("aix")) {
+                return "AIX";
+            } else if (trimmed.startsWith("hpux")) {
+                return "HPUX";
+            } else if (trimmed.startsWith("irix")) {
+                return "IRIX";
+            } else if (trimmed.startsWith("netware")) {
+                return "Netware";
+            } else if (trimmed.startsWith("openbsd")) {
+                return "OpenBSD";
+            } else if (trimmed.startsWith("netbsd")) {
+                return "NetBSD";
+            } else if (trimmed.startsWith("os2") || trimmed.startsWith("os/2")) {
+                return "OS2";
+            } else if (trimmed.startsWith("qnx") || trimmed.startsWith("procnto")) {
+                return "QNX";
+            } else if (trimmed.startsWith("solaris")) {
+                return "Solaris";
+            } else if (trimmed.startsWith("sunos")) {
+                return "SunOS";
+            } else if (trimmed.startsWith("vxworks")) {
+                return "VxWorks";
             }
             return name;
         }
@@ -161,17 +187,34 @@ public class PackageJarMojo extends AbstractMojo {
     }
 
     public String getOsgiProcessor() {
-        if( osgiProcessor == null ) {
+        if (osgiProcessor == null) {
             String name = System.getProperty("os.arch");
             String trimmed = name.toLowerCase().trim();
-            if( trimmed.equals("x86_64") ) {
+            if (trimmed.startsWith("x86-64") || trimmed.startsWith("amd64") || trimmed.startsWith("em64") || trimmed.startsWith("x86_64")) {
                 return "x86-64";
-            }
-            if( trimmed.equals("i386") ) {
+            } else if (trimmed.startsWith("x86") || trimmed.startsWith("pentium") || trimmed.startsWith("i386") 
+                    || trimmed.startsWith("i486") || trimmed.startsWith("i586") || trimmed.startsWith("i686")) {
                 return "x86";
+            } else if (trimmed.startsWith("68k")) {
+                return "68k";
+            } else if (trimmed.startsWith("arm")) {
+                return "ARM";
+            } else if (trimmed.startsWith("alpha")) {
+                return "Alpha";
+            } else if (trimmed.startsWith("ignite") || trimmed.startsWith("psc1k")) {
+                return "Ignite";
+            } else if (trimmed.startsWith("mips")) {
+                return "Mips";
+            } else if (trimmed.startsWith("parisc")) {
+                return "PArisc";
+            } else if (trimmed.startsWith("powerpc") || trimmed.startsWith("power") || trimmed.startsWith("ppc")) {
+                return "PowerPC";
+            } else if (trimmed.startsWith("sparc")) {
+                return "Sparc";
             }
             return name;
         }
         return osgiProcessor;
     }
+
 }

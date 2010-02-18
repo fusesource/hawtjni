@@ -225,9 +225,94 @@ HawtJNI looks for all classes annotated with `@JniClass`. For every static
 native method found, it will generate the corresponding JNI function which calls
 a the platform function of the same name as the java method.
 
+<!-- TODO: Cover these JniClass flags
+    
+    /**
+     * Indicate that the platform source is in C++
+     */
+    CPP,
+-->
+
 The JNI method mapping can be customized by applying the `@JniMethod` annotation
 to the method and the `@JniArg` to each method argument.
 
+<!-- TODO: Cover these JniMethod flags
+    /** 
+     * Indicate that the item should not be generated. For example, 
+     * custom natives are coded by hand. 
+     */
+    METHOD_SKIP,
+    
+    /**
+     * Indicate that a native method should be looked up dynamically. It 
+     * is useful when having a dependence on a given library is not 
+     * desirable. The library name is specified in the *_custom.h file.
+     */
+    DYNAMIC,
+    
+    /**
+     * Indicate that the native method represents a constant or global 
+     * variable instead of a function. This omits () from the generated 
+     * code.
+     */
+    CONSTANT_GETTER,
+    
+    /**
+     * Indicate that the C function should be casted to a prototype 
+     * generated from the parameters of the native method. Useful for 
+     * variable argument C functions.
+     */
+    CAST,
+    
+    /**
+     * Indicate that the native is part of the Java Native Interface. For 
+     * example: NewGlobalRef(). 
+     */
+    JNI,
+    
+    /**
+     * Indicate that the native method represents a structure global 
+     * variable and the address of it should be returned to Java. This is 
+     * done by prepending &.
+     */
+    ADDRESS,
+    
+    /**
+     * Indicate that the platform source is in C++
+     */
+    CPP,
+
+    /**
+     * Indicate that the native method is a C++ constructor that allocates 
+     * an object on the heap.
+     */
+    CPP_NEW,
+    
+    /**
+     * Indicate that the native method is a C++ destructor that 
+     * deallocates an object from the heap.
+     */
+    CPP_DELETE,
+    
+    /**
+     * Indicate that the native method is a C# constructor that allocates 
+     * an object on the managed (i.e. garbage collected) heap.
+     */
+    CS_NEW,
+    
+    /**
+     * Indicate that the native method's return value is a 
+     * C# managed object.
+     */
+    CS_OBJECT,
+    
+    /**
+     * Indicate that the native method takes 2 arguments, a collection and 
+     * an item, and the += operator is used to add the item to the 
+     * collection.
+     */
+    ADDER,
+-->
 ### Default Type Mappings
 
 Without additional configuration native methods automatically convert the
@@ -258,6 +343,13 @@ native array/pointer type.
 | `float[]`   | `float*`      | 32-bit FP array        |                 |
 | `double[]`  | `double*`     | 64-bit FP array        |                 |
 | `String`    | `char*`       | 8-bit array            | `LPTCSTR`       |
+
+<!-- 
+TODO: document the UNICODE flag:
+     * Indicate that GetStringChars()should be used instead of 
+     * GetStringUTFChars() to get the characters of a java.lang.String 
+     * passed as a parameter to native methods.
+-->
 
 It's important to note that when dealing with arrays and structures, HawtJNI must
 copy the contents of the java object to the native type since the JVM can any
@@ -310,6 +402,58 @@ public static class RECT {
 }
 {pygmentize}
 
+<!-- TODO: Cover these JniClass flags
+    
+    /**
+     * Indicate that the platform source is in C++
+     */
+    CPP,
+    
+    /**
+     * Indicate that structure name is a typedef (It should 
+     * not be prefixed with 'struct' to reference it.)
+     */
+    TYPEDEF,
+
+    /**
+     * Indicate that the struct should get zeroed out before
+     * setting any of it's fields.  Comes in handy when 
+     * you don't map all the struct fields to java fields but
+     * still want the fields that are not mapped initialized. 
+     */
+    ZERO_OUT,
+-->
+
+<!-- TODO: Cover these JniField flags
+    /** 
+     * Indicate that the item should not be generated. For example, 
+     * custom natives are coded by hand. 
+     */
+    FIELD_SKIP,
+-->
+
+<!-- TODO: Cover these JniArg flags
+    /**
+     * Indicate that a structure parameter should be passed by value 
+     * instead of by reference. This dereferences the parameter by 
+     * prepending *. The parameter must not be NULL.
+     */
+    BY_VALUE,
+-->
+
+<!-- TODO: Cover these JniMethod flags
+    /**
+     * Indicate that the native method represents a setter for a field in 
+     * an object or structure
+     */
+    SETTER,
+    
+    /**
+     * Indicate that the native method represents a getter for a field in 
+     * an object or structure.
+     */
+    GETTER,
+-->    
 ### Loading Platform Constants
 
 Many times you need to access the value of platform constants.  To load

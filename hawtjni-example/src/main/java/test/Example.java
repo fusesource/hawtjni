@@ -8,13 +8,6 @@
  *******************************************************************************/
 package test;
 
-import static org.fusesource.hawtjni.runtime.ArgFlag.CRITICAL;
-import static org.fusesource.hawtjni.runtime.ArgFlag.NO_IN;
-import static org.fusesource.hawtjni.runtime.ArgFlag.NO_OUT;
-import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
-import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
-import static org.fusesource.hawtjni.runtime.Pointer.FALSE;
-
 import java.util.Arrays;
 
 import org.fusesource.hawtjni.runtime.ClassFlag;
@@ -23,6 +16,10 @@ import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniField;
 import org.fusesource.hawtjni.runtime.JniMethod;
 import org.fusesource.hawtjni.runtime.Library;
+
+import static org.fusesource.hawtjni.runtime.ArgFlag.*;
+import static org.fusesource.hawtjni.runtime.FieldFlag.*;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * 
@@ -132,7 +129,7 @@ public class Example {
 
     public static final native void memmove (
             @JniArg(cast="void *") long dest, 
-            @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}, pointer=FALSE) long[] src, 
+            @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) long[] src, 
             @JniArg(cast="size_t") long size);
 
     public static final native void memmove (
@@ -168,7 +165,7 @@ public class Example {
             @JniArg(cast="size_t") long size);
 
     public static final native void memmove (
-            @JniArg(cast="void *", flags={NO_IN, CRITICAL}, pointer=FALSE) long[] dest, 
+            @JniArg(cast="void *", flags={NO_IN, CRITICAL}) long[] dest, 
             @JniArg(cast="const void *") long src, 
             @JniArg(cast="size_t") long size);
     

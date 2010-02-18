@@ -26,6 +26,5 @@ public @interface JniField {
     String accessor() default "";
     String conditional() default "";
     FieldFlag[] flags() default {};
-    Pointer pointer() default Pointer.DETERMINE_FROM_CAST;
     
 }

@@ -23,6 +23,5 @@ public @interface JniArg {
     
     ArgFlag[] flags() default {};
     String cast() default "";
-    Pointer pointer() default Pointer.DETERMINE_FROM_CAST;
 
 }

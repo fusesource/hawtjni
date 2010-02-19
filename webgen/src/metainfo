@@ -34,6 +34,8 @@
   project_svn_tags_url: 'http://fusesource.com/forge/svn/hawtjni/tags'
   project_maven_groupId: 'org.fusesource.hawtjni'
   project_maven_artifactId: hawtjni-core
+  project_git_browser: 'http://github.com/chirino/hawtjni'
+  project_git_url: 'git://github.com/chirino/hawtjni.git'
 
 blog/*/**/*:
   template: /styles/impact/blog.template

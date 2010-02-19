@@ -13,32 +13,21 @@ Get the latest source code
 
 The *{project_name:}* project stores its source code in a [Git](http://git-scm.com/) repository hosted on [github](http://github.com) at this location:
 
-* [http://github.com/chirino/hawtjni](http://github.com/chirino/hawtjni)
+* [{project_git_browser:}]({project_git_browser:})
 
 If you are new to Git you might like to try the [Git guide for subversion users](http://git.or.cz/course/svn.html) or have a look at the [Git community book](http://book.git-scm.com/).
 
-You can [browse the repository online](http://github.com/chirino/hawtjni) if you prefer.
+You can [browse the repository online]({project_git_browser:}) if you prefer.
 
 ## How to Checkout
 
 Read only access to the repository is available at the following URL:
 
-* **git://github.com/chirino/hawtjni.git**
+* **{project_git_url:}**
 
 You must first install a [Git client](http://git-scm.com/download). Then you clone the repository using the following:
 
-    git clone git://github.com/chirino/hawtjni.git
-    cd {project_id:}
-
-## Committer access
-
-Project members can push to the repository using the following URL:
-
-* **git@github.com:chirino/hawtjni.git**
-
-You must first install a [Git client](http://git-scm.com/download). Then you clone the repository using the Git URL:
-
-    git clone git@github.com:chirino/hawtjni.git
+    git clone {project_git_url:}
     cd {project_id:}
 
 ## Contributing patches

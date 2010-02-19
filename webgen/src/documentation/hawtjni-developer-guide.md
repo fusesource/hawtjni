@@ -216,22 +216,48 @@ native array/pointer type.
 | `double[]`  | `double*`     | 64-bit FP array        |                 |
 | `String`    | `char*`       | 8-bit array            | `LPTCSTR`       |
 
-<!-- 
-TODO: document the UNICODE flag:
-     * Indicate that GetStringChars()should be used instead of 
-     * GetStringUTFChars() to get the characters of a java.lang.String 
-     * passed as a parameter to native methods.
--->
-
 It's important to note that when dealing with arrays and structures, HawtJNI must
 copy the contents of the java object to the native type since the JVM can any
 time move java objects in memory. It will then call the native function and then
 copy back the native array back over the original java array so that the original
 java array picks up any changes.
 
+When a Java string is converted to a `char *` it applies a UTF-8 conversion.  If your
+native code can handle wide character (i.e. double byte unicode characters), then you 
+annotate the argument with `UNICODE` flag.  For example:
+
+{pygmentize:: java}
+  public static native int printf(
+    @JniArg(flags={UNICODE}) String message);
+{pygmentize}
+
+### Passing Primitives by Reference
+
+It is common to run into native methods similar to the following:
+{pygmentize:: c}
+void adder(int *result, int left, int right) {
+  *result = left + right;
+}
+{pygmentize}
+
+They use a pointer to a simple type to store the result of function call.  It may
+not be obvious at first, but this can be mapped in java using a primitive array.
+For example:
+{pygmentize:: java}
+  public static native void adder(int []result, int left, int right);
+{pygmentize}
+
+Just make sure you use the method with 1 element array:
+{pygmentize:: java}
+  byte[] result = new byte[1];
+  adder(result, 3, 4);
+  System.out.println("The result was: "+result[0]);
+{pygmentize}
+
 ## Mapping Native Structures {#mapping-native-structures}
 
-You define a Java class for each native structure that you want map and replicate all the fields that you will need to access as regular java fields.
+You define a Java class for each native structure that you want map and
+replicate all the fields that you will need to access as regular java fields.
 
 For example, say you had a C structure and function that was defined as follows:
 {pygmentize:: c}
@@ -245,7 +271,7 @@ void display_coord(struct COORD* position);
 Then the the corresponding Java class for the structure would look like:
 
 {pygmentize:: java}
-@JniClass(flags={ClassFlag.STRUCT})
+@JniClass(flags={STRUCT})
 public static class COORD {
   public short x;
   public short y;
@@ -257,7 +283,10 @@ The native method definition can then just take COORD java object as an argument
 public static native void display_coord(COORD position);
 {pygmentize}
 
+### Nested Structs and Unions
+
 Nested native structures are also easy.  For example:
+
 {pygmentize:: c}
 struct RECT {
   struct COORD top_left;
@@ -267,10 +296,86 @@ struct RECT {
 
 Would be mapped as:
 {pygmentize:: java}
-@JniClass(flags={ClassFlag.STRUCT})
+@JniClass(flags={STRUCT})
 public static class RECT {
   public COORD top_left = new COORD();
   public COORD bottom_right = new COORD();
+}
+{pygmentize}
+
+### Passing Structs By Value
+
+You probably noticed that structures are passed by reference by default. If your
+native method accepts the structure by value instead, then you need to annotate the method argument with the `BY_VALUE` flag.  
+
+For example, if your native method was defined as:
+{pygmentize:: c}
+int validate_coord(struct COORD position);
+{pygmentize}
+
+Then your Java method mapping would look like
+{pygmentize:: java}
+  public static native int validate_coord(
+    @JniArg(flags={BY_VALUE}) COORD position);
+{pygmentize}
+
+The passed object MUST not be `null`.
+
+### Typedef Structures
+
+If the structure name your mapping is actually a typedef, in other words, the type is referred to in native code by just the plain `name` and not the `struct name`, then you need to add the `TYPEDEF` flag to struct definition.
+
+For example, if the native definition was:
+{pygmentize:: c}
+typedef struct _COORD {
+  int x;
+  int y;
+} COORD;
+{pygmentize}
+
+Then the the corresponding Java class for the structure would look like:
+
+{pygmentize:: java}
+@JniClass(flags={STRUCT,TYPEDEF})
+public static class COORD {
+  public short x;
+  public short y;
+}
+{pygmentize}
+
+### Zeroing Out Structures
+
+You do NOT have to map all the native fields in a structure it's corresponding Java structure class. You will actually get better performance if you only map the fields that will be accessed by your Java application.
+
+If not all the fields of the structure are mapped, then when the native structure is created from a Java structure, the unmapped fields will have whatever random data was in the allocated memory location the native structure was allocated on.  If you prefer or NEED to zero out unmapped fields, then add the `ZERO_OUT` flag.  For example:
+
+{pygmentize:: java}
+@JniClass(flags={STRUCT,ZERO_OUT})
+public static class COORD {
+  public short x;
+}
+{pygmentize}
+
+### Skipping Fields
+
+If you need to have a Java field which is not mapped to a native structure field, annotate it with `@JniField(flags={FIELD_SKIP})`. This can be useful,
+to holding java side computations of the structure.
+
+For example, if you want to cache the hash computation of the structure you could do the following:
+{pygmentize:: java}
+@JniClass(flags={STRUCT,ZERO_OUT})
+public static class COORD {
+  public short x;
+  public short y;
+
+  @JniField(flags={FIELD_SKIP})
+  public int hash;
+  public int hashCode() {
+    if( hash==0 ) {
+      hash = (x << 16) & y;
+    }
+    return hash;
+  }
 }
 {pygmentize}
 
@@ -280,20 +385,6 @@ public static class RECT {
      * Indicate that the platform source is in C++
      */
     CPP,
-    
-    /**
-     * Indicate that structure name is a typedef (It should 
-     * not be prefixed with 'struct' to reference it.)
-     */
-    TYPEDEF,
-
-    /**
-     * Indicate that the struct should get zeroed out before
-     * setting any of it's fields.  Comes in handy when 
-     * you don't map all the struct fields to java fields but
-     * still want the fields that are not mapped initialized. 
-     */
-    ZERO_OUT,
 -->
 
 <!-- TODO: Cover these JniField flags
@@ -303,16 +394,6 @@ public static class RECT {
      */
     FIELD_SKIP,
 -->
-
-<!-- TODO: Cover these JniArg flags
-    /**
-     * Indicate that a structure parameter should be passed by value 
-     * instead of by reference. This dereferences the parameter by 
-     * prepending *. The parameter must not be NULL.
-     */
-    BY_VALUE,
--->
-
 <!-- TODO: Cover these JniMethod flags
     /**
      * Indicate that the native method represents a setter for a field in 
@@ -419,6 +500,8 @@ If the cast end with `*` and it's being mapped to a Java `long` then HawtJNI kno
 
 This is very common on the Windows platform where tend to typedef pointer types like `LPTCSTR`. 
 
+You may be tempted to do pointer arithmetic on the java side long value, but DON'T.  The native pointer is a combination of signed/unsigned, and 32/64 bit value which may more may not match java's memory model.  Adding offsets to the pointer on the java side will likely result in a invalid pointer location.
+
 ## Allocating Arrays and Structures on the Native Heap {#heap-structures}
 
 The memory associated with a passed structure or array is reclaimed at the end of every native method call.  Therefore, a method expects a passed array or structure reference to remain valid after the method call then that array or structure needs to be allocated on the native heap instead.
@@ -438,7 +521,7 @@ To create a structure on the the heap, your going to need a couple of helper met
 I recommend keeping those defined in the structure class itself.  For example:
 
 {pygmentize:: java}
-@JniClass(flags={ClassFlag.STRUCT})
+@JniClass(flags={STRUCT})
 public static class COORD {
 
   public short x;

@@ -35,7 +35,6 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.FileUtils.FilterWrapper;
-import org.codehaus.plexus.util.cli.Arg;
 import org.fusesource.hawtjni.generator.HawtJNI;
 import org.fusesource.hawtjni.generator.ProgressMonitor;
 
@@ -144,7 +143,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    private List<Arg> autogenArgs;
+    private List<String> autogenArgs;
     
     private File targetSrcDir;
     
@@ -209,11 +208,15 @@ public class GenerateMojo extends AbstractMojo {
             File configure = new File(packageDirectory, "configure");
             if( !autogen.exists() ) {
                 copyTemplateResource("autogen.sh", false);
-                cli.chmod("a+x", autogen);
+                cli.setExecutable(autogen);
             }
             if( !skipAutogen ) {
                 if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {
-                    cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
+                    try {
+                        cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             

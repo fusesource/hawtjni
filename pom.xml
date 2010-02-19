@@ -99,7 +99,7 @@
     <repository>
       <id>fusesource-release</id>
       <name>Fusesource Open Source Community Release Repository</name>
-      <url>http://fusesource.com/forge/dav/${forge-project-id}/repo/release</url>
+      <url>http://${forge-project-id}.fusesource.com/repo/release</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -110,7 +110,7 @@
     <repository>
       <id>fusesource-snapshot</id>
       <name>Fusesource Open Source Community Snapshot Repository</name>
-      <url>http://fusesource.com/forge/dav/${forge-project-id}/repo/snapshot</url>
+      <url>http://${forge-project-id}.fusesource.com/repo/snapshot</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>

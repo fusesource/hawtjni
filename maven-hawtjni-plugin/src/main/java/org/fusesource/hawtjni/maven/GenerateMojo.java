@@ -212,7 +212,11 @@ public class GenerateMojo extends AbstractMojo {
             }
             if( !skipAutogen ) {
                 if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {
-                    cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
+                    try {
+                        cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             

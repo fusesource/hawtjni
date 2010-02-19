@@ -20,10 +20,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.fusesource.hawtjni.runtime.Library;
@@ -48,6 +56,49 @@ public class BuildMojo extends AbstractMojo {
      * @readonly
      */
     protected MavenProject project;
+    
+    /**
+     * Remote repositories
+     *
+     * @parameter expression="${project.remoteArtifactRepositories}"
+     * @required
+     * @readonly
+     */
+    protected List remoteArtifactRepositories;
+
+    /**
+     * Local maven repository.
+     *
+     * @parameter expression="${localRepository}"
+     * @required
+     * @readonly
+     */
+    protected ArtifactRepository localRepository;
+
+    /**
+     * Artifact factory, needed to download the package source file
+     *
+     * @component role="org.apache.maven.artifact.factory.ArtifactFactory"
+     * @required
+     * @readonly
+     */
+    protected ArtifactFactory artifactFactory;
+
+    /**
+     * Artifact resolver, needed to download the package source file
+     *
+     * @component role="org.apache.maven.artifact.resolver.ArtifactResolver"
+     * @required
+     * @readonly
+     */
+    protected ArtifactResolver artifactResolver;
+    
+    /**
+     * @component
+     * @required
+     * @readonly
+     */
+    private ArchiverManager archiverManager;    
 
     /**
      * The base name of the library, used to determine generated file names.
@@ -138,6 +189,22 @@ public class BuildMojo extends AbstractMojo {
      * @parameter
      */
     private String platform;    
+    
+    /**
+     * The classifier of the package archive that will be created.
+     * 
+     * @parameter default-value="native-src"
+     */
+    private String sourceClassifier;  
+    
+    /**
+     * If the source build could not be fully generated, perhaps the autotools
+     * were not available on this platform, should we attempt to download
+     * a previously deployed source package and build that?
+     * 
+     * @parameter default-value="true"
+     */
+    private boolean downloadSourcePackage = true;  
 
     private final CLI cli = new CLI();
 
@@ -147,8 +214,6 @@ public class BuildMojo extends AbstractMojo {
         try {
             File buildDir = new File(buildDirectory, "native-build");
             buildDir.mkdirs();
-            FileUtils.copyDirectoryStructureIfModified(packageDirectory, buildDir);
-            
             if ( CLI.IS_WINDOWS ) {
                 vsBasedBuild(buildDir);
             } else {
@@ -161,12 +226,14 @@ public class BuildMojo extends AbstractMojo {
             this.project.addTestResource(testResource); //();
             
         } catch (Exception e) {
-            throw new MojoExecutionException("make failed: "+e, e);
+            throw new MojoExecutionException("build failed: "+e, e);
         } 
     }
 
     private void vsBasedBuild(File buildDir) throws CommandLineException, MojoExecutionException, IOException {
     	
+        FileUtils.copyDirectoryStructureIfModified(packageDirectory, buildDir);
+
         Library library = new Library(name);
         String platform;
         String configuration="release";
@@ -195,7 +262,17 @@ public class BuildMojo extends AbstractMojo {
 
     
 	private void configureBasedBuild(File buildDir) throws IOException, MojoExecutionException, CommandLineException {
-        File configure = new File(buildDir, "configure");
+        
+        File configure = new File(packageDirectory, "configure");
+        if( configure.exists() ) {
+            FileUtils.copyDirectoryStructureIfModified(packageDirectory, buildDir);            
+        } else if (downloadSourcePackage) {
+            downloadNativeSourcePackage(buildDir);
+        } else {
+            throw new MojoExecutionException("The configure script is missing from the generated native source package and downloadSourcePackage is disabled: "+configure);
+        }
+
+        configure = new File(buildDir, "configure");
         File autogen = new File(buildDir, "autogen.sh");
         File makefile = new File(buildDir, "Makefile");
         
@@ -251,5 +328,34 @@ public class BuildMojo extends AbstractMojo {
         File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResourcePath(platform));
         FileUtils.copyFile(libFile, target);
     }
+    
+    public void downloadNativeSourcePackage(File buildDir) throws MojoExecutionException  {
+        Artifact artifact = artifactFactory.createArtifactWithClassifier(project.getGroupId(), project.getArtifactId(), project.getVersion(), "zip", sourceClassifier);
+        try {
+            artifactResolver.resolve(artifact, remoteArtifactRepositories, localRepository);
+        } catch (ArtifactResolutionException e) {
+            throw new MojoExecutionException("Error downloading.", e);
+        } catch (ArtifactNotFoundException e) {
+            throw new MojoExecutionException("Requested download does not exist.", e);
+        }
+        
+        File packageZipFile = artifact.getFile();
 
+        try {
+            File dest = new File(buildDirectory, "native-build-extracted");
+            getLog().info("Extracting "+packageZipFile+" to "+dest);
+            
+            UnArchiver unArchiver = archiverManager.getUnArchiver("zip");
+            unArchiver.setSourceFile(packageZipFile);
+            unArchiver.extract("", dest);
+
+            String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+sourceClassifier;
+            File source = new File(dest, packageName);
+            FileUtils.copyDirectoryStructureIfModified(source, buildDir);            
+            
+        } catch (Throwable e) {
+            throw new MojoExecutionException("Could not extract the native source package.", e);
+        }            
+    }    
+    
 }

@@ -85,14 +85,15 @@ public class PackageJarMojo extends AbstractMojo {
      *            default-value="${project.build.directory}/generated-sources/hawtjni/lib"
      */
     private File libDirectory;
-
+    
     /**
-     * The classifier of the jar will use. If not specified it will be set to
-     * the platform string determined by the HawtJNI Library class.
+     * The platform identifier of this build.  If not specified,
+     * it will be automatically detected.  This will be used as the 
+     * artifact classifier for the platform specific jar.
      * 
      * @parameter
      */
-    private String jarClassifier;
+    private String platform;     
 
     /**
      * The osname to use in the OSGi bundle meta data.
@@ -112,11 +113,11 @@ public class PackageJarMojo extends AbstractMojo {
         try {
 
             Library library = new Library(name);
-            if (jarClassifier == null) {
-                jarClassifier = library.getPlatform();
+            if (platform == null) {
+                platform = library.getPlatform();
             }
 
-            String packageName = project.getArtifactId() + "-" + project.getVersion() + "-" + jarClassifier;
+            String packageName = project.getArtifactId() + "-" + project.getVersion() + "-" + platform;
             JarArchiver archiver = (JarArchiver) archiverManager.getArchiver("jar");
 
             File packageFile = new File(new File(project.getBuild().getDirectory()), packageName + ".jar");
@@ -128,7 +129,7 @@ public class PackageJarMojo extends AbstractMojo {
             String processor = getOsgiProcessor();
             if (osname != null && processor != null) {
                 Manifest manifest = new Manifest();
-                manifest.addConfiguredAttribute(new Attribute("Bundle-SymbolicName", project.getArtifactId() + "-" + jarClassifier));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-SymbolicName", project.getArtifactId() + "-" + platform));
                 manifest.addConfiguredAttribute(new Attribute("Bundle-Name", name + " for " + osname + " on " + processor));
                 manifest.addConfiguredAttribute(new Attribute("Bundle-NativeCode", library.getPlatformSpecifcResourcePath() + ";osname=" + osname + ";processor=" + processor
                         + ",*"));
@@ -140,7 +141,7 @@ public class PackageJarMojo extends AbstractMojo {
 
             archiver.createArchive();
 
-            projectHelper.attachArtifact(project, "jar", jarClassifier, packageFile);
+            projectHelper.attachArtifact(project, "jar", platform, packageFile);
 
         } catch (Exception e) {
             throw new MojoExecutionException("packageing failed: " + e, e);

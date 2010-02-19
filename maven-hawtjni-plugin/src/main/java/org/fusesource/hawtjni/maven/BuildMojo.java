@@ -25,7 +25,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.cli.Arg;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.fusesource.hawtjni.runtime.Library;
 
@@ -102,7 +101,7 @@ public class BuildMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    private List<Arg> autogenArgs;
+    private List<String> autogenArgs;
 
     /**
      * Should we skip executing the configure command.
@@ -130,7 +129,15 @@ public class BuildMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    private List<Arg> configureArgs;
+    private List<String> configureArgs;
+    
+    /**
+     * The platform identifier of this build.  If not specified,
+     * it will be automatically detected.
+     * 
+     * @parameter
+     */
+    private String platform;    
 
     private final CLI cli = new CLI();
 
@@ -236,7 +243,12 @@ public class BuildMojo extends AbstractMojo {
         if( !libFile.exists() ) {
             throw new MojoExecutionException("Make based build did not generate: "+libFile);
         }
-        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResourcePath());
+        
+        if( platform == null ) {
+            platform = library.getPlatform();
+        }
+        
+        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResourcePath(platform));
         FileUtils.copyFile(libFile, target);
     }
 

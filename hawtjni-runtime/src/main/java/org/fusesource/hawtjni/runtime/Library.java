@@ -102,18 +102,23 @@ public class Library {
         return null;
     }
 
-    public String getPlatform() {
+    public String getOperatingSystem() {
         String name = System.getProperty("os.name").toLowerCase().trim();
         if( name.startsWith("linux") ) {
-            return "linux"+getBitModel();
+            return "linux";
         }
         if( name.startsWith("mac os x") ) {
-            return "osx"+getBitModel();
+            return "osx";
         }
         if( name.startsWith("win") ) {
-            return "windows"+getBitModel();
+            return "windows";
         }
-        return name.replaceAll("\\W+", "_")+getBitModel();
+        return name.replaceAll("\\W+", "_");
+        
+    }
+
+    public String getPlatform() {
+        return getOperatingSystem()+getBitModel();
     }
     
     protected static int getBitModel() {
@@ -166,6 +171,8 @@ public class Library {
         if( classLoader!=null ) {
             if( exractAndLoad(errors, version, customPath, getPlatformSpecifcResourcePath()) ) 
                 return;
+            if( exractAndLoad(errors, version, customPath, getOperatingSystemSpecifcResourcePath()) ) 
+                return;
             // For the simpler case where only 1 platform lib is getting packed into the jar
             if( exractAndLoad(errors, version, customPath, getResorucePath()) )
                 return;
@@ -175,8 +182,14 @@ public class Library {
         throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
     }
 
+    final public String getOperatingSystemSpecifcResourcePath() {
+        return getPlatformSpecifcResourcePath(getOperatingSystem());
+    }
     final public String getPlatformSpecifcResourcePath() {
-        return "META-INF/native/"+getPlatform()+"/"+map(name);
+        return getPlatformSpecifcResourcePath(getPlatform());
+    }
+    final public String getPlatformSpecifcResourcePath(String platform) {
+        return "META-INF/native/"+platform+"/"+map(name);
     }
 
     final public String getResorucePath() {

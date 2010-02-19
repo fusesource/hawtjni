@@ -35,7 +35,6 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.FileUtils.FilterWrapper;
-import org.codehaus.plexus.util.cli.Arg;
 import org.fusesource.hawtjni.generator.HawtJNI;
 import org.fusesource.hawtjni.generator.ProgressMonitor;
 
@@ -144,7 +143,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    private List<Arg> autogenArgs;
+    private List<String> autogenArgs;
     
     private File targetSrcDir;
     

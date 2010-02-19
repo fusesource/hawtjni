@@ -37,10 +37,11 @@ AC_PROG_LIBTOOL([disable-static])
 ## -----------------------------------------------
 ## API Checks
 ## -----------------------------------------------
-WITH_OSX_UNIVERSAL
 WITH_JNI_JDK
 
 CUSTOM_M4_SETUP
+
+WITH_OSX_UNIVERSAL
 
 CFLAGS="$CFLAGS $JNI_EXTRA_CFLAGS"
 AC_SUBST(CFLAGS)

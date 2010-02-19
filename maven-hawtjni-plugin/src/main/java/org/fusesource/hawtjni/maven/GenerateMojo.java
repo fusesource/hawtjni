@@ -209,7 +209,7 @@ public class GenerateMojo extends AbstractMojo {
             File configure = new File(packageDirectory, "configure");
             if( !autogen.exists() ) {
                 copyTemplateResource("autogen.sh", false);
-                cli.chmod("a+x", autogen);
+                cli.setExecutable(autogen);
             }
             if( !skipAutogen ) {
                 if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {

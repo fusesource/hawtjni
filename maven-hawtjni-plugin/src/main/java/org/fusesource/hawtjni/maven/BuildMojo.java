@@ -198,9 +198,7 @@ public class BuildMojo extends AbstractMojo {
         
         if( autogen.exists() && !skipAutogen ) {
             if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {
-                if( !autogen.canExecute() ) {
-                    cli.chmod("a+x", autogen);
-                }
+                cli.setExecutable(autogen);
                 int rc = cli.system(buildDir, new String[] {"./autogen.sh"}, autogenArgs);
                 if( rc != 0 ) {
                     throw new MojoExecutionException("./autogen.sh failed with exit code: "+rc);
@@ -215,15 +213,11 @@ public class BuildMojo extends AbstractMojo {
                 File[] listFiles = autotools.listFiles();
                 if( listFiles!=null ) {
                     for (File file : listFiles) {
-                        if( !file.canExecute() ) {
-                            cli.chmod("a+x", file);
-                        }
+                        cli.setExecutable(file);
                     }
                 }
                 
-                if( !configure.canExecute() ) {
-                    cli.chmod("a+x", configure);
-                }
+                cli.setExecutable(configure);
                 int rc = cli.system(buildDir, new String[]{"./configure", "--disable-ccache", "--prefix="+distDirectory.getCanonicalPath()}, configureArgs);
                 if( rc != 0 ) {
                     throw new MojoExecutionException("./configure failed with exit code: "+rc);

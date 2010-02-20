@@ -145,6 +145,15 @@ public class GenerateMojo extends AbstractMojo {
      */
     private List<String> autogenArgs;
     
+    /**
+     * Set this value to false to disable the callback support in HawtJNI.
+     * Disabling callback support can substantially reduce the size
+     * of the generated native library.  
+     * 
+     * @parameter default-value="true"
+     */
+    private boolean callbacks;
+    
     private File targetSrcDir;
     
     private CLI cli = new CLI();
@@ -163,6 +172,7 @@ public class GenerateMojo extends AbstractMojo {
         generator.setCopyright(copyright);
         generator.setNativeOutput(generatedNativeSourceDirectory);
         generator.setPackages(packages);
+        generator.setCallbacks(callbacks);
         generator.setProgress(new ProgressMonitor() {
             public void step() {
             }

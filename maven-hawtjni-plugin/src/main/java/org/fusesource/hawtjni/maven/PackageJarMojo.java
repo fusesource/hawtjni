@@ -17,6 +17,7 @@
 package org.fusesource.hawtjni.maven;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -96,11 +97,12 @@ public class PackageJarMojo extends AbstractMojo {
     private String platform;     
 
     /**
-     * The info to add to the OSGi bundle meta data.
+     * The osgi platforms that the library match for.  Example value:
+     * osname=MacOS;processor=x86-64
      * 
-     * @parameter default-value="${osgi-platforms}"
+     * @parameter 
      */
-    private String osgiPlatforms;
+    private List<String> osgiPlatforms;
 
     public void execute() throws MojoExecutionException {
         try {
@@ -121,7 +123,7 @@ public class PackageJarMojo extends AbstractMojo {
             Manifest manifest = new Manifest();
             manifest.addConfiguredAttribute(new Attribute("Bundle-SymbolicName", project.getArtifactId() + "-" + platform));
             manifest.addConfiguredAttribute(new Attribute("Bundle-Name", name + " for " + platform));            
-            manifest.addConfiguredAttribute(new Attribute("Bundle-NativeCode", library.getPlatformSpecifcResourcePath(platform) + ";" +getOsgiPlatforms()));
+            manifest.addConfiguredAttribute(new Attribute("Bundle-NativeCode", getNativeCodeValue(library)));
             manifest.addConfiguredAttribute(new Attribute("Bundle-Version", project.getVersion()));
             manifest.addConfiguredAttribute(new Attribute("Bundle-ManifestVersion", "2"));
             manifest.addConfiguredAttribute(new Attribute("Bundle-Description", project.getDescription()));
@@ -136,11 +138,24 @@ public class PackageJarMojo extends AbstractMojo {
         }
     }
     
-    public String getOsgiPlatforms() {
-        if (osgiPlatforms == null || osgiPlatforms.trim().length()==0) {
-            return "osname=" + getOsgiOSName() + ";processor=" + getOsgiProcessor()+ ",*";
+    public String getNativeCodeValue(Library library) {
+        if (osgiPlatforms == null || osgiPlatforms.isEmpty() ) {
+            return library.getPlatformSpecifcResourcePath(platform) + ";" +"osname=" + getOsgiOSName() + ";processor=" + getOsgiProcessor()+ ",*";
         }
-        return osgiPlatforms;
+        boolean first=true;
+        String rc = "";
+        for (String s : osgiPlatforms) {
+            if( !first ) {
+                rc += ",";
+            }
+            first = false;
+            if( "*".equals(s) ) {
+                rc += s;
+            } else {
+                rc += library.getPlatformSpecifcResourcePath(platform) + ";"+s;
+            }
+        }
+        return rc;
     }
 
     public String getOsgiOSName() {

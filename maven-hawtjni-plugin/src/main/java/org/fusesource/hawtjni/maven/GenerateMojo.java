@@ -120,21 +120,21 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Should we skip executing the autogen.sh file.
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="${skip-autogen}"
      */
     private boolean skipAutogen;
     
     /**
      * Should we force executing the autogen.sh file.
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="${force-autogen}"
      */
     private boolean forceAutogen;
 
     /**
      * Should we display all the native build output?
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="${hawtjni-verbose}"
      */
     private boolean verbose;
 

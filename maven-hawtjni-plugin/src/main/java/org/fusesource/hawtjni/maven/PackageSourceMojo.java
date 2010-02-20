@@ -76,7 +76,7 @@ public class PackageSourceMojo extends AbstractMojo {
     /**
      * Should we skip executing the autogen.sh file.
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="${skip-autogen}"
      */
     private boolean skipAutogen;
     

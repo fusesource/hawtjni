@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package org.fusesource.hawtjni.generator;
+package org.fusesource.hawtjni.ui;
 
 import java.io.*;
 import java.util.*;

@@ -28,6 +28,7 @@ public class FileSupport {
 
     public static boolean write(byte[] bytes, File file) throws IOException {
         if( !equals(bytes, file) ) {
+            file.getParentFile().mkdirs();
             FileOutputStream out = new FileOutputStream(file);
             try {
                 out.write(bytes);

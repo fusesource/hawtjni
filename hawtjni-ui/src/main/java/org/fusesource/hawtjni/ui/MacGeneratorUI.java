@@ -9,11 +9,18 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.ui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import net.miginfocom.swt.MigLayout;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
@@ -23,10 +30,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -36,7 +46,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
-import org.fusesource.hawtjni.generator.MacGenerator;
 import org.fusesource.hawtjni.generator.ProgressMonitor;
 import org.fusesource.hawtjni.generator.HawtJNI.UsageException;
 import org.w3c.dom.Document;
@@ -44,6 +53,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static org.eclipse.swt.SWT.*;
+import static org.fusesource.hawtjni.ui.UISupport.*;
+
+import static org.eclipse.swt.SWT.*;
+import static org.fusesource.hawtjni.ui.UISupport.*;
+
+import static org.eclipse.swt.SWT.*;
+import static org.fusesource.hawtjni.ui.UISupport.*;
 
 /**
  * 
@@ -198,19 +216,46 @@ public class MacGeneratorUI {
 	void cleanup() {
 	}
 
-	Composite createSignaturesPanel(Composite parent) {
+    
+	private Composite createSourceTargetPanel(Composite parent) {
+        Composite panel = new Composite(parent, SWT.NONE);
+        panel.setLayout(mig("insets 0", "[]10[grow]", "[]10[]"));
+        // First row..
+        {
+            Label label = mig(new Label(panel, NONE), "");        
+            label.setText("Output Directory");
+            final Text text = mig(new Text(panel, SWT.BORDER | SWT.SINGLE | SWT.SEARCH), "grow,wrap"); 
+            text.addModifyListener(new ModifyListener() {
+                public void modifyText(ModifyEvent event) {
+                    gen.setOutputDir(text.getText());
+                }
+            });
+            text.setText(gen.outputDir);
+        }
+        // 2nd row..
+        {
+            Label label = mig(new Label(panel, NONE), "");        
+            label.setText("Target Class");
+            final Text text = mig(new Text(panel, SWT.BORDER | SWT.SINGLE | SWT.SEARCH), "grow,wrap"); 
+            text.addModifyListener(new ModifyListener() {
+                public void modifyText(ModifyEvent event) {
+                    gen.setMainClass(text.getText());
+                }
+            });
+            text.setText(gen.mainClassName);
+        }
+                
+        return panel;
+    }
+    	
+    private Composite createSignaturesPanel(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginLeft = 5;
-		layout.marginWidth = 0;
-		comp.setLayout(layout);
+		comp.setLayout(mig("insets 0", "[]10[grow]10", "[]10[]"));
 		
 		Label label = new Label(comp, SWT.NONE);
 		label.setText("Signatures:");
 		
-		final Text search = new Text(comp, SWT.BORDER | SWT.SINGLE | SWT.SEARCH);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		search.setLayoutData(data);
+		final Text search = mig(new Text(comp, SWT.BORDER | SWT.SINGLE | SWT.SEARCH), "grow,wrap");
 		search.setText(".*");
 		search.addListener(SWT.DefaultSelection, new Listener() {
 			public void handleEvent(Event arg0) {
@@ -225,10 +270,7 @@ public class MacGeneratorUI {
 			}
 		});
 		
-		nodesTree = new Tree(comp, SWT.SINGLE | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION);
-		data = new GridData(GridData.FILL_BOTH);
-		data.horizontalSpan = 2;
-		nodesTree.setLayoutData(data);
+		nodesTree = mig(new Tree(comp, SWT.SINGLE | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION), "grow,span,height 100::");
 		
 		nodesTree.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
@@ -254,19 +296,14 @@ public class MacGeneratorUI {
 		return comp;
 	}
 	
-	Composite createPropertiesPanel(Composite parent) {
+	private Composite createPropertiesPanel(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginWidth = 0;
-		if (!actions) layout.marginRight = 5;
-		comp.setLayout(layout);
+        comp.setLayout(mig("insets 0", "10[grow]", "[]10[grow]"));
 		
-		Label label = new Label(comp, SWT.NONE);
+		Label label = mig(new Label(comp, SWT.NONE), "wrap");
 		label.setText("Properties:");
 		
-		attribTable = new Table(comp, SWT.BORDER | SWT.FULL_SELECTION);
-		GridData data = new GridData(GridData.FILL_BOTH);
-		attribTable.setLayoutData(data);
+		attribTable = mig(new Table(comp, SWT.BORDER | SWT.FULL_SELECTION), "grow");
 		attribTable.setLinesVisible(true);
 		attribTable.setHeaderVisible(true);
 		TableColumn nameColumn = new TableColumn(attribTable, SWT.NONE);
@@ -345,7 +382,7 @@ public class MacGeneratorUI {
 		return comp;
 	}
 	
-	Composite createActionsPanel(Composite parent) {
+	private Composite createActionsPanel(final Composite parent) {
 		Composite panel = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, true);
 		layout.marginWidth = 10;
@@ -356,12 +393,33 @@ public class MacGeneratorUI {
 		generate.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				generate(null);
+				MessageBox messageBox = new MessageBox(parent.getShell());
+				messageBox.setMessage("Done");
+                messageBox.open();
 			}
 		});
 		return panel;
 	}
 	
-	public void generate(ProgressMonitor progress) {
+    private Composite createMainPanel(Composite parent) {
+        SashForm sash = mig(new SashForm(parent, HORIZONTAL|SMOOTH), "grow");
+        sash.setLayout(mig("insets 0", "", "") );
+        sash.setBackground(color(sash, COLOR_GRAY));
+        sash.setSashWidth(2);
+        mig(createSignaturesPanel(sash), "grow");
+        mig(createPropertiesPanel(sash), "grow");        
+        return sash;
+    }
+
+    public void open(Composite parent) {
+        parent.setLayout(new MigLayout("wrap 1", "[grow]", "[][grow][]"));
+        mig(createSourceTargetPanel(parent), "growx");
+        mig(createMainPanel(parent), "grow,wmin 0,hmin 0");
+        mig(createActionsPanel(parent), "align right");
+        updateNodes();
+    }
+
+    public void generate(ProgressMonitor progress) {
 		try {
             gen.generate(progress);
         } catch (UsageException e) {
@@ -372,67 +430,8 @@ public class MacGeneratorUI {
 	public boolean getActionsVisible() {
 		return actions;
 	}
-	
-	public void open(Composite parent) {
-		FormLayout layout = new FormLayout();
-		parent.setLayout(layout);
-		
-		Composite signaturePanel = createSignaturesPanel(parent);
-		final Sash sash = new Sash(parent, SWT.SMOOTH | SWT.VERTICAL);
-		Composite propertiesPanel = createPropertiesPanel(parent);
-		
-		Composite actionsPanel = null;
-		if (actions) {
-			actionsPanel = createActionsPanel(parent);
-		}
 
-		FormData data;
-		
-		data = new FormData();		
-		data.left = new FormAttachment(0, 0);
-		data.top = new FormAttachment(0, 0);
-		data.right = new FormAttachment(sash, 0);
-		data.bottom = new FormAttachment(100, 0);
-		signaturePanel.setLayoutData(data);
-		
-		data = new FormData();
-		data.left = new FormAttachment(null, Math.max(200, parent.getSize().x / 2));
-		data.top = new FormAttachment(0, 0);
-		data.bottom = new FormAttachment(100, 0);
-		sash.setLayoutData(data);
-		
-		data = new FormData();
-		data.left = new FormAttachment(sash, sash.computeSize(SWT.DEFAULT, SWT.DEFAULT).x);
-		data.top = new FormAttachment(0, 0);
-		data.right = actionsPanel != null ? new FormAttachment(actionsPanel, 0) : new FormAttachment(100, 0);
-		data.bottom = new FormAttachment(100, 0);
-		propertiesPanel.setLayoutData(data);
-
-		if (actionsPanel != null) {
-			data = new FormData();
-			data.top = new FormAttachment(0, 0);
-			data.right = new FormAttachment(100, 0);
-			data.bottom = new FormAttachment(100, 0);
-			actionsPanel.setLayoutData(data);
-		}
-		
-		sash.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				Composite parent = sash.getParent();
-				Rectangle rect = parent.getClientArea();
-				event.x = Math.min (Math.max (event.x, 60), rect.width - 60);
-				if (event.detail != SWT.DRAG) {
-					FormData data = (FormData)sash.getLayoutData();
-					data.left.offset = event.x;
-					parent.layout(true);
-				}
-			}
-		});
-
-		updateNodes();
-	}
-
-	public void dispose() {
+    public void dispose() {
 		cleanup();
 	}
 	
@@ -632,8 +631,8 @@ public class MacGeneratorUI {
 			Shell shell = new Shell(display);
 			MacGenerator gen = new MacGenerator();
 			gen.setXmls(args);
-			gen.setOutputDir("../org.eclipse.hawtjni/Eclipse SWT PI/cocoa/");
-			gen.setMainClass("org.eclipse.hawtjni.internal.cocoa.OS");
+			gen.setOutputDir(new File("target").getCanonicalPath());
+			gen.setMainClass("org.example.Framework");
 			MacGeneratorUI ui = new MacGeneratorUI(gen);
 			ui.open(shell);
 			shell.open();

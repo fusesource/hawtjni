@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  *******************************************************************************/
-package org.fusesource.hawtjni.generator;
+package org.fusesource.hawtjni.ui;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,6 +31,7 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.fusesource.hawtjni.generator.ProgressMonitor;
 import org.fusesource.hawtjni.generator.HawtJNI.UsageException;
 import org.fusesource.hawtjni.generator.util.FileSupport;
 import org.w3c.dom.Document;
@@ -45,6 +46,10 @@ import org.xml.sax.InputSource;
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class MacGenerator {
+    
+    static final String sectionStartText = "/** START: HawtJNI Generated Section */";
+    static final String sectionEndText   = "/** END: HawtJNI Generated Section */";
+    
     String[] xmls;
     Document[] documents;
     String outputDir, mainClassName;
@@ -572,27 +577,52 @@ public class MacGenerator {
 
         String header = "", footer = "";
         String fileName = outputDir + mainClassName.replace('.', '/') + ".java";
-        FileInputStream is = null;
-        try {
-            InputStreamReader input = new InputStreamReader(new BufferedInputStream(is = new FileInputStream(fileName)));
-            StringBuffer str = new StringBuffer();
-            char[] buffer = new char[4096];
-            int read;
-            while ((read = input.read(buffer)) != -1) {
-                str.append(buffer, 0, read);
-            }
-            String section = "/** This section is auto generated */";
-            int start = str.indexOf(section) + section.length();
-            int end = str.indexOf(section, start);
-            header = str.substring(0, start);
-            footer = str.substring(end);
-        } catch (IOException e) {
-        } finally {
+        File file = new File(fileName);
+        if( file.exists() ) {
+            FileInputStream is = null;
             try {
-                if (is != null)
-                    is.close();
+                InputStreamReader input = new InputStreamReader(new BufferedInputStream(is = new FileInputStream(fileName)));
+                StringBuffer str = new StringBuffer();
+                char[] buffer = new char[4096];
+                int read;
+                while ((read = input.read(buffer)) != -1) {
+                    str.append(buffer, 0, read);
+                }
+                
+                int pos = str.indexOf(sectionStartText);
+                if( pos < 0 ) {
+                    throw new RuntimeException("Did not find expect comment in the file ("+fileName+") : "+sectionStartText);
+                }
+                int start = pos + sectionStartText.length();
+                int end = str.indexOf(sectionEndText, start);
+                if( end < 0 ) {
+                    throw new RuntimeException("Did not find expect comment in the file ("+fileName+") : "+sectionEndText);
+                }
+                header = str.substring(0, start);
+                footer = str.substring(end);
+                
             } catch (IOException e) {
+            } finally {
+                try {
+                    if (is != null)
+                        is.close();
+                } catch (IOException e) {
+                }
             }
+        } else {
+            String pkg = "";
+            String clazz = mainClassName;
+            int p = mainClassName.lastIndexOf(".");
+            if( p > 0 ) {
+                pkg = mainClassName.substring(0, p);
+                clazz = mainClassName.substring(p+1);
+            }
+            header = "";
+            if( pkg.length() > 0 ) {
+                header += "package "+pkg+";\n";
+            }
+            header += "class "+clazz+" {\n"+sectionStartText+"\n";
+            footer = "\n"+sectionEndText+"\n}\n";
         }
 
         out(header);
@@ -643,8 +673,7 @@ public class MacGenerator {
         try {
             out.flush();
             if (out.size() > 0) {
-                FileSupport.write(out.toByteArray(), new File(fileName));
-                
+                FileSupport.write(out.toByteArray(), file);
             }
         } catch (Exception e) {
             System.out.println("Problem");
@@ -961,8 +990,13 @@ public class MacGenerator {
 
     boolean isStruct(Node node) {
         NamedNodeMap attributes = node.getAttributes();
-        String code = attributes.getNamedItem("type").getNodeValue();
-        return code.startsWith("{");
+        Node namedItem = attributes.getNamedItem("type");
+        if( namedItem==null ) {
+            return false;
+        } else {
+            String code = namedItem.getNodeValue();
+            return code.startsWith("{");
+        }
     }
 
     boolean isFloatingPoint(Node node) {

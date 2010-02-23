@@ -103,6 +103,11 @@ public enum MethodFlag {
     ADDER,
 
     /**
+     * Indicate that the return value is a pointer.
+     */
+    POINTER_RETURN,
+
+    /**
      * Indicate that this method will be the constant initializer for
      * the class.  When called, it will set all the static constant fields
      * to the values defined in your platform.

@@ -21,14 +21,6 @@
   <name>HawtJNI UI</name>
   <description>This module contains UI tools for HawtJNI</description>
 
-  <repositories>
-    <repository>
-      <id>codehaus</id>
-      <name>Maven Codehaus repository</name>
-      <url>http://repository.codehaus.org</url>
-    </repository>
-  </repositories>
-
   <dependencies>
 
     <dependency>
@@ -43,24 +35,31 @@
       <version>3.5</version>
       <classifier>${swt-platform}</classifier>
     </dependency>
-
     <dependency>
       <groupId>com.miglayout</groupId>
       <artifactId>miglayout</artifactId>
-      <version>3.7.1</version>
+      <version>3.7.2</version>
       <classifier>swt</classifier>
     </dependency>
-    
     <dependency>
-      <groupId>org.jruby.embed</groupId>
-      <artifactId>jruby-embed</artifactId>
-      <version>0.1.2</version>
+      <groupId>com.mozilla</groupId>
+      <artifactId>MozillaInterfaces</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/MozillaInterfaces.jar</systemPath>
     </dependency>
+    
     
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.7</version>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>      
       <scope>test</scope>
     </dependency>
 
@@ -68,9 +67,7 @@
 
   <build>
     <plugins>
-      
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.0.2</version>
         <configuration>
@@ -78,7 +75,7 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-            
+      
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>osxappbundle-maven-plugin</artifactId>
@@ -103,4 +100,36 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os><family>mac</family></os>
+      </activation>
+      <properties>
+        <swt-platform>cocoa-macosx</swt-platform>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os><family>windows</family></os>
+      </activation>
+      <properties>
+        <swt-platform>win32-win32-x86</swt-platform>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>linux</id>
+      <properties>
+        <swt-platform>gtk-linux-x86</swt-platform>
+      </properties>
+      <activation>
+        <os><name>linux</name></os>
+      </activation>
+    </profile>
+  </profiles>
+  
 </project>

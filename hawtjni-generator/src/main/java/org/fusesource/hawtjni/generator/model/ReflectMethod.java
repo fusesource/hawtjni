@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
-import static org.fusesource.hawtjni.generator.util.TextSupport.cast;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -24,8 +22,10 @@ import org.fusesource.hawtjni.runtime.ArgFlag;
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniMethod;
 import org.fusesource.hawtjni.runtime.MethodFlag;
-import org.fusesource.hawtjni.runtime.Pointer;
 import org.fusesource.hawtjni.runtime.T32;
+
+import static org.fusesource.hawtjni.generator.util.TextSupport.*;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * 
@@ -128,7 +128,7 @@ public class ReflectMethod implements JNIMethod {
         if( annotation == null ) {
             return false;
         }
-        return annotation.pointer() == Pointer.DETERMINE_FROM_CAST ? getCast().endsWith("*)") : annotation.pointer()==Pointer.TRUE;
+        return getFlag(POINTER_RETURN) || ( returnType.getWrappedClass() == Long.TYPE && getCast().endsWith("*)") );
     }
 
     public String getCopy() {

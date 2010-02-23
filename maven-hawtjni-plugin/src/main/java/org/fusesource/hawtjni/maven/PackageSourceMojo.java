@@ -73,11 +73,35 @@ public class PackageSourceMojo extends AbstractMojo {
      */
     private String sourceClassifier;
     
+    /**
+     * Should we skip executing the autogen.sh file.
+     * 
+     * @parameter default-value="${skip-autogen}"
+     */
+    private boolean skipAutogen;
+    
+    
     public void execute() throws MojoExecutionException {
         try {
+
             String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+sourceClassifier;
-            Archiver archiver = archiverManager.getArchiver( "zip" );
             File packageFile = new File(new File(project.getBuild().getDirectory()), packageName+".zip");
+
+            // Verify the the configure script got generated before packaging.
+            File configure = new File(packageDirectory, "configure");
+            if( !skipAutogen && !configure.exists() ) {
+                // Looks like this platform could not generate the 
+                // configure script.  So don't install deploy
+                // partially created source package.
+                getLog().info("");
+                getLog().warn("Will NOT package the native sources to: "+packageFile);
+                getLog().info("  Native source build directory did not contain a 'configure' script.");
+                getLog().info("  To ignore this warnning and package it up anyways configure the plugin with: <skipAutogen>true</skipAutogen>");
+                getLog().info("");
+                return;
+            }        
+            
+            Archiver archiver = archiverManager.getArchiver( "zip" );
             archiver.setDestFile( packageFile);
             archiver.setIncludeEmptyDirs(true);
             archiver.addDirectory(packageDirectory, packageName+"/");

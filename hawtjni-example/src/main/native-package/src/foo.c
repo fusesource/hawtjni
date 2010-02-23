@@ -23,3 +23,7 @@ long foowork(struct foo **arg, int count) {
 	}
 	return rc;
 }
+
+long callmeback(void (*thecallback)(int number)) {
+	thecallback(69);
+}

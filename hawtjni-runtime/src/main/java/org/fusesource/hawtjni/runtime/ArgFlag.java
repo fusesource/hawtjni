@@ -47,6 +47,11 @@ public enum ArgFlag {
     INIT,
     
     /**
+     * Indicate that the parameter is a pointer.
+     */
+    POINTER_ARG,
+
+    /**
      * Indicate that a structure parameter should be passed by value 
      * instead of by reference. This dereferences the parameter by 
      * prepending *. The parameter must not be NULL.

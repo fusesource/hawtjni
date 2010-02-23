@@ -1,11 +1,5 @@
 package org.fusesource.hawtjni.ui;
 
-import static org.eclipse.swt.SWT.*;
-import static org.fusesource.hawtjni.clang.ClangSupport.*;
-import static org.fusesource.hawtjni.ui.IOSupport.*;
-import static org.fusesource.hawtjni.ui.UISupport.*;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -34,6 +28,11 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.fusesource.hawtjni.clang.jaxb.ClangXml;
 import org.fusesource.hawtjni.clang.jaxb.Function;
+
+import static org.eclipse.swt.SWT.*;
+import static org.fusesource.hawtjni.clang.ClangSupport.*;
+import static org.fusesource.hawtjni.ui.IOSupport.*;
+import static org.fusesource.hawtjni.ui.UISupport.*;
 
 public class UI {
 
@@ -132,7 +131,6 @@ public class UI {
         }
         
         MozillaSupport.installProtocol("app", "52183e20-4d4b-11de-8a39-0800200c9a32", new MozillaSupport.UriHandler() {
-            @Override
             public InputStream open(URI uri) throws IOException {
                 String path = uri.getSchemeSpecificPart();
                 return UI.class.getClassLoader().getResourceAsStream("META-INF/app/"+path);
@@ -218,14 +216,12 @@ public class UI {
         });
      
         filterText.addModifyListener(new ModifyListener() {
-            @Override
             public void modifyText(ModifyEvent event) {
                 updateFunctionList();
             }
         });
 
         symbolTable.addSelectionListener(new SelectionListener() {
-            @Override
             public void widgetSelected(SelectionEvent event) {
                 if( event.detail == CHECK ) {
                     System.out.println("checked");
@@ -237,7 +233,6 @@ public class UI {
                 }
             }
 
-            @Override
             public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
@@ -276,7 +271,6 @@ public class UI {
                     final Function f = (Function) unit;
                     if (!sortedFunctionTree.containsKey(f.name)) {
                         sortedFunctionTree.put(f.name, new Runnable() {
-                            @Override
                             public void run() {
                                 displayFunction(xml, f);
                             }

@@ -26,4 +26,10 @@ public enum FieldFlag {
      * static.
      */
     CONSTANT,
+    
+    /**
+     * Indicate that the field is a pointer.
+     */
+    POINTER_FIELD,
+    
 }

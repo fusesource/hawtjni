@@ -1,0 +1,44 @@
+---
+title: HawtJNI
+in_menu: true
+sort_info: 1
+--- name:overview pipeline:haml,tags
+
+%h1 {project_name:}
+
+{project_slogan:}
+
+--- name:content pipeline:tags,markdown
+
+{project_name:}
+===============
+
+{project_name:} is a code generator that produces the JNI code needed to implement java native methods.  It is based on the [jnigen](http://www.eclipse.org/swt/jnigen.php) code generator that is part of the SWT Tools 
+project which is used to generate all the JNI code which powers the eclipse platform.
+
+Features
+--------
+
+* JNI code generated declaratively from annotations on your java code
+* Maven integration:
+  * Generates JNI source code
+  * Generates an autoconf and msbuild source project to build the native library. This gets attached to the maven project as as the native source zip file.
+  * Builds the native source tar for the current platform
+  * Built native library is stored in a platform specific jar.  This gets attached to the maven project as a platform specific jar file.
+
+Introduction
+------------
+
+There are many open source JNI code generators available, but if your performance sensitive,
+the code generator used by the eclipse SWT project is by far the best option.  The biggest 
+problem is that it was not developed to be reused by other projects.  It was tightly coupled
+to producing the SWT jni libraries and it could only be run within the eclipse platform.
+
+HawtJNI has taken that code generator and made it easier to use and accessible to more projects.
+
+
+Getting started
+---------------
+
+For more information, checkout the [developer guide](documentation/index.html)
+

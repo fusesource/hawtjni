@@ -35,7 +35,6 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.FileUtils.FilterWrapper;
-import org.codehaus.plexus.util.cli.Arg;
 import org.fusesource.hawtjni.generator.HawtJNI;
 import org.fusesource.hawtjni.generator.ProgressMonitor;
 
@@ -121,21 +120,21 @@ public class GenerateMojo extends AbstractMojo {
     /**
      * Should we skip executing the autogen.sh file.
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="${skip-autogen}"
      */
     private boolean skipAutogen;
     
     /**
      * Should we force executing the autogen.sh file.
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="${force-autogen}"
      */
     private boolean forceAutogen;
 
     /**
      * Should we display all the native build output?
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="${hawtjni-verbose}"
      */
     private boolean verbose;
 
@@ -144,7 +143,16 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    private List<Arg> autogenArgs;
+    private List<String> autogenArgs;
+    
+    /**
+     * Set this value to false to disable the callback support in HawtJNI.
+     * Disabling callback support can substantially reduce the size
+     * of the generated native library.  
+     * 
+     * @parameter default-value="true"
+     */
+    private boolean callbacks;
     
     private File targetSrcDir;
     
@@ -164,6 +172,7 @@ public class GenerateMojo extends AbstractMojo {
         generator.setCopyright(copyright);
         generator.setNativeOutput(generatedNativeSourceDirectory);
         generator.setPackages(packages);
+        generator.setCallbacks(callbacks);
         generator.setProgress(new ProgressMonitor() {
             public void step() {
             }
@@ -209,11 +218,15 @@ public class GenerateMojo extends AbstractMojo {
             File configure = new File(packageDirectory, "configure");
             if( !autogen.exists() ) {
                 copyTemplateResource("autogen.sh", false);
-                cli.chmod("a+x", autogen);
+                cli.setExecutable(autogen);
             }
             if( !skipAutogen ) {
                 if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {
-                    cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
+                    try {
+                        cli.system(packageDirectory, new String[] {"./autogen.sh"}, autogenArgs);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             

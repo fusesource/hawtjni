@@ -50,7 +50,7 @@
     the operating systems on which it is implemented.
   </description>
 
-  <url>http://${forge-project-id}.fusesource.org</url>
+  <url>http://hawtjni.fusesource.org</url>
   <organization>
     <name>Progress Software Inc.</name>
     <url>http://fusesource.com/</url>

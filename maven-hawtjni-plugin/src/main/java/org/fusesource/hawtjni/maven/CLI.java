@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.util.cli.Arg;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
@@ -24,11 +23,21 @@ public class CLI {
 	public boolean verbose;
 	public Log log;
 
-    public void chmod(String permision, File path) {
-        if( !IS_WINDOWS && !path.canExecute() ) {
+	
+    public void setExecutable(File path) {
+        if( IS_WINDOWS ) {
+            return;
+        }
+        try {
+            // These are Java 1.6 Methods..
+            if( !path.canExecute() ) {
+                path.setExecutable(true);
+            }
+        } catch (NoSuchMethodError e1) {
+            // Do it the old fasioned way...
             try {
-                system(path.getParentFile(), new String[] { "chmod", permision, path.getCanonicalPath() });
-            } catch (Throwable e) {
+                system(path.getParentFile(), new String[] { "chmod", "a+x", path.getCanonicalPath() });
+            } catch (Throwable e2) {
             }
         }
     }
@@ -37,15 +46,15 @@ public class CLI {
         return system(wd, command, null);
     }
     
-    public int system(File wd, String[] command, List<Arg> args) throws CommandLineException {
+    public int system(File wd, String[] command, List<String> args) throws CommandLineException {
         Commandline cli = new Commandline();
         cli.setWorkingDirectory(wd);
         for (String c : command) {
             cli.createArg().setValue(c);
         }
         if( args!=null ) {
-            for (Arg arg : args) {
-                cli.addArg(arg);
+            for (String arg : args) {
+                cli.createArg().setValue(arg);
             }
         }
         log.info("executing: "+cli);

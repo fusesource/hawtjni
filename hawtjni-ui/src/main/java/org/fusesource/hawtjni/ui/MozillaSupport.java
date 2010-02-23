@@ -42,41 +42,41 @@ public class MozillaSupport {
             this.handler = handler;
         }
 
-        @Override
+        
         public nsISupports queryInterface(String uuid) {
             if (uuid.equals(nsIProtocolHandler.NS_IPROTOCOLHANDLER_IID) || uuid.equals(nsIProtocolHandler.NS_ISUPPORTS_IID))
                 return this;
             return null;
         }
 
-        @Override
+        
         public String getScheme() {
             return protocol;
         }
 
-        @Override
+        
         public int getDefaultPort() {
             return -1;
         }
 
-        @Override
+        
         public long getProtocolFlags() {
             return nsIProtocolHandler.URI_NOAUTH;
         }
 
-        @Override
+        
         public boolean allowPort(int port, String scheme) {
             return false;
         }
 
-        @Override
+        
         public nsIURI newURI(String spec, String originCharset, nsIURI baseURI) {
             nsIURI uri = create_nsIURI();
             uri.setSpec(spec);
             return uri;
         }
 
-        @Override
+        
         public nsIChannel newChannel(final nsIURI uri) {
             File file = null;
             try {
@@ -99,10 +99,10 @@ public class MozillaSupport {
                 // Wrap the channel so we know when the transfer completes so we can 
                 // delete the temp file.
                 return new ChannelFilter(actualChannel) {
-                    @Override
+                    
                     public void asyncOpen(final nsIStreamListener listener, final nsISupports context) {
                         next.asyncOpen(new StreamListenerFilter(listener) {
-                            @Override
+                            
                             public void onStopRequest(nsIRequest aRequest, nsISupports aContext, long aStatusCode) {
                                 try {
                                     next.onStopRequest(aRequest, aContext, aStatusCode);
@@ -131,7 +131,7 @@ public class MozillaSupport {
             this.next = next;
         }
 
-        @Override
+        
         public nsISupports queryInterface(String uuid) {
             if (uuid.equals(nsIStreamListener.NS_ISTREAMLISTENER_IID) 
                     || uuid.equals(nsIStreamListener.NS_IREQUESTOBSERVER_IID)
@@ -140,17 +140,17 @@ public class MozillaSupport {
             return next.queryInterface(uuid);
         }
 
-        @Override
+        
         public void onDataAvailable(nsIRequest aRequest, nsISupports aContext, nsIInputStream aInputStream, long aOffset, long aCount) {
             next.onDataAvailable(aRequest, aContext, aInputStream, aOffset, aCount);
         }
 
-        @Override
+        
         public void onStartRequest(nsIRequest aRequest, nsISupports aContext) {
             next.onStartRequest(aRequest, aContext);
         }
 
-        @Override
+        
         public void onStopRequest(nsIRequest aRequest, nsISupports aContext, long aStatusCode) {
             next.onStopRequest(aRequest, aContext, aStatusCode);
         }
@@ -164,7 +164,6 @@ public class MozillaSupport {
             this.next = next;
         }
 
-        @Override
         public nsISupports queryInterface(String uuid) {
             if (uuid.equals(nsIChannel.NS_ICHANNEL_IID) 
                     || uuid.equals(nsIChannel.NS_IREQUEST_IID)
@@ -173,62 +172,62 @@ public class MozillaSupport {
             return next.queryInterface(uuid);
         }
 
-        @Override
+        
         public void asyncOpen(nsIStreamListener aListener, nsISupports aContext) {
             next.asyncOpen(aListener, aContext);
         }
 
-        @Override
+        
         public String getContentCharset() {
             return next.getContentCharset();
         }
 
-        @Override
+        
         public int getContentLength() {
             return next.getContentLength();
         }
 
-        @Override
+        
         public String getContentType() {
             return next.getContentType();
         }
 
-        @Override
+        
         public nsIInterfaceRequestor getNotificationCallbacks() {
             return next.getNotificationCallbacks();
         }
 
-        @Override
+        
         public nsIURI getOriginalURI() {
             return next.getOriginalURI();
         }
 
-        @Override
+        
         public nsISupports getOwner() {
             return next.getOwner();
         }
 
-        @Override
+        
         public nsISupports getSecurityInfo() {
             return next.getSecurityInfo();
         }
 
-        @Override
+        
         public nsIURI getURI() {
             return next.getURI();
         }
 
-        @Override
+        
         public nsIInputStream open() {
             return next.open();
         }
 
-        @Override
+        
         public void setContentCharset(String aContentCharset) {
             next.setContentCharset(aContentCharset);
         }
 
-        @Override
+        
         public void setContentLength(int aContentLength) {
             next.setContentLength(aContentLength);
         }

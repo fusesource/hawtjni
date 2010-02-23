@@ -1,0 +1,42 @@
+--- name:paths
+#
+# You cand define metainfo for mutliple pages in this file.
+#
+
+**/*.page: # <-- That means the following attributes get applied to all pages
+     # in the site.
+
+  # -------------------------------------------------------------------
+  # You can easily switch the site from one look to another here:
+  # -------------------------------------------------------------------
+  #template: /styles/default/default.template
+  template: /styles/impact/main.template
+  
+  # -------------------------------------------------------------------
+  # Define the project properties here, these can be accessed in the 
+  # pages using the {var:} syntax.
+  # -------------------------------------------------------------------
+  project_name: "HawtJNI"
+  project_slogan: 'Making JNI easy and fast.'
+  project_id: 'hawtjni'
+  project_jira_key: 'HAWTJNI'
+  project_issue_url: 'http://fusesource.com/issues/browse/HAWTJNI'
+  project_forums_url: 'http://fusesource.com/forums'
+  project_wiki_url: 'http://fusesource.com/wiki/display/HAWTJNI'
+  project_logo: "/images/project-logo.png"
+  project_version: "1.0-SNAPSHOT"
+
+  # -------------------------------------------------------------------
+  # TODO it would be nice to define these in terms of the project_id variable!
+  # -------------------------------------------------------------------
+  project_svn_url: 'http://fusesource.com/forge/svn/hawtjni/trunk'
+  project_svn_branches_url: 'http://fusesource.com/forge/svn/hawtjni/branches'
+  project_svn_tags_url: 'http://fusesource.com/forge/svn/hawtjni/tags'
+  project_maven_groupId: 'org.fusesource.hawtjni'
+  project_maven_artifactId: hawtjni-core
+  project_git_browser: 'http://github.com/chirino/hawtjni'
+  project_git_url: 'git://github.com/chirino/hawtjni.git'
+
+blog/*/**/*:
+  template: /styles/impact/blog.template
+  output_path_style: [:parent, :year, /, :month, /, :cnbase, [., :lang], :ext]

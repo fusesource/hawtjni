@@ -32,8 +32,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "parmVar",
+    "parmVar"
 })
+
 @XmlRootElement(name = "Function")
 public class Function {
 

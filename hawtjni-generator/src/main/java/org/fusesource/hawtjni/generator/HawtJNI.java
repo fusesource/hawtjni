@@ -57,6 +57,7 @@ public class HawtJNI {
     private List<String> packages = new ArrayList<String>();
     private String name = "hawtjni_native";
     private String copyright = "";
+    private boolean callbacks = true;
     
     ///////////////////////////////////////////////////////////////////
     // Command line entry point
@@ -193,6 +194,14 @@ public class HawtJNI {
     public void setCopyright(String copyright) {
         this.copyright = copyright;
     }
+    
+    public boolean isCallbacks() {
+        return callbacks;
+    }
+
+    public void setCallbacks(boolean enableCallbacks) {
+        this.callbacks = enableCallbacks;
+    }
 
     public void generate() throws UsageException, IOException {
         progress("Analyzing classes...");
@@ -242,6 +251,13 @@ public class HawtJNI {
         file = new File(nativeOutput, "hawtjni.c");
         generateFromResource("hawtjni.c", file);
 
+        file = new File(nativeOutput, "hawtjni-callback.c");
+        if( callbacks ) {
+            generateFromResource("hawtjni-callback.c", file);
+        } else {
+            file.delete();
+        }
+        
         file = new File(nativeOutput, "windows");
         file.mkdirs();
         file = new File(file, "stdint.h");

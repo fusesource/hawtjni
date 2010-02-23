@@ -11,6 +11,7 @@
 /* == HEADER-SNIP-LOCATION == */ 
 #include "hawtjni.h"
 #include <stdlib.h>
+#include <string.h>
 
 int IS_JNI_1_2 = 0;
 

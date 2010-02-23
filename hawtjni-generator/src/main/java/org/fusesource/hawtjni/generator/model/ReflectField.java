@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
-import static org.fusesource.hawtjni.generator.util.TextSupport.*;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 
 import org.fusesource.hawtjni.runtime.FieldFlag;
 import org.fusesource.hawtjni.runtime.JniField;
-import org.fusesource.hawtjni.runtime.Pointer;
 import org.fusesource.hawtjni.runtime.T32;
+
+import static org.fusesource.hawtjni.generator.util.TextSupport.*;
+import static org.fusesource.hawtjni.runtime.FieldFlag.*;
 
 /**
  * 
@@ -91,7 +91,7 @@ public class ReflectField implements JNIField {
         if( annotation == null ) {
             return false;
         }
-        return annotation.pointer() == Pointer.DETERMINE_FROM_CAST ? getCast().endsWith("*)") : annotation.pointer()==Pointer.TRUE;
+        return getFlag(POINTER_FIELD) || ( type.getWrappedClass() == Long.TYPE && getCast().endsWith("*)") );
     }
 
     public String getConditional() {

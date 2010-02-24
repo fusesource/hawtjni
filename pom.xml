@@ -29,6 +29,8 @@
   <properties>
     <forge-project-id>hawtjni</forge-project-id>
     <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
+    
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <url>http://${forge-project-id}.fusesource.org</url>
@@ -114,15 +116,6 @@
           <target>1.5</target>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
         
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -195,7 +188,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.5</version>
+        <version>2.6.1</version>
         <configuration>
           <excludePackageNames>*.internal</excludePackageNames>
           <linksource>true</linksource>
@@ -238,13 +231,6 @@
   
 
   <profiles>
-    <profile>
-      <id>gshell</id>
-      <modules>
-        <module>mop-gshell</module>
-      </modules>
-    </profile>
-
     <!--
       To generate a graph of the project dependencies, run: mvn -P graph
       graph:project
@@ -294,11 +280,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
+            <version>2.1.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
                 <goals>
-                  <goal>jar</goal>
+                  <goal>jar-no-fork</goal>
                 </goals>
               </execution>
             </executions>
@@ -307,7 +294,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.5</version>
+            <version>2.6.1</version>
             <configuration>
               <encoding>${project.build.sourceEncoding}</encoding>
             </configuration>
@@ -315,7 +302,7 @@
               <execution>
                 <id>attach-javadocs</id>
                 <goals>
-                  <goal>javadoc:aggregate</goal>
+                  <goal>jar</goal>
                 </goals>
               </execution>
             </executions>

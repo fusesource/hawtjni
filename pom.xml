@@ -307,10 +307,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.6.1</version>
+            <version>2.6</version>
+            
             <configuration>
               <encoding>${project.build.sourceEncoding}</encoding>
             </configuration>
+            
             <executions>
               <execution>
                 <id>attach-javadocs</id>

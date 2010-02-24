@@ -73,9 +73,9 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:git://forge.fusesource.com/${forge-project-id}.git</connection>
-    <developerConnection>scm:git:ssh://git@forge.fusesource.com/${forge-project-id}.git</developerConnection>
-    <url>http://fusesource.com/forge/gitweb?p=${forge-project-id}.git</url>
+    <connection>scm:git:git://forge.fusesource.com/hawtjni.git</connection>
+    <developerConnection>scm:git:ssh://git@forge.fusesource.com/hawtjni.git</developerConnection>
+    <url>http://fusesource.com/forge/gitweb?p=hawtjni.git</url>
   </scm>
 
   <distributionManagement>

@@ -31,6 +31,7 @@
     <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
     
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <release-altGitURL>scm:git:ssh://git@forge.fusesource.com/${forge-project-id}.git</release-altGitURL>
   </properties>
 
   <url>http://${forge-project-id}.fusesource.org</url>
@@ -73,9 +74,9 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:git://forge.fusesource.com/hawtjni.git</connection>
-    <developerConnection>scm:git:ssh://git@forge.fusesource.com/hawtjni.git</developerConnection>
-    <url>http://fusesource.com/forge/gitweb?p=hawtjni.git</url>
+    <connection>scm:git:git://forge.fusesource.com/${forge-project-id}.git</connection>
+    <developerConnection>${release-altGitURL}</developerConnection>
+    <url>http://fusesource.com/forge/gitweb?p=${forge-project-id}.git</url>
   </scm>
 
   <distributionManagement>

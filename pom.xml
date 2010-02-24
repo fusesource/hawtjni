@@ -75,6 +75,7 @@
   
   <scm>
     <connection>scm:git:git://forge.fusesource.com/${forge-project-id}.git</connection>
+    <!-- Work around for issue: http://jira.codehaus.org/browse/SCM-444 -->
     <developerConnection>${release-altGitURL}</developerConnection>
     <url>http://fusesource.com/forge/gitweb?p=${forge-project-id}.git</url>
   </scm>
@@ -95,7 +96,17 @@
       <name>website</name>
       <url>dav:http://fusesource.com/forge/dav/${forge-project-id}/maven/${project.version}</url>
     </site>
-  </distributionManagement> 
+  </distributionManagement>
+  
+  <developers>
+    <developer>
+      <id>chirino</id>
+      <name>Hiram Chirino</name>
+      <email>hiram@hiramchirino.com</email>
+      <url>http://hiramchirino.com</url>
+      <timezone>GMT-5</timezone>
+    </developer>
+  </developers>
 
   <build>
     <defaultGoal>install</defaultGoal>

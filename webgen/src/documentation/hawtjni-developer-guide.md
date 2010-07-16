@@ -63,7 +63,7 @@ you don't have to worry installing it to the java library path.
 The HawtJNI build process will take care of implementing your `simple` jni library
 by using some maven tooling which we will cover in the next example.
 
-## Building with Maven 
+### Building with Maven 
 
 If you are not familiar with Maven, please checkout 
 [Maven by Example](http://www.sonatype.com/books/mvnex-book/reference/public-book.html).
@@ -91,7 +91,8 @@ easily use them as dependencies in their builds.
 You may also be interesting in 
 [How to Add HawtJNI to an Existing Maven Build](#adding-to-maven-build).
 
-## Native Method Mapping {#method-mapping}
+## Mapping Native Methods {#method-mapping}
+### Overview
 
 HawtJNI looks for all classes annotated with `@JniClass`. For every static
 native method found, it will generate the corresponding JNI function which calls
@@ -185,7 +186,6 @@ to the method and the `@JniArg` to each method argument.
      */
     ADDER,
 -->
-### Default Type Mappings {#default-type-mappings}
 
 Without additional configuration native methods automatically convert the
 method arguments and return types to the corresponding type of the
@@ -283,7 +283,7 @@ The native method definition can then just take COORD java object as an argument
 public static native void display_coord(COORD position);
 {pygmentize}
 
-### Nested Structs and Unions
+### Nested Structures
 
 Nested native structures are also easy.  For example:
 
@@ -303,7 +303,7 @@ public static class RECT {
 }
 {pygmentize}
 
-### Passing Structs By Value
+### Passing Structures By Value
 
 You probably noticed that structures are passed by reference by default. If your
 native method accepts the structure by value instead, then you need to annotate the method argument with the `BY_VALUE` flag.  
@@ -321,7 +321,7 @@ Then your Java method mapping would look like
 
 The passed object MUST not be `null`.
 
-### Typedef Structures
+### Using Typedefed Structures
 
 If the structure name your mapping is actually a typedef, in other words, the type is referred to in native code by just the plain `name` and not the `struct name`, then you need to add the `TYPEDEF` flag to struct definition.
 
@@ -343,7 +343,7 @@ public static class COORD {
 }
 {pygmentize}
 
-### Zeroing Out Structures
+### Zero Out Structures
 
 You do NOT have to map all the native fields in a structure it's corresponding Java structure class. You will actually get better performance if you only map the fields that will be accessed by your Java application.
 
@@ -407,7 +407,10 @@ public static class COORD {
      */
     GETTER,
 -->    
-## Loading Platform Constants {#platform-constants}
+
+## Advanced Mapping Topics
+
+### Loading Constants {#platform-constants}
 
 Many times you need to access the value of platform constants.  To load
 platform constants you will need to:
@@ -437,7 +440,7 @@ platform constants you will need to:
     {pygmentize}
 
 
-## Accessors: Changing the Function or Field Accessed {#accessors}
+### Renaming {#accessors}
 
 If you want to call your java method something different from the native method
 name, you can set the `accessor` attribute on a `@JniMethod` or `@JniField` annotation.
@@ -470,7 +473,7 @@ are not a simple symbol, for example the size of a structure:
   public static int SIZEOF_COORD;
 {pygmentize}
 
-## Working with Pointers {#pointers}
+### Pointers {#pointers}
 
 If you want the same java class to be able to work with 32 bit and 64 bit
 pointers, you should map pointers to Java `long`. If your only targeting 32 bit
@@ -502,7 +505,7 @@ This is very common on the Windows platform where tend to typedef pointer types 
 
 You may be tempted to do pointer arithmetic on the java side long value, but DON'T.  The native pointer is a combination of signed/unsigned, and 32/64 bit value which may more may not match java's memory model.  Adding offsets to the pointer on the java side will likely result in a invalid pointer location.
 
-## Allocating Arrays and Structures on the Native Heap {#heap-structures}
+### Using the Native Heap {#heap-structures}
 
 The memory associated with a passed structure or array is reclaimed at the end of every native method call.  Therefore, a method expects a passed array or structure reference to remain valid after the method call then that array or structure needs to be allocated on the native heap instead.
 
@@ -559,7 +562,7 @@ Now you can allocate and initialize a structure on the heap:
 
 <!-- TODO: talk about pointer arithmetic to index into an array of structs -->
 
-## Callbacks: Calling Java methods from native functions.
+### Callbacks: Calling Java methods from native functions.
 
 Some native functions require a callback function pointer as an argument.  You can
 create one using a `Callback` object.  For example, lets say needed to call the following
@@ -604,7 +607,7 @@ Warning: you can only create up to 128 Callbacks concurrently.  If you exceed th
 `callback.getAddress()` returns zero.  You should use the `callback.dispose()` method
 to release a callback once it's not being used anymore.
 
-## Optimizations {#optimizations}
+### Optimizations {#optimizations}
 
 If you have performance sensitive method that works on an Array or Structure,
 setting on of the following flags may help your performance.
@@ -636,7 +639,7 @@ define the `memmove` method as follows:
 {pygmentize}
 
 
-## Conditionals {#conditionals}
+### Conditionals {#conditionals}
 
 You can use the `conditional` attribute on the `@JniClass`, `@JniMethod` and `@JniField` annotations to control if JNI code associated
 with the class, method, or field gets conditionally compiled out.
@@ -664,10 +667,21 @@ The `conditional` on a `@JniMethod` or `@JniField` defaults to value configured 
 the enclosing `@JniClass`. So if most of the fields or methods in a class need to
 have have the same conditional applied, just set it on the `@JniClass` annotation.
 
-## How to Add HawtJNI to an Existing Maven Build {#adding-to-maven-build}
+## Maven Plugin Reference {#adding-to-maven-build}
 
 The HawtJNI provides a maven plugin which makes it easy code generate and build
-the native library for your current platform.  
+the native library for your current platform.
+
+The maven tooling takes care of:
+
+* Generating the native JNI source code from your annotated Java code
+* Generating a GNU make and MS Build compatible source project for building the native library
+* Attaches the source project as `native-src.zip` artifact to the maven build
+* Kicking of a native build of the library using the platform's build tools
+* Packages the native library in a `platform.jar` and attaches the artifact to the maven build.
+* Updates the test build path so that unit tests can use the build native library.
+
+### Usage
 
 Once you have a working maven build for a java module, you can then update it to
 use HawtJNI to generate your JNI libraries. With the following steps:
@@ -769,7 +783,7 @@ use HawtJNI to generate your JNI libraries. With the following steps:
     <pom>
     {pygmentize}
 
-### Generation Details
+### Build Phases
 
 You may have noticed that HawtJNI is generating a slew of code in different
 directories. Here is a breakdown of what gets generated where and during which
@@ -798,6 +812,56 @@ jarred and attached to the maven build with a platform specific classifier.
 4. __package-source__: The contents of
 `target/generated-sources/hawtjni/native-package` get zipped up into a platform
 agnostic source package for building the native library.
+
+## Platform Build Tools Requirements
+
+### Windows
+
+Download and install the free [Microsoft Windows SDK][ms_sdk].  The SDK includes
+all the headers, libraries, and build tools needed to compile the JNI library.
+
+Set the `JAVA_HOME` environment variable to the location where your JDK is 
+installed.  
+
+Make sure the `vcbuild` tool is on in your system PATH.  The simplest way 
+to use SDK command prompt by following the following menu choices: 
+`Start > All Programs > Microsoft Windows SDK ... > CMD`
+    
+[ms_sdk]: http://www.microsoft.com/downloads/details.aspx?FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505
+
+### Ubuntu Linux
+
+On Ubuntu you need a JDK and the `build-essential` package installed to do 
+native library builds.
+
+If you want to be able to generate the `native-src.zip` which contains a GNU style 
+make project, then you will also need the following packages installed:
+ 
+* automake1.10 
+* libtool
+
+Install them is by running:
+
+    sudo apt-get install build-essential automake1.10 libtool
+
+### Fedora Core Linux
+
+On Ubuntu you need a JDK and the and gcc package installed to do 
+native library builds.
+
+Install them is by running:
+
+    yum install gcc java-1.6.0-openjdk-devel
+
+If you want to be able to generate the `native-src.zip` which contains a GNU style 
+make project, then you will also need the following packages installed:
+
+* automake
+* libtool
+
+Install them is by running:
+
+    yum install automake libtool
 
 <!-- TODO:
 ### Using Autoconf to Detect Platform Features

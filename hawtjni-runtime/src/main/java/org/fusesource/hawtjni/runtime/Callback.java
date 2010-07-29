@@ -100,7 +100,7 @@ public class Callback {
      * @param errorResult
      *            the return value if the java code throws an exception
      */
-    public Callback(Object object, String method, int argCount, boolean isArrayBased, int /* long */errorResult) {
+    public Callback(Object object, String method, int argCount, boolean isArrayBased, long /* int */errorResult) {
 
         /* Set the callback fields */
         this.object = object;

@@ -4,10 +4,10 @@ template: ~
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="{lang:}">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="description" content="description goes here" />
-    <meta name="keywords" content="keywords,goes,here" />
-    <meta name="author" content="Your Name" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="description" content="HawtJNI is a code generator that produces the JNI code needed to implement java native methods."/>
+    <meta name="keywords" content="JNI,C,Java,C++,jnigen,swt,maven,code,generator,native,jna"/>
+    <meta name="author" content="Hiram Chirino"/>
 
     <link href="{relocatable: css/site.css}" rel="stylesheet" type="text/css" />
     <link href="{relocatable: css/pygmentize.css}" rel="stylesheet" type="text/css" />

@@ -57,7 +57,7 @@ typedef struct CALLBACK_DATA {
   jboolean isStatic;
   jboolean isArrayBased; 
   jint argCount;
-  jintLong errorResult;
+  jlong errorResult;
 } CALLBACK_DATA;
   
 static JavaVM *jvm = NULL;
@@ -502,8 +502,8 @@ jintLong fnx_array[MAX_ARGS+1][MAX_CALLBACKS] = {
 
 /* --------------- class Callback Native Methods --------------- */
 
-JNIEXPORT jintLong JNICALL Java_org_fusesource_hawtjni_runtime_Callback_bind
-  (JNIEnv *env, jclass that, jobject callbackObject, jobject object, jstring method, jstring signature, jint argCount, jboolean isStatic, jboolean isArrayBased, jintLong errorResult)
+JNIEXPORT jlong JNICALL Java_org_fusesource_hawtjni_runtime_Callback_bind
+  (JNIEnv *env, jclass that, jobject callbackObject, jobject object, jstring method, jstring signature, jint argCount, jboolean isStatic, jboolean isArrayBased, jlong errorResult)
 {
   int i;
   jmethodID mid = NULL;
@@ -690,7 +690,7 @@ jintLong callback(int index, ...)
   jboolean isStatic = callbackData[index].isStatic;
   jboolean isArrayBased = callbackData[index].isArrayBased;
   jint argCount = callbackData[index].argCount;
-  jintLong result = callbackData[index].errorResult;
+  jlong result = callbackData[index].errorResult;
   int detach = 0;
   va_list vl;
 

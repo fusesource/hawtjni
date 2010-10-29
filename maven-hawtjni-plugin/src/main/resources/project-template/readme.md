@@ -36,7 +36,7 @@ installed.
 Use the "Start>All Programs>Microsoft Windows SDK vX.X>CMD" command window 
 and change to the directory that this file is located in and then run: 
 
-    vcbuild
+    vcbuild vs2008.vcproj
 
 The dll files will be located under the target directory.
     

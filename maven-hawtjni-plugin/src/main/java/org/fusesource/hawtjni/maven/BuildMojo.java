@@ -244,13 +244,24 @@ public class BuildMojo extends AbstractMojo {
         } else {
         	throw new MojoExecutionException("Usupported platform: "+library.getPlatform());
         }
-    	
-        //TODO: look into supporting cross compilation 
-        int rc = cli.system(buildDir, new String[]{"vcbuild", "/platform:"+platform, "vs2008.vcproj", configuration});
-        if( rc != 0 ) {
-            throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
-        }        
-        
+
+        String toolset = System.getenv("PlatformToolset");
+        if( "Windows7.1SDK".equals(toolset) ) {
+            // vcbuild was removed.. use the msbuild tool instead.
+            int rc = cli.system(buildDir, new String[]{"msbuild", "vs2010.vcxproj", "/property:Platform="+platform, "/property:Configuration="+configuration});
+            if( rc != 0 ) {
+                throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
+            }
+        } else {
+            // try to use a vcbuild..
+            int rc = cli.system(buildDir, new String[]{"vcbuild", "/platform:"+platform, "vs2008.vcproj", configuration});
+            if( rc != 0 ) {
+                throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
+            }
+        }
+
+
+
         File libFile=FileUtils.resolveFile(buildDir, "target/"+platform+"-"+configuration+"/lib/"+library.getLibraryFileName());
         if( !libFile.exists() ) {
             throw new MojoExecutionException("vcbuild did not generate: "+libFile);

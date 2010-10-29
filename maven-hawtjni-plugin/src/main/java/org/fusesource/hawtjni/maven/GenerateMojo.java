@@ -213,7 +213,8 @@ public class GenerateMojo extends AbstractMojo {
 
             // To support windows based builds..
             copyTemplateResource("vs2008.vcproj", true);
-                        
+            copyTemplateResource("vs2010.vcxproj", true);
+
             File autogen = new File(packageDirectory, "autogen.sh");
             File configure = new File(packageDirectory, "configure");
             if( !autogen.exists() ) {
@@ -291,6 +292,7 @@ public class GenerateMojo extends AbstractMojo {
         files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.cxx", null, false));
         String sources = "";
         String xml_sources = "";
+        String vs10_sources = "";
         boolean first = true;
         for (String f : files) {
             if( !first ) {
@@ -302,12 +304,13 @@ public class GenerateMojo extends AbstractMojo {
             sources += "  src/"+f;
             
             xml_sources+="      <File RelativePath=\".\\src\\"+ (f.replace('/', '\\')) +"\"/>\n";
+            vs10_sources+="    <ClCompile Include=\".\\src\\"+ (f.replace('/', '\\')) +"\"/>\n";
         }
         
         values.put("PROJECT_SOURCES", sources);
         values.put("PROJECT_XML_SOURCES", xml_sources);
+        values.put("PROJECT_VS10_SOURCES", vs10_sources);
 
-        
         FileUtils.FilterWrapper wrapper = new FileUtils.FilterWrapper() {
             public Reader getReader(Reader reader) {
                 StringSearchInterpolator propertiesInterpolator = new StringSearchInterpolator(startExp, endExp);

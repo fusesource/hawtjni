@@ -161,6 +161,8 @@ public class Library {
         }
 
         /* Try loading library from java library path */
+        if( version!=null && load(errors, name + getBitModel() + "-" + version) ) 
+            return;        
         if( version!=null && load(errors, name + "-" + version) ) 
             return;        
         if( load(errors, name ) )
@@ -205,11 +207,10 @@ public class Library {
         URL resource = classLoader.getResource(resourcePath);
         if( resource !=null ) {
             
-            String libName = name;
+            String libName = name + "-" + getBitModel();
             if( version !=null) {
                 libName += "-" + version;
             }
-            libName += "-" + getBitModel();
             
             if( customPath!=null ) {
                 // Try to extract it to the custom path...

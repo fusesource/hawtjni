@@ -1,0 +1,123 @@
+---
+# Copyright (C) 2009-2011 the original author or authors.
+# See the notice.md file distributed with this work for additional
+# information regarding copyright ownership.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+title: Download
+in_menu: true
+sort_info: 5
+--- name:overview
+
+# ${project_name}
+Download it today!
+--- name:head pipeline:plain
+<style type='text/css'>
+/*<![CDATA[ */
+
+.download {
+  font-size: 80%;
+}
+table.download { width: 100%;}
+table.download tr td {
+  border: 1px solid #ccc;
+  padding: .5em;
+}
+ 
+/*]]>*/
+</style> 
+  
+--- name:content pipeline:jade
+
+:&markdown
+  ## Get the latest official version
+  
+- for( version <- project_versions.headOption )
+  :&markdown
+    ### #{project_name} #{version} 
+    [Release Notes](blog/releases/release-#{version.replace('.','-')}.html) | [Installation Instructions](${website_base_url}/versions/#{version}/website/documentation/getting-started.html) | [Documentation](${website_base_url}/versions/#{version}/website/documentation/index.html)
+    
+  table.download
+    tr 
+      td Binaries for Unix/Linux/OS X:
+      td 
+        a(href="http://www.apache.org/dyn/closer.cgi?path=activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-unix-distro.tar.gz") apache-hawtjni-#{version}-unix-distro.tar.gz
+      td
+        a(href="http://apache.org/dist/activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-unix-distro.tar.gz.asc") GPG Signature
+    tr 
+      td Binaries for Windows:
+      td 
+        a(href="http://www.apache.org/dyn/closer.cgi?path=activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-windows-distro.zip") apache-hawtjni-#{version}-windows-distro.zip
+      td
+        a(href="http://apache.org/dist/activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-windows-distro.zip.asc") GPG Signature
+    tr 
+      td  Source Code Distribution:
+      td 
+        a(href="http://www.apache.org/dyn/closer.cgi?path=activemq/activemq-hawtjni/#{version}/hawtjni-project-#{version}-source-release.tar.gz") hawtjni-project-#{version}-source-release.tar.gz
+      td
+        a(href="http://apache.org/dist/activemq/activemq-hawtjni/#{version}/hawtjni-project-#{version}-source-release.tar.gz.asc") GPG Signature
+    
+    
+- if( !project_versions.drop(1).isEmpty )
+  :&markdown
+    ## Older Versions
+
+  - for( version <- project_versions.drop(1) )
+    :&markdown
+      ### #{project_name} #{version} 
+      [Release Notes](blog/releases/release-#{version.replace('.','-')}.html) | [Installation Instructions](${website_base_url}/versions/#{version}/website/documentation/getting-started.html) | [Documentation](${website_base_url}/versions/#{version}/website/documentation/index.html)
+
+    table.download
+      tr 
+        td Binaries for Unix/Linux/OS X:
+        td 
+          a(href="http://archive.apache.org/dist/activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-unix-distro.tar.gz") apache-hawtjni-#{version}-unix-distro.tar.gz
+        td
+          a(href="http://archive.apache.org/dist/activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-unix-distro.tar.gz.asc") GPG Signature
+      tr 
+        td Binaries for Windows:
+        td 
+          a(href="http://archive.apache.org/dist/activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-windows-distro.zip") apache-hawtjni-#{version}-windows-distro.zip
+        td
+          a(href="http://archive.apache.org/dist/activemq/activemq-hawtjni/#{version}/apache-hawtjni-#{version}-windows-distro.zip.asc") GPG Signature
+      tr 
+        td  Source Code Distribution:
+        td 
+          a(href="http://archive.apache.org/dist/activemq/activemq-hawtjni/#{version}/hawtjni-project-#{version}-source-release.tar.gz") hawtjni-project-#{version}-source-release.tar.gz
+        td
+          a(href="http://archive.apache.org/dist/activemq/activemq-hawtjni/#{version}/hawtjni-project-#{version}-source-release.tar.gz.asc") GPG Signature
+
+
+:&markdown
+
+  ## Development Snapshot
+
+  Want to help stablize the latest and greatest nightly development
+  build?  **Warnning**: These builds are extremely bleeding edge!
+
+  ### #{project_name} #{project_snapshot_version} 
+  [Installation Instructions](${website_base_url}/versions/#{project_snapshot_version}/website/documentation/getting-started.html) | [Documentation](${website_base_url}/versions/#{project_snapshot_version}/website/documentation/index.html)
+
+table.download
+  tr 
+    td Binaries for Unix/Linux/OS X:
+    td 
+      a(href="http://repository.apache.org/service/local/artifact/maven/redirect?r=snapshots&g=org.apache.activemq&a=apache-hawtjni&v=#{project_snapshot_version}&e=tar.gz&c=unix-distro") apache-hawtjni-#{project_snapshot_version}-unix-distro.tar.gz
+  tr 
+    td Binaries for Windows:
+    td 
+      a(href="https://repository.apache.org/service/local/artifact/maven/redirect?r=snapshots&g=org.apache.activemq&a=apache-hawtjni&v=#{project_snapshot_version}&e=zip&c=windows-distro") apache-hawtjni-#{project_snapshot_version}-windows-distro.zip
+  
+:&markdown
+  The development build source code should be directly checked out from our [source code repository](community/source.html)

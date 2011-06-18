@@ -1,0 +1,63 @@
+---
+# Copyright (C) 2009-2011 the original author or authors.
+# See the notice.md file distributed with this work for additional
+# information regarding copyright ownership.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+title: HawtJNI
+--- name:overview pipeline:jade
+
+h1 HawtJNI #{project_version}
+
+| #{project_slogan}
+
+--- name:content pipeline:markdown 
+
+HawtJNI is a code generator that produces the JNI code needed
+to implement java native methods. It is based on the
+[jnigen](http://www.eclipse.org/swt/jnigen.php) code generator that is
+part of the SWT Tools project which is used to generate all the JNI
+code which powers the eclipse platform.
+
+Features
+--------
+
+* JNI code generated declaratively from annotations on your java code
+* Maven integration:
+  * Generates JNI source code
+  * Generates an autoconf and msbuild source project to build the 
+    native library. This gets attached to the maven project as as 
+    the native source zip file.
+  * Builds the native source tar for the current platform
+  * Built native library is stored in a platform specific jar.  This 
+  gets attached to the maven project as a platform specific jar file.
+
+Introduction
+------------
+
+There are many open source JNI code generators available, but if your
+performance sensitive, the code generator used by the eclipse SWT
+project is by far the best option. The biggest problem is that it was
+not developed to be reused by other projects. It was tightly coupled
+to producing the SWT JNI libraries and it could only be run within the
+eclipse platform.
+
+HawtJNI has taken that code generator and made it easier to use and
+accessible to more projects.
+
+
+Getting started
+---------------
+
+For more information, checkout the 
+[developer guide](documentation/developer-guide.html)

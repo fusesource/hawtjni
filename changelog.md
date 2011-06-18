@@ -1,6 +1,12 @@
 ![HawtJNI](http://hawtjni.fusesource.org/images/project-logo.png)
 =================================================================
 
+[HawtJNI 1.2](http://hawtjni.fusesource.org/blog/releases/release-1-2.html), released 2011-06-11
+----
+
+* Adding bit model to the name of the extracted library to support hosts running both 32 and 64 bits JVM.
+* Converted website to a scalate based static website
+
 [HawtJNI 1.1](http://hawtjni.fusesource.org/blog/releases/release-1-1.html), released 2010-11-04
 ----
 

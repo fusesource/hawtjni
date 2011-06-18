@@ -36,6 +36,13 @@
     <forge-project-id>hawtjni</forge-project-id>
     <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
     <release-altGitURL>scm:git:ssh://git@forge.fusesource.com/${forge-project-id}.git</release-altGitURL>
+    
+    <scalate-version>1.5.0</scalate-version>
+    <scalamd-version>1.5</scalamd-version>    
+    <slf4j-version>1.6.1</slf4j-version>
+    <jetty-plugin-version>7.0.1.v20091125</jetty-plugin-version>
+    <scala-plugin-version>2.15.2</scala-plugin-version>
+    <scala-version>2.9.0-1</scala-version>
   </properties>
 
   <url>http://${forge-project-id}.fusesource.org</url>
@@ -201,6 +208,7 @@
     <module>hawtjni-generator</module>
     <module>maven-hawtjni-plugin</module>
     <module>hawtjni-example</module>
+    <module>hawtjni-website</module>
   </modules>
 
 </project>

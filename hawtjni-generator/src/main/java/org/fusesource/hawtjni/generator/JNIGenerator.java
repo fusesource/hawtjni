@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Progress Software, Inc.
+ * Copyright (C) 2009-2011 FuseSource Corp.
  * Copyright (c) 2004, 2006 IBM Corporation and others.
  *
  * All rights reserved. This program and the accompanying materials

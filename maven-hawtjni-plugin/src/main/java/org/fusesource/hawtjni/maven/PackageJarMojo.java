@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Progress Software, Inc.
+ * Copyright (C) 2009-2011 FuseSource Corp.
  * http://fusesource.com
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");

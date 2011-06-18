@@ -209,6 +209,7 @@ public class Library {
             if( version !=null) {
                 libName += "-" + version;
             }
+            libName += "-" + getBitModel();
             
             if( customPath!=null ) {
                 // Try to extract it to the custom path...

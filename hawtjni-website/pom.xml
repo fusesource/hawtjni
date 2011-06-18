@@ -144,7 +144,7 @@
         <configuration>
           <webappDirectory>${basedir}/src</webappDirectory>
           <remoteServerId>website.fusesource.org</remoteServerId>
-          <remoteServerUrl>dav:http://fusesource.com/forge/dav/${forge-project-id}</remoteServerUrl>
+          <remoteServerUrl>dav:http://fusesource.com/forge/dav/${forge-project-id}/versions/${project.version}/website/</remoteServerUrl>
         </configuration>
         
         <executions>

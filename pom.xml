@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.fusesource</groupId>
     <artifactId>fusesource-pom</artifactId>
-    <version>1.2</version>
+    <version>1.5</version>
   </parent>
 
   <groupId>org.fusesource.hawtjni</groupId>
@@ -35,7 +35,7 @@
   <properties>
     <forge-project-id>hawtjni</forge-project-id>
     <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
-    <release-altGitURL>scm:git:ssh://git@forge.fusesource.com/${forge-project-id}.git</release-altGitURL>
+    <release-altGitURL>scm:git:ssh://git@github.com:fusesources/hawtjni.git</release-altGitURL>
     
     <scalate-version>1.5.0</scalate-version>
     <scalamd-version>1.5</scalamd-version>    
@@ -49,20 +49,25 @@
   <inceptionYear>2009</inceptionYear>
 
   <issueManagement>
-    <system>jira</system>
-    <url>http://fusesource.com/issues/browse/${forge-project-id-uc}</url>
+    <system>github</system>
+    <url>https://github.com/fusesource/hawtjni/issues</url>
   </issueManagement>
   
   <mailingLists>
+    
     <mailingList>
-      <name>${forge-project-id} dev</name>
-      <post>${forge-project-id}-dev@fusesource.org</post>
-      <subscribe>${forge-project-id}-dev-subscribe@fusesource.org</subscribe>
+      <name>Discussion List</name>
+      <archive>http://groups.google.com/group/${forge-project-id}</archive>
+      <post>${forge-project-id}@googlegroups.com</post>
+      <subscribe>${forge-project-id}+subscribe@googlegroups.com</subscribe>
+      <unsubscribe>${forge-project-id}+unsubscribe@googlegroups.com</unsubscribe>
     </mailingList>
     <mailingList>
-      <name>${forge-project-id} commits</name>
-      <post>${forge-project-id}-commits@fusesource.org</post>
-      <subscribe>${forge-project-id}-commits-subscribe@fusesource.org</subscribe>
+      <name>Commits and Issue Tracker List</name>
+      <archive>http://groups.google.com/group/${forge-project-id}-commits</archive>
+      <post>${forge-project-id}-commits@googlegroups.com</post>
+      <subscribe>${forge-project-id}-commits+subscribe@googlegroups.com</subscribe>
+      <unsubscribe>${forge-project-id}-commits+unsubscribe@googlegroups.com</unsubscribe>
     </mailingList>
   </mailingLists>
 

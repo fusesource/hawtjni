@@ -46,9 +46,9 @@ object Website {
   val project_keywords= "jni,java,jna,c,objective-c,c++,c#"
 
   // -------------------------------------------------------------------
-  val github_page= "http://github.com/chirino/hawtjni"
-  val git_user_url= "git://github.com/chirino/hawtjni.git"
-  val git_commiter_url= "git@github.com:chirino/hawtjni.git"
+  val github_page= "http://github.com/fusesource/hawtjni"
+  val git_user_url= "git://github.com/fusesource/hawtjni.git"
+  val git_commiter_url= "git@github.com:fusesources/hawtjni.git"
 
   val project_maven_groupId= "org.fusesource.hawtjni"
   val project_maven_artifactId= "hawtjni-runtime"

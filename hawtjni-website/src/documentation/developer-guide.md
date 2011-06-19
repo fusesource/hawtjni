@@ -190,30 +190,32 @@ Without additional configuration native methods automatically convert the
 method arguments and return types to the corresponding type of the
 same size on the platform.
 
-| Java Type   | Native Type   | Description            | Windows Types   |
-|-------------|---------------|------------------------|-----------------|
-| `byte`      | `char`        | 8-bit integer          | `BYTE`, `TCHAR` |
-| `short`     | `short`       | 16-bit integer         | `WORD`          |
-| `char`      | `wchar_t`     | 16 or 32-bit character | `TCHAR`         |
-| `int`       | `int`         | 32-bit integer         | `DWORD`         |
-| `long`      | `long long`   | 64-bit integer         | `LONG`          |
-| `boolean`   | `int`         | boolean value          | `BOOL`          |
-| `float`     | `float`       | 32-bit FP              |                 |
-| `double`    | `double`      | 64-bit FP              |                 |
+{filter::textile}
+|| Java Type   || Native Type   || Description          || Windows Types   ||
+| <code>byte</code>      | <code>char</code>        | 8-bit integer          | <code>BYTE</code>, <code>TCHAR</code> |
+| <code>short</code>     | <code>short</code>       | 16-bit integer         | <code>WORD</code>          |
+| <code>char</code>      | <code>wchar_t</code>     | 16 or 32-bit character | <code>TCHAR</code>         |
+| <code>int</code>       | <code>int</code>         | 32-bit integer         | <code>DWORD</code>         |
+| <code>long</code>      | <code>long long</code>   | 64-bit integer         | <code>LONG</code>          |
+| <code>boolean</code>   | <code>int</code>         | boolean value          | <code>BOOL</code>          |
+| <code>float</code>     | <code>float</code>       | 32-bit FP              |                 |
+| <code>double</code>    | <code>double</code>      | 64-bit FP              |                 |
+{filter}
 
 If a primitive array type or String is used, it gets converted to the corresponding
 native array/pointer type.
 
-| Java Type   | Native Type   | Description            | Windows Types   |
-|-------------|---------------|------------------------|-----------------|
-| `byte[]`    | `char*`       | 8-bit array            | `BYTE`, `TCHAR` |
-| `short[]`   | `short*`      | 16-bit array           | `WORD`          |
-| `char[]`    | `wchar_t*`    | 16 or 32-bit array     | `TCHAR`         |
-| `int[]`     | `int*`        | 32-bit array           | `DWORD`         |
-| `long[]`    | `long long*`  | 64-bit array           | `LONG`          |
-| `float[]`   | `float*`      | 32-bit FP array        |                 |
-| `double[]`  | `double*`     | 64-bit FP array        |                 |
-| `String`    | `char*`       | 8-bit array            | `LPTCSTR`       |
+{filter::textile}
+|| Java Type   || Native Type   || Description          || Windows Types   ||
+| <code>byte[]</code>    | <code>char*</code>       | 8-bit array            | <code>BYTE</code>, <code>TCHAR</code> |
+| <code>short[]</code>   | <code>short*</code>      | 16-bit array           | <code>WORD</code>          |
+| <code>char[]</code>    | <code>wchar_t*</code>    | 16 or 32-bit array     | <code>TCHAR</code>         |
+| <code>int[]</code>     | <code>int*</code>        | 32-bit array           | <code>DWORD</code>         |
+| <code>long[]</code>    | <code>long long*</code>  | 64-bit array           | <code>LONG</code>          |
+| <code>float[]</code>   | <code>float*</code>      | 32-bit FP array        |                 |
+| <code>double[]</code>  | <code>double*</code>     | 64-bit FP array        |                 |
+| <code>String</code>    | <code>char*</code>       | 8-bit array            | <code>LPTCSTR</code>       |
+{filter}
 
 It's important to note that when dealing with arrays and structures, HawtJNI must
 copy the contents of the java object to the native type since the JVM can any

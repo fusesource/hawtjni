@@ -24,7 +24,7 @@ typedef struct _point {
 } point;
 
 struct foo * foo_add(struct foo *arg, int count);
-void * void_add(void *arg, int count);
+char * char_add(char *arg, int count);
 
 void print_foo(struct foo *arg);
 long foowork(struct foo **arg, int count);

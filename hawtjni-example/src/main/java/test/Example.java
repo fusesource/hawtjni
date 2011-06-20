@@ -284,8 +284,8 @@ public class Example {
     @JniMethod(cast = "struct foo *")
     public static final native long foo_add(@JniArg(cast="struct foo *")long ptr, int count);
 
-    @JniMethod(cast = "void *")
-    public static final native long void_add(@JniArg(cast="void *")long ptr, int count);
+    @JniMethod(cast = "char *")
+    public static final native long char_add(@JniArg(cast="char *")long ptr, int count);
 
         @JniClass(flags={ClassFlag.STRUCT, ClassFlag.TYPEDEF})
     static public class point {

@@ -32,7 +32,7 @@ struct foo * foo_add(struct foo *arg, int count) {
   return arg+count;
 }
 
-void * void_add(void *arg, int count) {
+char * char_add(char *arg, int count) {
   return arg+count;
 }
 

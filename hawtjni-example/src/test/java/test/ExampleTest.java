@@ -21,8 +21,8 @@ public class ExampleTest {
                 0+1, Long.MAX_VALUE+1, Long.MIN_VALUE+1, Integer.MAX_VALUE+1, Integer.MIN_VALUE+1,
                 0-1, Long.MAX_VALUE-1, Long.MIN_VALUE-1, Integer.MAX_VALUE-1, Integer.MIN_VALUE-1};
         for( long i: values ) {
-           assertEquals(void_add(i, 1), add(i, 1) );
-           assertEquals(void_add(i, -1), add(i, -1) );
+           assertEquals(char_add(i, 1), add(i, 1) );
+           assertEquals(char_add(i, -1), add(i, -1) );
         }
     }
 

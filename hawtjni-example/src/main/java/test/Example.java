@@ -281,7 +281,13 @@ public class Example {
     public static final native void print_foo(@JniArg(cast="struct foo *")long ptr);
     public static final native long foowork (@JniArg(cast="struct foo **") long[] foos, int count);
 
-    @JniClass(flags={ClassFlag.STRUCT, ClassFlag.TYPEDEF})
+    @JniMethod(cast = "struct foo *")
+    public static final native long foo_add(@JniArg(cast="struct foo *")long ptr, int count);
+
+    @JniMethod(cast = "void *")
+    public static final native long void_add(@JniArg(cast="void *")long ptr, int count);
+
+        @JniClass(flags={ClassFlag.STRUCT, ClassFlag.TYPEDEF})
     static public class point {
         static {
             LIBRARY.load();

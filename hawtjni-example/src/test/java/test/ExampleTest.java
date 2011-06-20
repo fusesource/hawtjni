@@ -5,6 +5,7 @@ import static test.Example.*;
 
 import org.fusesource.hawtjni.runtime.Callback;
 import org.junit.Test;
+import static org.fusesource.hawtjni.runtime.PointerMath.*;
 
 import test.Example.foo;
 
@@ -12,6 +13,18 @@ public class ExampleTest {
 
     static private int staticCallbackResult;
     private int instanceCallbackResult;
+
+    @Test
+    public void testPointerMath() {
+        long values[] = new long[]{
+                0, Long.MAX_VALUE, Long.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE,
+                0+1, Long.MAX_VALUE+1, Long.MIN_VALUE+1, Integer.MAX_VALUE+1, Integer.MIN_VALUE+1,
+                0-1, Long.MAX_VALUE-1, Long.MIN_VALUE-1, Integer.MAX_VALUE-1, Integer.MIN_VALUE-1};
+        for( long i: values ) {
+           assertEquals(void_add(i, 1), add(i, 1) );
+           assertEquals(void_add(i, -1), add(i, -1) );
+        }
+    }
 
     @Test
     public void test() {
@@ -59,4 +72,5 @@ public class ExampleTest {
         staticCallbackResult = (int) value;
         return 0;
     }
+
 }

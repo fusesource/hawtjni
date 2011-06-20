@@ -102,7 +102,7 @@ public class Library {
         return null;
     }
 
-    public String getOperatingSystem() {
+    public static String getOperatingSystem() {
         String name = System.getProperty("os.name").toLowerCase().trim();
         if( name.startsWith("linux") ) {
             return "linux";
@@ -117,11 +117,11 @@ public class Library {
         
     }
 
-    public String getPlatform() {
+    public static String getPlatform() {
         return getOperatingSystem()+getBitModel();
     }
     
-    protected static int getBitModel() {
+    public static int getBitModel() {
         String prop = System.getProperty("sun.arch.data.model"); 
         if (prop == null) {
             prop = System.getProperty("com.ibm.vm.bitmode");

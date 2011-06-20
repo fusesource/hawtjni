@@ -27,3 +27,12 @@ long foowork(struct foo **arg, int count) {
 void callmeback(void (*thecallback)(int number)) {
 	thecallback(69);
 }
+
+struct foo * foo_add(struct foo *arg, int count) {
+  return arg+count;
+}
+
+void * void_add(void *arg, int count) {
+  return arg+count;
+}
+

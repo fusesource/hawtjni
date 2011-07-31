@@ -32,7 +32,7 @@ dnl
 dnl      This macro calls:
 dnl        AC_SUBST(CFLAGS)
 dnl        AC_SUBST(LDFLAGS)
-dnl        AC_SUBST(MAC_OSX_VERSION)
+dnl        AC_SUBST(OSX_VERSION)
 dnl
 dnl AUTHOR: <a href="http://hiramchirino.com">Hiram Chrino</a>
 dnl ---------------------------------------------------------------------------
@@ -41,44 +41,58 @@ AC_DEFUN([WITH_OSX_UNIVERSAL],
 [
   AC_PREREQ([2.61])
   case "$host_os" in
-	darwin*)
-  	AS_IF(test -z "$OSX_VERSION", [
-			OSX_VERSION="10.5"
-			AC_SUBST(OSX_VERSION)
-		])
-		
-    AC_MSG_CHECKING(whether to build universal binaries)
-	  AC_ARG_WITH([universal],
-    [AS_HELP_STRING([--with-universal@<:@=ARCH@:>@],
-			[Build a universal binary.  Set to a space separated architecture list. Pick from: i386, x86_64, ppc, and/or ppc64. @<:@default="i386 x86_64 ppc"@:>@])],
+  darwin*)
+    
+    AC_MSG_CHECKING(OS X SDK version)
+    AC_ARG_WITH([osxsdk],
+    [AS_HELP_STRING([--with-osxsdk@<:@=VERSION@:>@],
+      [OS X SDK version to build against. Example: --with-osxsdk=10.6])],
     [ 
-			AS_IF(test "$withval" = "no", [
-				OSX_UNIVERSAL=""
-				AC_MSG_RESULT([no])
-			], test "$withval" = "yes", [
-				OSX_UNIVERSAL="i386 x86_64 ppc"
-				AC_MSG_RESULT([yes, archs: $OSX_UNIVERSAL])
-			],[
-				OSX_UNIVERSAL="$withval"
-				AC_MSG_RESULT([yes, archs: $OSX_UNIVERSAL])
-			])
-		],[
-			OSX_UNIVERSAL=""
-			AC_MSG_RESULT([no])
-		])
-  	AS_IF(test -n "$OSX_UNIVERSAL", [
-			for i in $OSX_UNIVERSAL ; do
-				CFLAGS="-arch $i $CFLAGS" 
-				LDFLAGS="-arch $i $LDFLAGS"
-			done 
-			
-			CFLAGS="-isysroot /Developer/SDKs/MacOSX${OSX_VERSION}.sdk $CFLAGS" 
-			LDFLAGS="-syslibroot,/Developer/SDKs/MacOSX${OSX_VERSION}.sdk $LDFLAGS"
-			AC_SUBST(CFLAGS)
-			AC_SUBST(LDFLAGS)
-		])
-		;;
-	esac
+      OSX_UNIVERSAL="$withval"
+    ],[
+      OSX_VERSION=""
+      for v in 10.0 10.1 10.2 10.3 10.4 10.5 10.6 10.7 10.8 10.9 10.10 ; do
+        if test -z "${OSX_VERSION}" && test -d "/Developer/SDKs/MacOSX${v}.sdk" ; then 
+          OSX_VERSION="${v}"
+        fi
+      done
+    ])
+    AC_MSG_RESULT([$OSX_VERSION])
+    AC_SUBST(OSX_VERSION)
+        
+    AC_MSG_CHECKING(whether to build universal binaries)
+    AC_ARG_WITH([universal],
+    [AS_HELP_STRING([--with-universal@<:@=ARCH@:>@],
+      [Build a universal binary.  Set to a space separated architecture list. Pick from: i386, x86_64, ppc, and/or ppc64. @<:@default="i386 x86_64"@:>@])],
+    [ 
+      AS_IF(test "$withval" = "no", [
+        OSX_UNIVERSAL=""
+        AC_MSG_RESULT([no])
+      ], test "$withval" = "yes", [
+        OSX_UNIVERSAL="i386 x86_64"
+        AC_MSG_RESULT([yes, archs: $OSX_UNIVERSAL])
+      ],[
+        OSX_UNIVERSAL="$withval"
+        AC_MSG_RESULT([yes, archs: $OSX_UNIVERSAL])
+      ])
+    ],[
+      OSX_UNIVERSAL=""
+      AC_MSG_RESULT([no])
+    ])
+    
+    AS_IF(test -n "$OSX_UNIVERSAL", [
+      for i in $OSX_UNIVERSAL ; do
+        CFLAGS="-arch $i $CFLAGS" 
+        LDFLAGS="-arch $i $LDFLAGS"
+      done 
+      
+      CFLAGS="-isysroot /Developer/SDKs/MacOSX${OSX_VERSION}.sdk $CFLAGS" 
+      LDFLAGS="-syslibroot,/Developer/SDKs/MacOSX${OSX_VERSION}.sdk $LDFLAGS"
+      AC_SUBST(CFLAGS)
+      AC_SUBST(LDFLAGS)
+    ])
+    ;;
+  esac
 ])
 
 

@@ -37,7 +37,7 @@
     <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
     <release-altGitURL>scm:git:ssh://git@github.com:fusesources/hawtjni.git</release-altGitURL>
     
-    <scalate-version>1.5.0</scalate-version>
+    <scalate-version>1.6.0-SNAPSHOT</scalate-version>
     <scalamd-version>1.5</scalamd-version>    
     <slf4j-version>1.6.1</slf4j-version>
     <jetty-plugin-version>7.0.1.v20091125</jetty-plugin-version>

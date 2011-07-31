@@ -920,12 +920,19 @@ public class NativesGenerator extends JNIGenerator {
             if (accessor.length() != 0) {
                 output(accessor);
             } else {
-                int index = -1;
-                if ((index = name.indexOf('_')) != -1) {
-                    output(name.substring(0, index));
+
+                JNIClass dc = method.getDeclaringClass();
+                if( dc.getFlag(ClassFlag.CPP) ) {
+                    output(method.getDeclaringClass().getSimpleName());
                 } else {
-                    output(name);
+                    int index = -1;
+                    if ((index = name.indexOf('_')) != -1) {
+                        output(name.substring(0, index));
+                    } else {
+                        output(name);
+                    }
                 }
+
             }
         } else if (method.getFlag(MethodFlag.CPP_DELETE)) {
             output("delete ");

@@ -310,15 +310,18 @@ public class Example {
         }
 
         @JniMethod(flags={MethodFlag.CPP_NEW}, cast="Range *")
-        public static final native long Range_new();
+        public static final native long create();
+
+        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="Range *")
+        public static final native long create(int start, int end);
 
         @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void Range_delete(
-                @JniArg(cast="Range *")
+        public static final native void delete(
+                @JniArg(cast = "Range *")
                 long ptr);
 
         @JniMethod(flags={MethodFlag.CPP})
-        public static final native void Range_dump(
+        public static final native void dump(
                 @JniArg(cast="Range *")
                 long ptr);
 

@@ -52,8 +52,17 @@ public class ExampleTest {
         callmeback(callback.getAddress());
         assertEquals(69, instanceCallbackResult);
         callback.dispose();
-        
-        
+
+        long r1 = Range.create();
+        Range.dump(r1);
+
+        long r2 = Range.create(10,100);
+        Range.dump(r2);
+
+        Range.delete(r1);
+        Range.delete(r2);
+
+
         callback = new Callback(ExampleTest.class, "staticCallback", 1);
         callmeback(callback.getAddress());
         assertEquals(69, staticCallbackResult);

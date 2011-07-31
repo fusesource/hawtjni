@@ -31,6 +31,7 @@ dnl   for example: AM_INIT_AUTOMAKE([no-dependencies])
 dnl
 dnl      This macro calls:
 dnl        AC_SUBST(CFLAGS)
+dnl        AC_SUBST(CXXFLAGS)
 dnl        AC_SUBST(LDFLAGS)
 dnl        AC_SUBST(OSX_VERSION)
 dnl
@@ -82,13 +83,16 @@ AC_DEFUN([WITH_OSX_UNIVERSAL],
     
     AS_IF(test -n "$OSX_UNIVERSAL", [
       for i in $OSX_UNIVERSAL ; do
-        CFLAGS="-arch $i $CFLAGS" 
+        CFLAGS="-arch $i $CFLAGS"
+        CXXFLAGS="-arch $i $CXXFLAGS"
         LDFLAGS="-arch $i $LDFLAGS"
       done 
       
-      CFLAGS="-isysroot /Developer/SDKs/MacOSX${OSX_VERSION}.sdk $CFLAGS" 
+      CFLAGS="-isysroot /Developer/SDKs/MacOSX${OSX_VERSION}.sdk $CFLAGS"
+      CXXFLAGS="-isysroot /Developer/SDKs/MacOSX${OSX_VERSION}.sdk $CXXFLAGS"
       LDFLAGS="-syslibroot,/Developer/SDKs/MacOSX${OSX_VERSION}.sdk $LDFLAGS"
       AC_SUBST(CFLAGS)
+      AC_SUBST(CXXFLAGS)
       AC_SUBST(LDFLAGS)
     ])
     ;;

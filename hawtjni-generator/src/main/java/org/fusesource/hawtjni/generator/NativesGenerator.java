@@ -814,7 +814,8 @@ public class NativesGenerator extends JNIGenerator {
         String copy = method.getCopy();
         boolean makeCopy = copy.length() != 0 && isCPP && !returnType.isType("void");
         if (makeCopy) {
-            output("\t");
+            output("\t{");
+            output("\t\t");
             output(copy);
             output(" temp = ");
         } else {
@@ -893,11 +894,17 @@ public class NativesGenerator extends JNIGenerator {
             if (accessor.length() != 0) {
                 output(accessor);
             } else {
-                int index = -1;
-                if ((index = name.indexOf('_')) != -1) {
-                    output(name.substring(index + 1, name.length()));
-                } else {
+                JNIClass dc = method.getDeclaringClass();
+                if( dc.getFlag(ClassFlag.CPP) || dc.getFlag(ClassFlag.STRUCT) ) {
                     output(name);
+                } else {
+                    int index = -1;
+                    // HRC
+                    if ((index = name.indexOf('_')) != -1) {
+                        output(name.substring(index + 1, name.length()));
+                    } else {
+                        output(name);
+                    }
                 }
             }
             paramStart = 1;
@@ -907,11 +914,16 @@ public class NativesGenerator extends JNIGenerator {
             if (accessor.length() != 0) {
                 output(accessor);
             } else {
-                int index = -1;
-                if ((index = name.indexOf('_')) != -1) {
-                    output(name.substring(index + 1));
-                } else {
+                JNIClass dc = method.getDeclaringClass();
+                if( dc.getFlag(ClassFlag.CPP) || dc.getFlag(ClassFlag.STRUCT) ) {
                     output(name);
+                } else {
+                    int index = -1;
+                    if ((index = name.indexOf('_')) != -1) {
+                        output(name.substring(index + 1));
+                    } else {
+                        output(name);
+                    }
                 }
             }
         } else if (method.getFlag(MethodFlag.CPP_NEW)) {
@@ -1015,18 +1027,19 @@ public class NativesGenerator extends JNIGenerator {
         output(";");
         outputln();
         if (makeCopy) {
-            outputln("\t{");
-            output("\t\t");
+            outputln("\t\t{");
+            output("\t\t\t");
             output(copy);
             output("* copy = new ");
             output(copy);
             outputln("();");
-            outputln("\t\t*copy = temp;");
-            output("\t\trc = ");
+            outputln("\t\t\t*copy = temp;");
+            output("\t\t\trc = ");
             output("(");
             output(returnType.getTypeSignature2(!returnType.equals(returnType64)));
             output(")");
             outputln("copy;");
+            outputln("\t\t}");
             outputln("\t}");
         }
         if (objc_struct) {

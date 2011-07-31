@@ -868,6 +868,9 @@ public class NativesGenerator extends JNIGenerator {
                 output("TO_HANDLE(");
             }
             output("(");
+            if( params.isEmpty() ) {
+                throw new Error(String.format("C++ bound method '%s' missing the 'this' parameter", method.getDeclaringClass().getSimpleName()+"."+method.getName()));
+            }
             JNIParameter param = params.get(0);
             if (param.getFlag(ArgFlag.BY_VALUE))
                 output("*");

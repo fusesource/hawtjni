@@ -22,6 +22,7 @@ public interface JNIType {
     public boolean isType(String type);
     public String getName();
     public String getSimpleName();
+    public String getNativeName();
     public String getTypeSignature(boolean define);
     public String getTypeSignature1(boolean define);
     public String getTypeSignature2(boolean define);

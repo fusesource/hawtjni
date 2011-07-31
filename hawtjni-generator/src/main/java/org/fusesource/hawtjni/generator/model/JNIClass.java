@@ -24,6 +24,7 @@ public interface JNIClass {
 
     public String getName();
     public String getSimpleName();
+    public String getNativeName();
 
     public JNIClass getSuperclass();
     public List<JNIField> getDeclaredFields();

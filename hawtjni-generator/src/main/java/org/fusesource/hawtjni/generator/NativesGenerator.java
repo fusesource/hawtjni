@@ -188,7 +188,7 @@ public class NativesGenerator extends JNIGenerator {
             JNIType type = field.getType(), type64 = field.getType64();
             boolean allowConversion = !type.equals(type64);
             
-            String typeName = type.getSimpleName();
+            String simpleName = type.getSimpleName();
             String accessor = field.getAccessor();
             if (accessor == null || accessor.length() == 0)
                 accessor = field.getName();
@@ -266,7 +266,7 @@ public class NativesGenerator extends JNIGenerator {
                 output(field.getName());
                 outputln(");");
                 output("\tif (lpObject1 != NULL) set");
-                output(typeName);
+                output(simpleName);
                 output("Fields(env, lpObject1, &lpStruct->");
                 output(accessor);
                 outputln(");");
@@ -607,7 +607,7 @@ public class NativesGenerator extends JNIGenerator {
                 if (param.getTypeClass().getFlag(ClassFlag.STRUCT) && !param.getTypeClass().getFlag(ClassFlag.TYPEDEF)) {
                     output("struct ");
                 }
-                output(paramType.getSimpleName());
+                output(paramType.getNativeName());
                 output(" _arg" + i);
                 if (param.getFlag(ArgFlag.INIT))
                     output("={0}");
@@ -923,7 +923,7 @@ public class NativesGenerator extends JNIGenerator {
 
                 JNIClass dc = method.getDeclaringClass();
                 if( dc.getFlag(ClassFlag.CPP) ) {
-                    output(method.getDeclaringClass().getSimpleName());
+                    output(method.getDeclaringClass().getNativeName());
                 } else {
                     int index = -1;
                     if ((index = name.indexOf('_')) != -1) {

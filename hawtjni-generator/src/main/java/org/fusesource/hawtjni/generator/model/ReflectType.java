@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.fusesource.hawtjni.generator.model;
 
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniMethod;
+
 /**
  * 
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -76,6 +79,20 @@ public class ReflectType implements JNIType {
 
     public String getSimpleName() {
         return clazz.getSimpleName();
+    }
+
+    public String getNativeName() {
+        JniClass annotation = clazz.getAnnotation(JniClass.class);
+        if( annotation==null ) {
+            return getSimpleName();
+        } else {
+            String name = annotation.name().trim();
+            if( name.length()==0 ) {
+                return getSimpleName();
+            } else {
+                return name;
+            }
+        }
     }
 
     public String getTypeSignature(boolean define) {
@@ -212,7 +229,7 @@ public class ReflectType implements JNIType {
             String sig = getComponentType().getTypeSignature4(define, struct);
             return struct ? sig : sig + " *";
         }
-        String sig = getSimpleName();
+        String sig = getNativeName();
         return struct ? sig : sig + " *";
     }
 

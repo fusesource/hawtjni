@@ -24,4 +24,6 @@ public @interface JniClass {
     ClassFlag[] flags() default {};
 
     String conditional() default "";
+
+    String name() default "";
 }

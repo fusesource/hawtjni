@@ -32,6 +32,7 @@ public class ReflectClass implements JNIClass {
     private ArrayList<ReflectMethod> methods;
     private JniClass annotation;
     private HashSet<ClassFlag> flags;
+    private String nativeName;
 
     public ReflectClass(Class<?> clazz) {
         this.clazz = clazz;
@@ -67,6 +68,14 @@ public class ReflectClass implements JNIClass {
     
     public String getSimpleName() {
         return clazz.getSimpleName();
+    }
+    
+    public String getNativeName() {
+        lazyLoad();
+        if( nativeName!=null )
+            return nativeName;
+        else
+            return getSimpleName();
     }
     
     public List<JNIField> getDeclaredFields() {
@@ -120,7 +129,11 @@ public class ReflectClass implements JNIClass {
         this.flags = new HashSet<ClassFlag>();
         if( this.annotation!=null ) {
             this.flags.addAll(Arrays.asList(this.annotation.flags()));
+            if( this.annotation.name().trim().length() > 0 ) {
+                this.nativeName = this.annotation.name().trim();
+            }
         }
+
         
         Field[] fields = clazz.getDeclaredFields();
         this.fields = new ArrayList<ReflectField>(fields.length);

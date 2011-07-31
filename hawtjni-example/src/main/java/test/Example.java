@@ -44,10 +44,10 @@ public class Example {
         long last=0;
         for( int i=0; i < COUNT; i++ ) {
             // Allocate heap space of the structure..
-            ptrArray[i] = malloc(foo.SIZEOF);
+            ptrArray[i] = malloc(bar.SIZEOF);
 
             // Configure some data for a structure...
-            foo f = new foo();
+            bar f = new bar();
             f.a = i;
             f.b = 1;
             
@@ -58,7 +58,7 @@ public class Example {
             f.prev = last;
             
             // Copy the data values into the allocated space.
-            memmove(ptrArray[i], f, foo.SIZEOF);
+            memmove(ptrArray[i], f, bar.SIZEOF);
             
             last = ptrArray[i];
         }
@@ -193,8 +193,8 @@ public class Example {
     public static final native int strlen(
             @JniArg(cast="char *")long s);
     
-    @JniClass(flags={ClassFlag.STRUCT})
-    static public class foo {
+    @JniClass(name="foo", flags={ClassFlag.STRUCT})
+    static public class bar {
         
         static {
             LIBRARY.load();
@@ -242,7 +242,7 @@ public class Example {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            foo other = (foo) obj;
+            bar other = (bar) obj;
             if (a != other.a)
                 return false;
             if (b != other.b)
@@ -265,11 +265,11 @@ public class Example {
     
     public static final native void memmove (
             @JniArg(cast="void *") long dest, 
-            @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) foo src, 
+            @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) bar src,
             @JniArg(cast="size_t") long size);
     
     public static final native void memmove (
-            @JniArg(cast="void *", flags={NO_IN, CRITICAL}) foo dest, 
+            @JniArg(cast="void *", flags={NO_IN, CRITICAL}) bar dest,
             @JniArg(cast="const void *") long src, 
             @JniArg(cast="size_t") long size);
 

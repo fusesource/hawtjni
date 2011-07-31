@@ -104,10 +104,10 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     void generateGlobalVar(JNIClass clazz) {
-        String clazzName = clazz.getSimpleName();
-        output(clazzName);
+        String simpleName = clazz.getSimpleName();
+        output(simpleName);
         output("_FID_CACHE ");
-        output(clazzName);
+        output(simpleName);
         outputln("Fc;");
     }
 
@@ -117,30 +117,31 @@ public class StructsGenerator extends JNIGenerator {
             return;
         }
         
-        String clazzName = clazz.getSimpleName();
+        String simpleName = clazz.getSimpleName();
         outputln("#else");
         output("#define cache");
-        output(clazzName);
+        output(simpleName);
         outputln("Fields(a,b)");
         output("#define get");
-        output(clazzName);
+        output(simpleName);
         outputln("Fields(a,b,c) NULL");
         output("#define set");
-        output(clazzName);
+        output(simpleName);
         outputln("Fields(a,b,c)");
     }
 
     void generatePrototypes(JNIClass clazz) {
-        String clazzName = clazz.getSimpleName();
+        String clazzName = clazz.getNativeName();
+        String simpleName = clazz.getSimpleName();
         output("void cache");
-        output(clazzName);
+        output(simpleName);
         outputln("Fields(JNIEnv *env, jobject lpObject);");
         if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);
         output(" *get");
-        output(clazzName);
+        output(simpleName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
         if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
@@ -148,7 +149,7 @@ public class StructsGenerator extends JNIGenerator {
         output(clazzName);
         outputln(" *lpStruct);");
         output("void set");
-        output(clazzName);
+        output(simpleName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
         if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
@@ -158,9 +159,9 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     void generateFIDsStructure(JNIClass clazz) {
-        String clazzName = clazz.getSimpleName();
+        String simpleName = clazz.getSimpleName();
         output("typedef struct ");
-        output(clazzName);
+        output(simpleName);
         outputln("_FID_CACHE {");
         outputln("\tint cached;");
         outputln("\tjclass clazz;");
@@ -177,18 +178,19 @@ public class StructsGenerator extends JNIGenerator {
         }
         outputln(";");
         output("} ");
-        output(clazzName);
+        output(simpleName);
         outputln("_FID_CACHE;");
     }
 
     void generateCacheFunction(JNIClass clazz) {
-        String clazzName = clazz.getSimpleName();
+        String simpleName = clazz.getSimpleName();
+        String clazzName = clazz.getNativeName();
         output("void cache");
-        output(clazzName);
+        output(simpleName);
         outputln("Fields(JNIEnv *env, jobject lpObject)");
         outputln("{");
         output("\tif (");
-        output(clazzName);
+        output(simpleName);
         outputln("Fc.cached) return;");
         JNIClass superclazz = clazz.getSuperclass();
         if (!superclazz.getName().equals("java.lang.Object")) {
@@ -198,7 +200,7 @@ public class StructsGenerator extends JNIGenerator {
             outputln("Fields(env, lpObject);");
         }
         output("\t");
-        output(clazzName);
+        output(simpleName);
         if (isCPP) {
             if (GLOBAL_REF) {
                 output("Fc.clazz = (jclass)env->NewGlobalRef(env->GetObjectClass(lpObject));");
@@ -218,7 +220,7 @@ public class StructsGenerator extends JNIGenerator {
             if (ignoreField(field))
                 continue;
             output("\t");
-            output(clazzName);
+            output(simpleName);
             output("Fc.");
             output(field.getName());
             if (isCPP) {
@@ -226,7 +228,7 @@ public class StructsGenerator extends JNIGenerator {
             } else {
                 output(" = (*env)->GetFieldID(env, ");
             }
-            output(clazzName);
+            output(simpleName);
             output("Fc.clazz, \"");
             output(field.getName());
             JNIType type = field.getType(), type64 = field.getType64();
@@ -239,15 +241,15 @@ public class StructsGenerator extends JNIGenerator {
             outputln(");");
         }
         output("\t");
-        output(clazzName);
+        output(simpleName);
         outputln("Fc.cached = 1;");
         outputln("}");
     }
 
     void generateGetFields(JNIClass clazz) {
         JNIClass superclazz = clazz.getSuperclass();
-        String clazzName = clazz.getSimpleName();
-        String superName = superclazz.getSimpleName();
+        String clazzName = clazz.getNativeName();
+        String superName = superclazz.getNativeName();
         if (!superclazz.getName().equals("java.lang.Object")) {
             /*
              * Windows exception - cannot call get/set function of super class
@@ -272,7 +274,7 @@ public class StructsGenerator extends JNIGenerator {
                 outputln("#if "+conditional);
             }
             JNIType type = field.getType(), type64 = field.getType64();
-            String typeName = type.getSimpleName();
+            String simpleName = type.getSimpleName();
             String accessor = field.getAccessor();
             if (accessor == null || accessor.length() == 0)
                 accessor = field.getName();
@@ -355,7 +357,7 @@ public class StructsGenerator extends JNIGenerator {
                 output(field.getName());
                 outputln(");");
                 output("\tif (lpObject1 != NULL) get");
-                output(typeName);
+                output(simpleName);
                 output("Fields(env, lpObject1, &lpStruct->");
                 output(accessor);
                 outputln(");");
@@ -369,13 +371,14 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     void generateGetFunction(JNIClass clazz) {
-        String clazzName = clazz.getSimpleName();
+        String clazzName = clazz.getNativeName();
+        String simpleName = clazz.getSimpleName();
         if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
         }
         output(clazzName);
         output(" *get");
-        output(clazzName);
+        output(simpleName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
         if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
@@ -384,9 +387,9 @@ public class StructsGenerator extends JNIGenerator {
         outputln(" *lpStruct)");
         outputln("{");
         output("\tif (!");
-        output(clazzName);
+        output(simpleName);
         output("Fc.cached) cache");
-        output(clazzName);
+        output(simpleName);
         outputln("Fields(env, lpObject);");
         if( clazz.getFlag(ClassFlag.ZERO_OUT) ) {
             outputln("memset(lpStruct, 0, sizeof(struct "+clazzName+"));");
@@ -398,8 +401,8 @@ public class StructsGenerator extends JNIGenerator {
 
     void generateSetFields(JNIClass clazz) {
         JNIClass superclazz = clazz.getSuperclass();
-        String clazzName = clazz.getSimpleName();
-        String superName = superclazz.getSimpleName();
+        String clazzName = clazz.getNativeName();
+        String superName = superclazz.getNativeName();
         if (!superclazz.getName().equals("java.lang.Object")) {
             /*
              * Windows exception - cannot call get/set function of super class
@@ -426,7 +429,7 @@ public class StructsGenerator extends JNIGenerator {
             JNIType type = field.getType(), type64 = field.getType64();
             boolean allowConversion = !type.equals(type64);
             
-            String typeName = type.getSimpleName();
+            String simpleName = type.getSimpleName();
             String accessor = field.getAccessor();
             if (accessor == null || accessor.length() == 0)
                 accessor = field.getName();
@@ -504,7 +507,7 @@ public class StructsGenerator extends JNIGenerator {
                 output(field.getName());
                 outputln(");");
                 output("\tif (lpObject1 != NULL) set");
-                output(typeName);
+                output(simpleName);
                 output("Fields(env, lpObject1, &lpStruct->");
                 output(accessor);
                 outputln(");");
@@ -518,9 +521,10 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     void generateSetFunction(JNIClass clazz) {
-        String clazzName = clazz.getSimpleName();
+        String clazzName = clazz.getNativeName();
+        String simpleName = clazz.getSimpleName();
         output("void set");
-        output(clazzName);
+        output(simpleName);
         output("Fields(JNIEnv *env, jobject lpObject, ");
         if (clazz.getFlag(ClassFlag.STRUCT) && !clazz.getFlag(ClassFlag.TYPEDEF)) {
             output("struct ");
@@ -529,9 +533,9 @@ public class StructsGenerator extends JNIGenerator {
         outputln(" *lpStruct)");
         outputln("{");
         output("\tif (!");
-        output(clazzName);
+        output(simpleName);
         output("Fc.cached) cache");
-        output(clazzName);
+        output(simpleName);
         outputln("Fields(env, lpObject);");
         generateSetFields(clazz);
         outputln("}");

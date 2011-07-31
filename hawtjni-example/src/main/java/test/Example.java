@@ -10,7 +10,12 @@ package test;
 
 import java.util.Arrays;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.ClassFlag;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniField;
+import org.fusesource.hawtjni.runtime.JniMethod;
+import org.fusesource.hawtjni.runtime.Library;
 
 import static org.fusesource.hawtjni.runtime.ArgFlag.*;
 import static org.fusesource.hawtjni.runtime.FieldFlag.*;
@@ -219,7 +224,7 @@ public class Example {
         @JniField(accessor="c[5]")
         public byte c5;
         
-        @JniField(cast="struct foo *")
+        @JniField(cast="void *")
         public long prev;
 
         @Override
@@ -299,9 +304,6 @@ public class Example {
         public int y;
     }
     
-    public static final native void callmeback(
-            @JniArg(cast="void (*)(int)", flags = ArgFlag.POINTER_ARG)
-            long ptr);
-
+    public static final native void callmeback(@JniArg(cast="void *")long ptr);
     
 }

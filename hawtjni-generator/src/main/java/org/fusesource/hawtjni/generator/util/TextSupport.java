@@ -18,8 +18,10 @@ public class TextSupport {
     static public String cast(String cast) {
         cast = cast.trim();
         if (cast.length() > 0) {
-            if (!cast.startsWith("(") || !cast.endsWith(")"))
-                cast = "(" + cast + ")";
+            if (!cast.startsWith("("))
+                cast = "(" + cast;
+            if (!cast.endsWith(")"))
+                cast = cast + ")";
         }
         return cast;
     }

@@ -131,7 +131,6 @@
               <osgiPlatforms>
                 <osgiPlatform>osname=MacOS;processor=x86-64</osgiPlatform>
                 <osgiPlatform>osname=MacOS;processor=x86</osgiPlatform>
-                <osgiPlatform>osname=MacOS;processor=PowerPC</osgiPlatform>
                 <osgiPlatform>*</osgiPlatform>
               </osgiPlatforms>
               <configureArgs>

@@ -10,12 +10,7 @@ package test;
 
 import java.util.Arrays;
 
-import org.fusesource.hawtjni.runtime.ClassFlag;
-import org.fusesource.hawtjni.runtime.JniArg;
-import org.fusesource.hawtjni.runtime.JniClass;
-import org.fusesource.hawtjni.runtime.JniField;
-import org.fusesource.hawtjni.runtime.JniMethod;
-import org.fusesource.hawtjni.runtime.Library;
+import org.fusesource.hawtjni.runtime.*;
 
 import static org.fusesource.hawtjni.runtime.ArgFlag.*;
 import static org.fusesource.hawtjni.runtime.FieldFlag.*;
@@ -224,7 +219,7 @@ public class Example {
         @JniField(accessor="c[5]")
         public byte c5;
         
-        @JniField(cast="void *")
+        @JniField(cast="struct foo *")
         public long prev;
 
         @Override
@@ -304,6 +299,31 @@ public class Example {
         public int y;
     }
     
-    public static final native void callmeback(@JniArg(cast="void *")long ptr);
+    public static final native void callmeback(
+            @JniArg(cast="void (*)(int)", flags = ArgFlag.POINTER_ARG)
+            long ptr);
+
+    @JniClass(flags={ClassFlag.STRUCT, ClassFlag.CPP})
+    static class Range {
+        static {
+            LIBRARY.load();
+        }
+
+        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="Range *")
+        public static final native long Range_new();
+
+        @JniMethod(flags={MethodFlag.CPP_DELETE})
+        public static final native void Range_delete(
+                @JniArg(cast="Range *")
+                long ptr);
+
+        @JniMethod(flags={MethodFlag.CPP})
+        public static final native void Range_dump(
+                @JniArg(cast="Range *")
+                long ptr);
+
+
+    }
+
     
 }

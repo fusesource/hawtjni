@@ -429,6 +429,9 @@ public class HawtJNI {
         gen.setOutput(new PrintStream(out));
         gen.generate();
         if (out.size() > 0) {
+            if( target.getName().endsWith(".c") && gen.isCPP ) {
+                target = new File(target.getParentFile(), target.getName()+"pp");
+            }
             if( FileSupport.write(out.toByteArray(), target) ) {
                 progress("Wrote: "+target);
             }

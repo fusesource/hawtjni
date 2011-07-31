@@ -286,10 +286,14 @@ public class GenerateMojo extends AbstractMojo {
         values.put("PROJECT_NAME_UNDER_SCORE", name.replaceAll("\\W", "_"));
         values.put("VERSION", project.getVersion());
         
+        List<String> cpp_files = new ArrayList<String>();
+        cpp_files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.cpp", null, false));
+        cpp_files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.cxx", null, false));
+
         List<String> files = new ArrayList<String>();
+        files.addAll(cpp_files);
         files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.c", null, false));
-        files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.cpp", null, false));
-        files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.cxx", null, false));
+        files.addAll(FileUtils.getFileNames(targetSrcDir, "**/*.m", null, false));
         String sources = "";
         String xml_sources = "";
         String vs10_sources = "";
@@ -306,7 +310,13 @@ public class GenerateMojo extends AbstractMojo {
             xml_sources+="      <File RelativePath=\".\\src\\"+ (f.replace('/', '\\')) +"\"/>\n";
             vs10_sources+="    <ClCompile Include=\".\\src\\"+ (f.replace('/', '\\')) +"\"/>\n";
         }
-        
+
+        if( cpp_files.isEmpty() ) {
+            values.put("AC_PROG_CHECKS", "AC_PROG_CC");
+        } else {
+            values.put("AC_PROG_CHECKS", "AC_PROG_CXX");
+        }
+
         values.put("PROJECT_SOURCES", sources);
         values.put("PROJECT_XML_SOURCES", xml_sources);
         values.put("PROJECT_VS10_SOURCES", vs10_sources);

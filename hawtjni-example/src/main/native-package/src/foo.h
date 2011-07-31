@@ -11,6 +11,10 @@
 
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct foo {
    int    a;
    size_t b;     
@@ -29,8 +33,11 @@ char * char_add(char *arg, int count);
 void print_foo(struct foo *arg);
 long foowork(struct foo **arg, int count);
 
-
 void callmeback(void (*thecallback)(int number));
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* INCLUDED_FOO_H */

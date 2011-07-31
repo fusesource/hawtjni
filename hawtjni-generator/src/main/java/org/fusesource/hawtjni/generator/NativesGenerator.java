@@ -174,6 +174,9 @@ public class NativesGenerator extends JNIGenerator {
             return;
         }
         
+        if (isCPP) {
+            output("extern \"C\" ");
+        }
         outputln("JNIEXPORT void JNICALL "+clazz.getSimpleName()+"_NATIVE("+toC(method.getName())+")(JNIEnv *env, jclass that)");
         outputln("{");
         for (JNIField field : constants) {
@@ -189,10 +192,18 @@ public class NativesGenerator extends JNIGenerator {
             String accessor = field.getAccessor();
             if (accessor == null || accessor.length() == 0)
                 accessor = field.getName();
-            
+
             String fieldId = "(*env)->GetStaticFieldID(env, that, \""+field.getName()+"\", \""+type.getTypeSignature(allowConversion)+"\")";
+            if (isCPP) {
+                fieldId = "env->GetStaticFieldID(that, \""+field.getName()+"\", \""+type.getTypeSignature(allowConversion)+"\")";
+            }
+
             if (type.isPrimitive()) {
-                output("\t(*env)->SetStatic"+type.getTypeSignature1(allowConversion)+"Field(env, that, "+fieldId +", ");
+                if (isCPP) {
+                    output("\tenv->SetStatic"+type.getTypeSignature1(allowConversion)+"Field(that, "+fieldId +", ");
+                } else {
+                    output("\t(*env)->SetStatic"+type.getTypeSignature1(allowConversion)+"Field(env, that, "+fieldId +", ");
+                }
                 output("("+type.getTypeSignature2(allowConversion)+")");
                 if( field.isPointer() ) {
                     output("(intptr_t)");
@@ -245,7 +256,11 @@ public class NativesGenerator extends JNIGenerator {
                 }
             } else {
                 outputln("\t{");
-                output("\tjobject lpObject1 = (*env)->GetStaticObjectField(env, that, ");
+                if (isCPP) {
+                    output("\tjobject lpObject1 = env->GetStaticObjectField(that, ");
+                } else {
+                    output("\tjobject lpObject1 = (*env)->GetStaticObjectField(env, that, ");
+                }
                 output(field.getDeclaringClass().getSimpleName());
                 output("Fc.");
                 output(field.getName());

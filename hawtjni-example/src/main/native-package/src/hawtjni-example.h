@@ -39,4 +39,26 @@
 #include <fcntl.h>
 #include "foo.h"
 
+#include "stdio.h"
+
+class Range {
+public:
+
+  int start;
+  int end;
+
+  Range() {
+    start = 0;
+    end = 0;
+  }
+  Range(const int s, const int e) {
+    start = s;
+    end = e;
+  }
+
+  void dump() {
+    printf("range: %d-%d\n", start, end);
+  }
+};
+
 #endif /* INCLUDED_PLATFORM_H */

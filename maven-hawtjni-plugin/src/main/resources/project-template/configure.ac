@@ -30,7 +30,7 @@ AC_CANONICAL_SYSTEM
 ## -----------------------------------------------
 ## Application Checks
 ## -----------------------------------------------
-AC_PROG_CC
+@AC_PROG_CHECKS@
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL([disable-static])
 
@@ -45,6 +45,8 @@ WITH_OSX_UNIVERSAL
 
 CFLAGS="$CFLAGS $JNI_EXTRA_CFLAGS"
 AC_SUBST(CFLAGS)
+CXXFLAGS="$CXXFLAGS $JNI_EXTRA_CFLAGS"
+AC_SUBST(CXXFLAGS)
 LDFLAGS="$LDFLAGS $JNI_EXTRA_LDFLAGS -release @VERSION@"
 AC_SUBST(LDFLAGS)
 

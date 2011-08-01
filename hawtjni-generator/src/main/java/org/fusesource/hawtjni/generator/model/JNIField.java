@@ -30,6 +30,7 @@ public interface JNIField {
     public String getAccessor();
     public String getCast();
     public String getConditional();
+    public boolean ignore();
 
     public boolean isPointer();
 }

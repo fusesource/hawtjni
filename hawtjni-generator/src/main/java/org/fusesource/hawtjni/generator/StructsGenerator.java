@@ -551,7 +551,7 @@ public class StructsGenerator extends JNIGenerator {
 
     boolean ignoreField(JNIField field) {
         int mods = field.getModifiers();
-        return ((mods & Modifier.PUBLIC) == 0) || ((mods & Modifier.FINAL) != 0) || ((mods & Modifier.STATIC) != 0);
+        return ((mods & Modifier.FINAL) != 0) || ((mods & Modifier.STATIC) != 0);
     }
 
 }

@@ -140,10 +140,11 @@ public class ReflectClass implements JNIClass {
         for (Field field : fields) {
             this.fields.add(new ReflectField(this, field));
         }
+
         Method[] methods = clazz.getDeclaredMethods();
         this.methods = new ArrayList<ReflectMethod>(methods.length);
-        for (int i = 0; i < methods.length; i++) {
-            this.methods.add(new ReflectMethod(this, methods[i]));
+        for (Method method : methods) {
+            this.methods.add(new ReflectMethod(this, method));
         }
     }
 

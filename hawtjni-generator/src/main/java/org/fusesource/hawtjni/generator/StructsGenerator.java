@@ -501,7 +501,11 @@ public class StructsGenerator extends JNIGenerator {
                 }
             } else {
                 outputln("\t{");
-                output("\tjobject lpObject1 = (*env)->GetObjectField(env, lpObject, ");
+                if (isCPP) {
+                    output("\tjobject lpObject1 = env->GetObjectField(lpObject, ");
+                } else {
+                    output("\tjobject lpObject1 = (*env)->GetObjectField(env, lpObject, ");
+                }
                 output(field.getDeclaringClass().getSimpleName());
                 output("Fc.");
                 output(field.getName());

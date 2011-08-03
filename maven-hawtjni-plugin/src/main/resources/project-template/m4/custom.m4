@@ -21,5 +21,7 @@ AC_DEFUN([CUSTOM_M4_SETUP],
   # This is just a stub.  If you wish to customize your configure.ac
   # just copy this file to src/main/native-package/m4/custom.m4
   # then replace add your configure.ac statements here.
-  #  
+  #
+  AC_CHECK_HEADER([pthread.h],[AC_DEFINE([HAVE_PTHREAD_H], [1], [Define to 1 if you have the <pthread.h> header file.])])
+
 ])

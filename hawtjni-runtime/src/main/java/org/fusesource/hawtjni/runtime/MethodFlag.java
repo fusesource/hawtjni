@@ -55,9 +55,9 @@ public enum MethodFlag {
     ADDRESS,
     
     /**
-     * Indicate that the platform source is in C++
+     * Indicate that the native method is calling a C++ object's method.
      */
-    CPP,
+    CPP_METHOD,
 
     /**
      * Indicate that the native method is a C++ constructor that allocates 

@@ -756,15 +756,21 @@ public class NativesGenerator extends JNIGenerator {
             }
 
             String cast = method.getCast();
-            if (cast != null) {
+            if (cast.length() != 0 && !cast.equals("()")) {
                 if( method.isPointer() ) {
                     output("(intptr_t)");
                 }
                 output(cast);
             } else {
-                output("(");
-                output(returnType.getTypeSignature2(!returnType.equals(returnType64)));
-                output(")");
+                if( method.getFlag(CPP_NEW)) {
+                    String[] parts = getNativeNameParts(method);
+                    String className = parts[0];
+                    output("(intptr_t)("+className+" *)");
+                } else {
+                    output("(");
+                    output(returnType.getTypeSignature2(!returnType.equals(returnType64)));
+                    output(")");
+                }
             }
         }
         if (method.getFlag(MethodFlag.ADDRESS)) {
@@ -807,6 +813,38 @@ public class NativesGenerator extends JNIGenerator {
             }
             output(")");
         }
+    }
+
+    static String[] getNativeNameParts(JNIMethod method) {
+        String className = null;
+        String methodName = null;
+
+        JNIClass dc = method.getDeclaringClass();
+        if( dc.getFlag(ClassFlag.CPP) || dc.getFlag(ClassFlag.STRUCT) ) {
+            className = method.getDeclaringClass().getNativeName();
+        }
+
+        if( method.getAccessor().length() != 0 ) {
+            methodName = method.getAccessor();
+            int pos = methodName.lastIndexOf("::");
+            if( pos >= 0 ) {
+                className = methodName.substring(0, pos);
+                methodName = methodName.substring(pos+2);
+            }
+        } else {
+            methodName = method.getName();
+            if( className==null ) {
+                int pos = methodName.indexOf("_");
+                if( pos > 0 ) {
+                    className = methodName.substring(0, pos);
+                    methodName = methodName.substring(pos+1);
+                }
+            }
+        }
+        if( className==null ) {
+            throw new Error(String.format("Could not determine object type name of method '%s'", method.getDeclaringClass().getSimpleName()+"."+method.getName()));
+        }
+        return new String[]{className, methodName};
     }
 
     void generateFunctionCall(JNIMethod method, List<JNIParameter> params, JNIType returnType, JNIType returnType64, boolean needsReturn) {
@@ -864,7 +902,12 @@ public class NativesGenerator extends JNIGenerator {
             output(paramType.getTypeSignature4(!paramType.equals(paramType64), false));
             output(" **)arg1)[arg0])");
             paramStart = 1;
-        } else if (method.getFlag(MethodFlag.CPP) || method.getFlag(MethodFlag.SETTER) || method.getFlag(MethodFlag.GETTER) || method.getFlag(MethodFlag.ADDER)) {
+        } else if (method.getFlag(MethodFlag.CPP_METHOD) || method.getFlag(MethodFlag.SETTER) || method.getFlag(MethodFlag.GETTER) || method.getFlag(MethodFlag.ADDER)) {
+
+            String[] parts = getNativeNameParts(method);
+            String className = parts[0];
+            String methodName = parts[1];
+
             if (method.getFlag(MethodFlag.CS_OBJECT)) {
                 output("TO_HANDLE(");
             }
@@ -881,6 +924,8 @@ public class NativesGenerator extends JNIGenerator {
                 if( param.isPointer() ) {
                     output("(intptr_t)");
                 }
+            } else {
+                output("("+className+" *)(intptr_t)");
             }
             if (param.getFlag(ArgFlag.CS_OBJECT)) {
                 output("TO_OBJECT(");
@@ -890,23 +935,7 @@ public class NativesGenerator extends JNIGenerator {
                 output(")");
             }
             output(")->");
-            String accessor = method.getAccessor();
-            if (accessor.length() != 0) {
-                output(accessor);
-            } else {
-                JNIClass dc = method.getDeclaringClass();
-                if( dc.getFlag(ClassFlag.CPP) || dc.getFlag(ClassFlag.STRUCT) ) {
-                    output(name);
-                } else {
-                    int index = -1;
-                    // HRC
-                    if ((index = name.indexOf('_')) != -1) {
-                        output(name.substring(index + 1, name.length()));
-                    } else {
-                        output(name);
-                    }
-                }
-            }
+            output(methodName);
             paramStart = 1;
         } else if (method.getFlag(MethodFlag.CS_NEW)) {
             output("TO_HANDLE(gcnew ");
@@ -916,7 +945,7 @@ public class NativesGenerator extends JNIGenerator {
             } else {
                 JNIClass dc = method.getDeclaringClass();
                 if( dc.getFlag(ClassFlag.CPP) || dc.getFlag(ClassFlag.STRUCT) ) {
-                    output(name);
+                    output(dc.getNativeName());
                 } else {
                     int index = -1;
                     if ((index = name.indexOf('_')) != -1) {
@@ -942,7 +971,7 @@ public class NativesGenerator extends JNIGenerator {
                 } else {
                     int index = -1;
                     if ((index = name.indexOf('_')) != -1) {
-                        output(name.substring(0, index));
+                        output(name.substring(index+1));
                     } else {
                         output(name);
                     }
@@ -950,6 +979,9 @@ public class NativesGenerator extends JNIGenerator {
 
             }
         } else if (method.getFlag(MethodFlag.CPP_DELETE)) {
+            String[] parts = getNativeNameParts(method);
+            String className = parts[0];
+
             output("delete ");
             JNIParameter param = params.get(0);
             String cast = param.getCast();
@@ -959,9 +991,7 @@ public class NativesGenerator extends JNIGenerator {
                     output("(intptr_t)");
                 }
             } else {
-                output("(");
-                output(name.substring(0, name.indexOf("_")));
-                output(" *)");
+                output("("+className+" *)(intptr_t)");
             }
             outputln("arg0;");
             return;
@@ -982,7 +1012,7 @@ public class NativesGenerator extends JNIGenerator {
                         output(", ");
                     JNIParameter param = params.get(i);
                     String cast = param.getCast();
-                    if (cast != null && cast.length() != 0) {
+                    if (cast.length() != 0 && !cast.equals("()") ) {
                         if (cast.startsWith("("))
                             cast = cast.substring(1);
                         if (cast.endsWith(")"))
@@ -1064,7 +1094,7 @@ public class NativesGenerator extends JNIGenerator {
             if( param.isPointer() ) {
                 output("(intptr_t)");
             }
-            if (cast != null && cast.length() != 0) {
+            if (cast.length() != 0 && !cast.equals("()")) {
                 if (cast.startsWith("("))
                     cast = cast.substring(1);
                 if (cast.endsWith(")"))

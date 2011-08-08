@@ -34,7 +34,7 @@ pthread_key_t JNI_ATTACH_THREAD_LOCAL_KEY;
 jint hawtjni_attach_thread(JNIEnv **env, const char *thread_name) {
   JavaVMAttachArgs args;
   args.version = JNI_VERSION_1_2;
-  args.name = thread_name;
+  args.name = (char *)thread_name;
   args.group = 0;
   #ifdef HAVE_PTHREAD_H
     if( JNI_ATTACH_THREAD_LOCAL_KEY ) {

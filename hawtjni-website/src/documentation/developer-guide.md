@@ -380,34 +380,52 @@ public static class COORD {
 }
 {pygmentize}
 
-<!-- TODO: Cover these JniClass flags
-    
-    /**
-     * Indicate that the platform source is in C++
-     */
-    CPP,
--->
+## Binding to C++ Classes
 
-<!-- TODO: Cover these JniField flags
-    /** 
-     * Indicate that the item should not be generated. For example, 
-     * custom natives are coded by hand. 
-     */
-    FIELD_SKIP,
--->
-<!-- TODO: Cover these JniMethod flags
-    /**
-     * Indicate that the native method represents a setter for a field in 
-     * an object or structure
-     */
-    SETTER,
-    
-    /**
-     * Indicate that the native method represents a getter for a field in 
-     * an object or structure.
-     */
-    GETTER,
--->    
+HawtJNI support binding to C++ classes. Here's an example of bind to the "std::string" class.
+
+{pygmentize:: java}
+@JniClass(name="std::string", flags={ClassFlag.CPP})
+private static class StdString {
+
+    @JniMethod(flags={CPP_NEW})
+    public static final native long create();
+
+    @JniMethod(flags={CPP_NEW})
+    public static final native long create(String value);
+
+    @JniMethod(flags={CPP_DELETE})
+    static final native void delete(long self);
+
+    @JniMethod(flags={CPP_METHOD}, cast="const char*")
+    public static final native long c_str_ptr (long self);
+
+    @JniMethod(flags={CPP_METHOD}, cast="size_t")
+    public static final native long length (long self);
+}
+{pygmentize}
+
+The `CPP_NEW` flagged methods are constructor methods.  They allocate
+a new instance of the class or structure on the native heap and return 
+a pointer to it.
+
+The `CPP_DELETE` flagged method is used to destruct a previously created object.
+The `CPP_METHOD` flagged methods are used to call methods on the object.
+
+You can also get and set fields on the object using the `GETTER` and `SETTER`
+method flags.  For example, if we had an object with a `int count` field.
+
+{pygmentize:: java}
+    @JniMethod(flags={GETTER})
+    public static final native int count(long self);
+
+    @JniMethod(flags={SETTER})
+    public static final native void count(long self, int value);
+{pygmentize}
+
+Notice that the `CPP_DELETE`, `CPP_METHOD`, `GETTER`, and `SETTER` all take
+a pointer the object they operating against as the first argument of the java
+method definition.
 
 ## Advanced Mapping Topics
 
@@ -607,6 +625,20 @@ For example:
 Warning: you can only create up to 128 Callbacks concurrently.  If you exceed this number
 `callback.getAddress()` returns zero.  You should use the `callback.dispose()` method
 to release a callback once it's not being used anymore.
+
+### Attaching Native Threads to the JVM
+
+If you have a thread that was not started by the JVM try to call into the 
+JVM you must first "attach" it to the JVM.  HawtDispatch provides some helper 
+methods to make it simpler and more efficient.  These methods are only available
+on JVMs supporting JNI 1.2.
+
+* `jint hawtjni_attach_thread(JNIEnv **env, const char *thread_name);`
+* `jint hawtjni_detach_thread();`
+
+If your platform supports pthreads and you have the `HAVE_PTHREAD_H` define enabled,
+then the attach operation is cached and the detach is only performed when the
+thread stops.
 
 ### Optimizations {#optimizations}
 

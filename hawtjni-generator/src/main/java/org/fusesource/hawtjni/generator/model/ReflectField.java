@@ -88,7 +88,7 @@ public class ReflectField implements JNIField {
     }
 
     public boolean ignore() {
-        return annotation == null ? false : annotation.ignore();
+        return getFlag(FieldFlag.FIELD_SKIP);
     }
 
     public boolean isPointer() {

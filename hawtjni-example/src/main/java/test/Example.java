@@ -309,21 +309,17 @@ public class Example {
             LIBRARY.load();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="Range *")
-        public static final native long create();
+        @JniMethod(flags={MethodFlag.CPP_NEW})
+        public static final native long Range();
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="Range *")
-        public static final native long create(int start, int end);
+        @JniMethod(flags={MethodFlag.CPP_NEW})
+        public static final native long Range(int start, int end);
 
         @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(
-                @JniArg(cast = "Range *")
-                long ptr);
+        public static final native void delete(long ptr);
 
-        @JniMethod(flags={MethodFlag.CPP})
-        public static final native void dump(
-                @JniArg(cast="Range *")
-                long ptr);
+        @JniMethod(flags={MethodFlag.CPP_METHOD})
+        public static final native void dump(long ptr);
 
 
     }

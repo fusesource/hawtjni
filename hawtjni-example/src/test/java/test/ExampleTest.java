@@ -53,10 +53,10 @@ public class ExampleTest {
         assertEquals(69, instanceCallbackResult);
         callback.dispose();
 
-        long r1 = Range.create();
+        long r1 = Range.Range();
         Range.dump(r1);
 
-        long r2 = Range.create(10,100);
+        long r2 = Range.Range(10,100);
         Range.dump(r2);
 
         Range.delete(r1);

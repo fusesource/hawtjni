@@ -35,9 +35,8 @@
   <properties>
     <forge-project-id>hawtjni</forge-project-id>
     <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
-    <release-altGitURL>scm:git:ssh://git@github.com:fusesources/hawtjni.git</release-altGitURL>
     
-    <scalate-version>1.6.0-SNAPSHOT</scalate-version>
+    <scalate-version>1.5.1</scalate-version>
     <scalamd-version>1.5</scalamd-version>    
     <slf4j-version>1.6.1</slf4j-version>
     <jetty-plugin-version>7.0.1.v20091125</jetty-plugin-version>
@@ -86,8 +85,7 @@
   
   <scm>
     <connection>scm:git:git://forge.fusesource.com/${forge-project-id}.git</connection>
-    <!-- Work around for issue: http://jira.codehaus.org/browse/SCM-444 -->
-    <developerConnection>${release-altGitURL}</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com:fusesources/hawtjni.git</developerConnection>
     <url>http://fusesource.com/forge/gitweb?p=${forge-project-id}.git</url>
   </scm>
 

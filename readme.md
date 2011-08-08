@@ -75,5 +75,5 @@ Readme TODO
 * Show the maven plugin
 * Show the OSX cocoa native code generation tool
 
-[1]: http://github.com/chirino/mvnplugins/tree/master/hawtjni "HawtJNI"
+[1]: http://http://hawtjni.fusesource.org/ "HawtJNI"
 [2]: http://www.eclipse.org/swt/jnigen.php

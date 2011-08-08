@@ -1,6 +1,18 @@
 ![HawtJNI](http://hawtjni.fusesource.org/images/project-logo.png)
 =================================================================
 
+[HawtJNI 1.3](http://hawtjni.fusesource.org/blog/releases/release-1-3.html), released 2011-08-08
+----
+
+* Add hawtjni_attach_thread and hawtjni_dettach_thread helper methods
+* Fully support binding against C++ source code / classes.
+* Support using private fields in struct bound classes.
+* Avoid "jump to label from here crosses initialization" compiler error message.
+* Provide better error messages when a user does not properly setup a C++ method binding.
+* Support mapping a class to a differently named structure name.
+* Support picking the OS X SDK version via a configure option.
+* Added pointer math support class to be able to do pointer math in java land without going into a JNI layer.
+
 [HawtJNI 1.2](http://hawtjni.fusesource.org/blog/releases/release-1-2.html), released 2011-06-11
 ----
 

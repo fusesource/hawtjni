@@ -36,7 +36,7 @@ Release Highlights:
 
 Further information:
 
-* [Documentation](http://${website_base_url}/documentation/index.html)
+* [Documentation](${website_base_url}/documentation/developer-guide.html)
 
 [Feedback](${website_base_url}/community/index.html) is always welcome! 
 

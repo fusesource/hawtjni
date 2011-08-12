@@ -16,8 +16,8 @@
  */
 package org.fusesource.hawtjni.maven;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -33,6 +33,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.fusesource.hawtjni.runtime.Library;
 
@@ -206,6 +207,14 @@ public class BuildMojo extends AbstractMojo {
      */
     private boolean downloadSourcePackage = true;  
 
+    /**
+     * URL to where we can down the source package
+     *
+     * @parameter
+     */
+    private String downloadUrl;
+
+
     private final CLI cli = new CLI();
 
     public void execute() throws MojoExecutionException {
@@ -341,16 +350,44 @@ public class BuildMojo extends AbstractMojo {
     }
     
     public void downloadNativeSourcePackage(File buildDir) throws MojoExecutionException  {
-        Artifact artifact = artifactFactory.createArtifactWithClassifier(project.getGroupId(), project.getArtifactId(), project.getVersion(), "zip", sourceClassifier);
-        try {
-            artifactResolver.resolve(artifact, remoteArtifactRepositories, localRepository);
-        } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Error downloading.", e);
-        } catch (ArtifactNotFoundException e) {
-            throw new MojoExecutionException("Requested download does not exist.", e);
+        File packageZipFile;
+        if( downloadUrl==null || downloadUrl.trim().length()==0 ) {
+            Artifact artifact = artifactFactory.createArtifactWithClassifier(project.getGroupId(), project.getArtifactId(), project.getVersion(), "zip", sourceClassifier);
+            try {
+                artifactResolver.resolveAlways(artifact, remoteArtifactRepositories, localRepository);
+            } catch (ArtifactResolutionException e) {
+                throw new MojoExecutionException("Error downloading.", e);
+            } catch (ArtifactNotFoundException e) {
+                throw new MojoExecutionException("Requested download does not exist.", e);
+            }
+
+            packageZipFile = artifact.getFile();
+            if( packageZipFile.isDirectory() ) {
+                // Yep. looks like we are running on mvn 3, seem like
+                // mvn 3 does not actually download the artifact. it just points us
+                // to our own build.
+                throw new MojoExecutionException("You must configure the downloadUrl to be able to download the source package on this version of maven");
+            }
+        } else {
+            try {
+                packageZipFile = new File(buildDirectory, "native-build.zip");
+                URL url = new URL(downloadUrl.trim());
+                InputStream is = url.openStream();
+                try {
+                    FileOutputStream os = new FileOutputStream(packageZipFile);
+                    try {
+                        IOUtil.copy(is, os);
+                    } finally {
+                        IOUtil.close(is);
+                    }
+
+                } finally {
+                    IOUtil.close(is);
+                }
+            } catch (Exception e) {
+                throw new MojoExecutionException("Error downloading: "+downloadUrl, e);
+            }
         }
-        
-        File packageZipFile = artifact.getFile();
 
         try {
             File dest = new File(buildDirectory, "native-build-extracted");

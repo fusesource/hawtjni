@@ -17,8 +17,10 @@
 package org.fusesource.hawtjni.maven;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -38,7 +40,7 @@ import org.fusesource.hawtjni.runtime.Library;
  * current platform.
  * 
  * @goal package-jar
- * @phase package
+ * @phase prepare-package
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class PackageJarMojo extends AbstractMojo {
@@ -89,12 +91,19 @@ public class PackageJarMojo extends AbstractMojo {
     
     /**
      * The platform identifier of this build.  If not specified,
-     * it will be automatically detected.  This will be used as the 
-     * artifact classifier for the platform specific jar.
+     * it will be automatically detected.
      * 
      * @parameter default-value="${hawtjni-platform}"
      */
     private String platform;     
+
+    /**
+     * Should a classifier of the native jar be set
+     * to match the platform?
+     *
+     * @parameter default-value="true"
+     */
+    private boolean classified;
 
     /**
      * The osgi platforms that the library match for.  Example value:
@@ -112,29 +121,37 @@ public class PackageJarMojo extends AbstractMojo {
                 platform = library.getPlatform();
             }
 
-            String packageName = project.getArtifactId() + "-" + project.getVersion() + "-" + platform;
-            JarArchiver archiver = (JarArchiver) archiverManager.getArchiver("jar");
+            String classifier = null;
+            if( classified ) {
+                classifier = platform;
 
-            File packageFile = new File(new File(project.getBuild().getDirectory()), packageName + ".jar");
-            archiver.setDestFile(packageFile);
-            archiver.setIncludeEmptyDirs(true);
-            archiver.addDirectory(libDirectory);
+                String packageName = project.getArtifactId() + "-" + project.getVersion() + "-" + platform;
+                JarArchiver archiver = (JarArchiver) archiverManager.getArchiver("jar");
 
-            Manifest manifest = new Manifest();
-            manifest.addConfiguredAttribute(new Attribute("Bundle-SymbolicName", project.getArtifactId() + "-" + platform));
-            manifest.addConfiguredAttribute(new Attribute("Bundle-Name", name + " for " + platform));            
-            manifest.addConfiguredAttribute(new Attribute("Bundle-NativeCode", getNativeCodeValue(library)));
-            manifest.addConfiguredAttribute(new Attribute("Bundle-Version", project.getVersion()));
-            manifest.addConfiguredAttribute(new Attribute("Bundle-ManifestVersion", "2"));
-            manifest.addConfiguredAttribute(new Attribute("Bundle-Description", project.getDescription()));
-            archiver.addConfiguredManifest(manifest);
+                File packageFile = new File(new File(project.getBuild().getDirectory()), packageName + ".jar");
+                archiver.setDestFile(packageFile);
+                archiver.setIncludeEmptyDirs(true);
+                archiver.addDirectory(libDirectory);
 
-            archiver.createArchive();
+                Manifest manifest = new Manifest();
+                manifest.addConfiguredAttribute(new Attribute("Bundle-SymbolicName", project.getArtifactId() + "-" + platform));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-Name", name + " for " + platform));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-NativeCode", getNativeCodeValue(library)));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-Version", project.getVersion()));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-ManifestVersion", "2"));
+                manifest.addConfiguredAttribute(new Attribute("Bundle-Description", project.getDescription()));
+                archiver.addConfiguredManifest(manifest);
 
-            projectHelper.attachArtifact(project, "jar", platform, packageFile);
+                archiver.createArchive();
+
+                projectHelper.attachArtifact(project, "jar", classifier, packageFile);
+
+            } else {
+                projectHelper.addResource(project, libDirectory.getCanonicalPath(), null, null);
+            }
 
         } catch (Exception e) {
-            throw new MojoExecutionException("packageing failed: " + e, e);
+            throw new MojoExecutionException("packaging failed: " + e, e);
         }
     }
     

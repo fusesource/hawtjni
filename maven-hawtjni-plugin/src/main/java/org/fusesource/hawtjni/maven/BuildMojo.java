@@ -26,10 +26,12 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.util.FileUtils;
@@ -208,12 +210,18 @@ public class BuildMojo extends AbstractMojo {
     private boolean downloadSourcePackage = true;  
 
     /**
+     * The dependency to download to get the native sources.
+     *
+     * @parameter
+     */
+    private Dependency nativeSrcDependency;
+
+    /**
      * URL to where we can down the source package
      *
      * @parameter default-value="${native-src-url}"
      */
     private String nativeSrcUrl;
-
 
     private final CLI cli = new CLI();
 
@@ -278,6 +286,7 @@ public class BuildMojo extends AbstractMojo {
 
         File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecifcResourcePath());
         FileUtils.copyFile(libFile, target);
+
 	}
 
     
@@ -354,7 +363,12 @@ public class BuildMojo extends AbstractMojo {
     public void downloadNativeSourcePackage(File buildDir) throws MojoExecutionException  {
         File packageZipFile;
         if( nativeSrcUrl ==null || nativeSrcUrl.trim().length()==0 ) {
-            Artifact artifact = artifactFactory.createArtifactWithClassifier(project.getGroupId(), project.getArtifactId(), project.getVersion(), "zip", sourceClassifier);
+            Artifact artifact=null;
+            if( nativeSrcDependency==null ) {
+                artifact = artifactFactory.createArtifactWithClassifier(project.getGroupId(), project.getArtifactId(), project.getVersion(), "zip", sourceClassifier);
+            } else {
+                artifact = artifactFactory.createArtifactWithClassifier(nativeSrcDependency.getGroupId(), nativeSrcDependency.getArtifactId(), nativeSrcDependency.getVersion(), nativeSrcDependency.getType(), nativeSrcDependency.getClassifier());
+            }
             try {
                 artifactResolver.resolveAlways(artifact, remoteArtifactRepositories, localRepository);
             } catch (ArtifactResolutionException e) {
@@ -399,13 +413,36 @@ public class BuildMojo extends AbstractMojo {
             unArchiver.setSourceFile(packageZipFile);
             unArchiver.extract("", dest);
 
-            String packageName = project.getArtifactId()+"-"+project.getVersion()+"-"+sourceClassifier;
-            File source = new File(dest, packageName);
+
+            File source = findSourceRoot(dest);
+            if( source==null ) {
+                throw new MojoExecutionException("Extracted package did not look like it contained a native source build.");
+            }
             FileUtils.copyDirectoryStructureIfModified(source, buildDir);            
             
+        } catch (MojoExecutionException e) {
+            throw e;
         } catch (Throwable e) {
             throw new MojoExecutionException("Could not extract the native source package.", e);
         }            
-    }    
-    
+    }
+
+    private File findSourceRoot(File dest) {
+        if(dest.isDirectory()) {
+            if( new File(dest, "configure").exists() ) {
+                return dest;
+            } else {
+                for (File file : dest.listFiles()) {
+                    File root = findSourceRoot(file);
+                    if( root!=null ) {
+                        return root;
+                    }
+                }
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
 }

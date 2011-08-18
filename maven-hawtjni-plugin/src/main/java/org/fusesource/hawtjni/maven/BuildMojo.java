@@ -210,9 +210,9 @@ public class BuildMojo extends AbstractMojo {
     /**
      * URL to where we can down the source package
      *
-     * @parameter
+     * @parameter default-value="${native-src-url}"
      */
-    private String downloadUrl;
+    private String nativeSrcUrl;
 
 
     private final CLI cli = new CLI();
@@ -289,7 +289,9 @@ public class BuildMojo extends AbstractMojo {
         } else if (downloadSourcePackage) {
             downloadNativeSourcePackage(buildDir);
         } else {
-            throw new MojoExecutionException("The configure script is missing from the generated native source package and downloadSourcePackage is disabled: "+configure);
+            if( !buildDir.exists() ) {
+                throw new MojoExecutionException("The configure script is missing from the generated native source package and downloadSourcePackage is disabled: "+configure);
+            }
         }
 
         configure = new File(buildDir, "configure");
@@ -351,7 +353,7 @@ public class BuildMojo extends AbstractMojo {
     
     public void downloadNativeSourcePackage(File buildDir) throws MojoExecutionException  {
         File packageZipFile;
-        if( downloadUrl==null || downloadUrl.trim().length()==0 ) {
+        if( nativeSrcUrl ==null || nativeSrcUrl.trim().length()==0 ) {
             Artifact artifact = artifactFactory.createArtifactWithClassifier(project.getGroupId(), project.getArtifactId(), project.getVersion(), "zip", sourceClassifier);
             try {
                 artifactResolver.resolveAlways(artifact, remoteArtifactRepositories, localRepository);
@@ -366,12 +368,12 @@ public class BuildMojo extends AbstractMojo {
                 // Yep. looks like we are running on mvn 3, seem like
                 // mvn 3 does not actually download the artifact. it just points us
                 // to our own build.
-                throw new MojoExecutionException("You must configure the downloadUrl to be able to download the source package on this version of maven");
+                throw new MojoExecutionException("Add a '-Dnative-src-url=file:...' to have maven download the native package");
             }
         } else {
             try {
                 packageZipFile = new File(buildDirectory, "native-build.zip");
-                URL url = new URL(downloadUrl.trim());
+                URL url = new URL(nativeSrcUrl.trim());
                 InputStream is = url.openStream();
                 try {
                     FileOutputStream os = new FileOutputStream(packageZipFile);
@@ -385,7 +387,7 @@ public class BuildMojo extends AbstractMojo {
                     IOUtil.close(is);
                 }
             } catch (Exception e) {
-                throw new MojoExecutionException("Error downloading: "+downloadUrl, e);
+                throw new MojoExecutionException("Error downloading: "+ nativeSrcUrl, e);
             }
         }
 

@@ -1,6 +1,13 @@
 ![HawtJNI](http://hawtjni.fusesource.org/images/project-logo.png)
 =================================================================
 
+[HawtJNI 1.4](http://hawtjni.fusesource.org/blog/releases/release-1-4.html), released 2011-08-18
+----
+
+* Add more options to the maven hawtjni plugin so that you can build jars containing
+  native libs in a different module from the one which generates the native package for 
+  the jar.
+
 [HawtJNI 1.3](http://hawtjni.fusesource.org/blog/releases/release-1-3.html), released 2011-08-08
 ----
 

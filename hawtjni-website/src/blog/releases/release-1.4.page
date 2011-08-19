@@ -16,14 +16,14 @@
 # limitations under the License.
 
 blog_post: true
-title: HawtJNI 1.2
+title: HawtJNI 1.4
 author: Hiram Chirino
 author_url: http://hiramchirino.com
-created_at: 2011-06-18 12:06:40 -0000
+created_at: 2011-08-18 12:06:40 -0000
 --- 
 
 The [${project_name}](${website_base_url}) project is pleased to announce
-the availability of HawtJNI 1.2. HawtJNI is a code generator that produces
+the availability of HawtJNI 1.4. HawtJNI is a code generator that produces
 the JNI code needed to implement java native methods. It is based on the
 [jnigen](http://www.eclipse.org/swt/jnigen.php) code generator that is part
 of the SWT Tools project which is used to generate all the JNI code which
@@ -31,8 +31,9 @@ powers the eclipse platform.
 
 Release Highlights:
 
-* Adding bit model to the name of the extracted library to support hosts
-  running both 32 and 64 bits JVM.
+* Add more options to the maven hawtjni plugin so that you can build jars containing
+  native libs in a different module from the one which generates the native package for 
+  the jar.
 
 Further information:
 

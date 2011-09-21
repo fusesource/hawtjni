@@ -20,7 +20,10 @@
 #define INC_HAWTJNI_H
 #define _MULTI_THREADED
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
+
 #include "jni.h"
 #include <stdint.h>
 

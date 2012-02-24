@@ -324,5 +324,6 @@ public class Example {
 
     }
 
-    
+    public static final native void passingtheenv (String msg, JNIEnv env);
+
 }

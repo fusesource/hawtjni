@@ -596,6 +596,8 @@ public class NativesGenerator extends JNIGenerator {
                 } else {
                     throw new Error("not done");
                 }
+            } else if (paramType.isType("org.fusesource.hawtjni.runtime.JNIEnv")) {
+                // no need to generate a local for this one..
             } else if (paramType.isType("java.lang.String")) {
                 if (param.getFlag(ArgFlag.UNICODE)) {
                     output("const jchar *lparg" + i);
@@ -631,26 +633,32 @@ public class NativesGenerator extends JNIGenerator {
         boolean genFailTag = false;
         int criticalCount = 0;
         for (JNIParameter param : params) {
-            if (!isCritical(param)) {
-                genFailTag |= generateGetParameter(method, param, false, 1);
-            } else {
-                criticalCount++;
+            if( !"org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                if (!isCritical(param)) {
+                    genFailTag |= generateGetParameter(method, param, false, 1);
+                } else {
+                    criticalCount++;
+                }
             }
         }
         if (criticalCount != 0) {
             outputln("#ifdef JNI_VERSION_1_2");
             outputln("\tif (IS_JNI_1_2) {");
             for (JNIParameter param : params) {
-                if (isCritical(param)) {
-                    genFailTag |= generateGetParameter(method, param, true, 2);
+                if( !"org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                    if (isCritical(param)) {
+                        genFailTag |= generateGetParameter(method, param, true, 2);
+                    }
                 }
             }
             outputln("\t} else");
             outputln("#endif");
             outputln("\t{");
             for (JNIParameter param : params) {
-                if (isCritical(param)) {
-                    genFailTag |= generateGetParameter(method, param, false, 2);
+                if( !"org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                    if (isCritical(param)) {
+                        genFailTag |= generateGetParameter(method, param, false, 2);
+                    }
                 }
             }
             outputln("\t}");
@@ -662,8 +670,10 @@ public class NativesGenerator extends JNIGenerator {
         int criticalCount = 0;
         for (int i = params.size() - 1; i >= 0; i--) {
             JNIParameter param = params.get(i);
-            if (isCritical(param)) {
-                criticalCount++;
+            if( !"org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                if (isCritical(param)) {
+                    criticalCount++;
+                }
             }
         }
         if (criticalCount != 0) {
@@ -671,9 +681,11 @@ public class NativesGenerator extends JNIGenerator {
             outputln("\tif (IS_JNI_1_2) {");
             for (int i = params.size() - 1; i >= 0; i--) {
                 JNIParameter param = params.get(i);
-                if (isCritical(param)) {
-                    output("\t");
-                    generateSetParameter(param, true);
+                if( !"org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                    if (isCritical(param)) {
+                        output("\t");
+                        generateSetParameter(param, true);
+                    }
                 }
             }
             outputln("\t} else");
@@ -681,17 +693,21 @@ public class NativesGenerator extends JNIGenerator {
             outputln("\t{");
             for (int i = params.size() - 1; i >= 0; i--) {
                 JNIParameter param = params.get(i);
-                if (isCritical(param)) {
-                    output("\t");
-                    generateSetParameter(param, false);
+                if( !"org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                    if (isCritical(param)) {
+                        output("\t");
+                        generateSetParameter(param, false);
+                    }
                 }
             }
             outputln("\t}");
         }
         for (int i = params.size() - 1; i >= 0; i--) {
             JNIParameter param = params.get(i);
-            if (!isCritical(param)) {
-                generateSetParameter(param, false);
+            if( !"org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                if (!isCritical(param)) {
+                    generateSetParameter(param, false);
+                }
             }
         }
     }
@@ -803,10 +819,14 @@ public class NativesGenerator extends JNIGenerator {
                 if (i == params.size() - 1 && param.getFlag(ArgFlag.SENTINEL)) {
                     output("NULL");
                 } else {
-                    JNIType paramType = param.getType32();
-                    if (!paramType.isPrimitive() && !isSystemClass(paramType))
-                        output("lp");
-                    output("arg" + i);
+                    if( "org.fusesource.hawtjni.runtime.JNIEnv".equals(param.getTypeClass().getName()) ) {
+                        output("env");
+                    } else {
+                        JNIType paramType = param.getType32();
+                        if (!paramType.isPrimitive() && !isSystemClass(paramType))
+                            output("lp");
+                        output("arg" + i);
+                    }
                 }
                 if (param.getFlag(ArgFlag.CS_OBJECT))
                     output(")");

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static test.Example.*;
 
 import org.fusesource.hawtjni.runtime.Callback;
+import org.fusesource.hawtjni.runtime.JNIEnv;
 import org.junit.Test;
 import static org.fusesource.hawtjni.runtime.PointerMath.*;
 
@@ -70,6 +71,8 @@ public class ExampleTest {
         
         // Heap memory is not GCed, we must manually free it.
         free(ptr);
+
+        passingtheenv("Hiram", null);
     }
     
     public long instanceCallback(long value) {

@@ -36,3 +36,6 @@ char * char_add(char *arg, int count) {
   return arg+count;
 }
 
+void passingtheenv (const char *who, JNIEnv *env) {
+   printf("%s, the JNIEnv is at: %x\n", who, env);
+}

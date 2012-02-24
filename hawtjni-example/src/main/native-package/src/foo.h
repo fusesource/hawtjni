@@ -10,6 +10,7 @@
 #define INCLUDED_FOO_H
 
 #include <stdlib.h>
+#include "jni.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,7 @@ long foowork(struct foo **arg, int count);
 
 void callmeback(void (*thecallback)(int number));
 
+void passingtheenv (const char *who, JNIEnv *env);
 
 #ifdef __cplusplus
 } /* extern "C" */

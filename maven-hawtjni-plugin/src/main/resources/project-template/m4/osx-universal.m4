@@ -22,9 +22,9 @@ dnl
 dnl   Allows creating universal binaries on the 
 dnl
 dnl   Adds the --with-universal=ARCH option.  This will will 
-dnl   set sysroot option to /Developer/SDKs/MacOSX${OSX_VERSION}.sdk.
-dnl   if OSX_VERSION is not defined, it will set it to 10.5 (the first
-dnl   release where intel universal binaries were supported)
+dnl   set -isysroot option to the location of the MacOSX${OSX_VERSION}.sdk.
+dnl   if OSX_VERSION is not defined, it will set it to the latest version
+dnl   of the SDK installed on your system.
 dnl
 dnl   You must use the no-dependencies option when automake is initialized.  
 dnl   for example: AM_INIT_AUTOMAKE([no-dependencies]) 
@@ -51,14 +51,19 @@ AC_DEFUN([WITH_OSX_UNIVERSAL],
     [ 
       OSX_UNIVERSAL="$withval"
     ],[
+      OSX_SDKS_DIR=""
       OSX_VERSION=""
-      for v in 10.0 10.1 10.2 10.3 10.4 10.5 10.6 10.7 10.8 10.9 10.10 ; do
-        if test -z "${OSX_VERSION}" && test -d "/Developer/SDKs/MacOSX${v}.sdk" ; then 
-          OSX_VERSION="${v}"
-        fi
+      for v in 10.0 10.1 10.2 10.3 10.4 10.5 10.6 10.7 10.8 10.9 10.10 10.11 10.12; do
+        for location in "/Developer/SDKs" "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs" ; do
+          if test -z "${OSX_VERSION}" && test -d "${location}/MacOSX${v}.sdk" ; then 
+            OSX_SDKS_DIR="${location}"
+            OSX_VERSION="${v}"
+          fi
+        done
       done
     ])
     AC_MSG_RESULT([$OSX_VERSION])
+    AC_SUBST(OSX_SDKS_DIR)
     AC_SUBST(OSX_VERSION)
         
     AC_MSG_CHECKING(whether to build universal binaries)
@@ -88,9 +93,17 @@ AC_DEFUN([WITH_OSX_UNIVERSAL],
         LDFLAGS="-arch $i $LDFLAGS"
       done 
       
-      CFLAGS="-isysroot /Developer/SDKs/MacOSX${OSX_VERSION}.sdk $CFLAGS"
-      CXXFLAGS="-isysroot /Developer/SDKs/MacOSX${OSX_VERSION}.sdk $CXXFLAGS"
-      LDFLAGS="-syslibroot,/Developer/SDKs/MacOSX${OSX_VERSION}.sdk $LDFLAGS"
+      
+      for f in $__JNI_INCLUDE_EXTRAS ; do
+        if test -d "$__JNI_INCLUDE/$f"; then
+          __JNI_CFLAGS="$__JNI_CFLAGS -I$__JNI_INCLUDE/$f"
+        fi
+      done
+
+      
+      CFLAGS="-isysroot ${OSX_SDKS_DIR}/MacOSX${OSX_VERSION}.sdk $CFLAGS"
+      CXXFLAGS="-isysroot ${OSX_SDKS_DIR}/MacOSX${OSX_VERSION}.sdk $CXXFLAGS"
+      LDFLAGS="-syslibroot,${OSX_SDKS_DIR}/MacOSX${OSX_VERSION}.sdk $LDFLAGS"
       AC_SUBST(CFLAGS)
       AC_SUBST(CXXFLAGS)
       AC_SUBST(LDFLAGS)

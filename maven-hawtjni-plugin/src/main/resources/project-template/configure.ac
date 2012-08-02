@@ -33,6 +33,7 @@ AC_CANONICAL_SYSTEM
 @AC_PROG_CHECKS@
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL([disable-static])
+AM_PROG_AR
 
 ## -----------------------------------------------
 ## API Checks

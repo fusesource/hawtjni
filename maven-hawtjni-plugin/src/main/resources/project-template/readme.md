@@ -24,6 +24,15 @@ install the code into the system directories, run:
 You will have to become the superuser in order to be able to install the
 JNI libraries.
 
+
+### OS X Lion requirements
+
+Install brew.  It will depends on XCode being installed along with 
+the command line tools.  Then use brew to install autoconf, automake,
+and libtool.
+
+    brew install autoconf automake libtool
+
 Building on Windows
 -------------------
 

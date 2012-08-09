@@ -1,0 +1,42 @@
+---
+# Copyright (C) 2009-2011 the original author or authors.
+# See the notice.md file distributed with this work for additional
+# information regarding copyright ownership.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+blog_post: true
+title: HawtJNI 1.6
+author: Hiram Chirino
+author_url: http://hiramchirino.com
+created_at: 2012-08-09 12:06:40 -0000
+--- 
+
+The [${project_name}](${website_base_url}) project is pleased to announce
+the availability of HawtJNI 1.6. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+[jnigen](http://www.eclipse.org/swt/jnigen.php) code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.
+
+Release Highlights:
+
+* Updating hawtjni generate projects so that they work on OS X Lion.
+* Fixes issue #2 : Support passing the JNIEnv pointer to native methods.
+
+Further information:
+
+* [Documentation](${website_base_url}/documentation/developer-guide.html)
+
+[Feedback](${website_base_url}/community/index.html) is always welcome! 
+

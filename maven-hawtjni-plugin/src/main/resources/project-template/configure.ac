@@ -33,7 +33,8 @@ AC_CANONICAL_SYSTEM
 @AC_PROG_CHECKS@
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL([disable-static])
-AM_PROG_AR
+# Make AM_PROG_AR work before automake 1.12
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 ## -----------------------------------------------
 ## API Checks

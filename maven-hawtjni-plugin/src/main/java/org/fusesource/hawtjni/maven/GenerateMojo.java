@@ -154,6 +154,14 @@ public class GenerateMojo extends AbstractMojo {
      */
     private boolean callbacks;
     
+    /**
+     * The build tool to use on Windows systems.  Set
+     * to 'msbuild', 'vcbuild', or 'detect'
+     *
+     * @parameter default-value="detect"
+     */
+    private String windowsBuildTool;
+
     private File targetSrcDir;
     
     private CLI cli = new CLI();
@@ -212,8 +220,18 @@ public class GenerateMojo extends AbstractMojo {
             copyTemplateResource("m4/osx-universal.m4", false);
 
             // To support windows based builds..
-            copyTemplateResource("vs2008.vcproj", true);
-            copyTemplateResource("vs2010.vcxproj", true);
+            String tool = windowsBuildTool.toLowerCase().trim();
+            if( "detect".equals(tool) ) {
+                copyTemplateResource("vs2008.vcproj", true);
+                copyTemplateResource("vs2010.vcxproj", true);
+            } else if( "msbuild".equals(tool) ) {
+                copyTemplateResource("vs2010.vcxproj", true);
+            } else if( "vcbuild".equals(tool) ) {
+                copyTemplateResource("vs2008.vcproj", true);
+            } else if( "none".equals(tool) ) {
+            } else {
+                throw new MojoExecutionException("Invalid setting for windowsBuildTool: "+windowsBuildTool);
+            }
 
             File autogen = new File(packageDirectory, "autogen.sh");
             File configure = new File(packageDirectory, "configure");

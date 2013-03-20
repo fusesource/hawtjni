@@ -223,6 +223,14 @@ public class BuildMojo extends AbstractMojo {
      */
     private String nativeSrcUrl;
 
+    /**
+     * The build tool to use on Windows systems.  Set
+     * to 'msbuild', 'vcbuild', or 'detect'
+     *
+     * @parameter default-value="detect"
+     */
+    private String windowsBuildTool;
+
     private final CLI cli = new CLI();
 
     public void execute() throws MojoExecutionException {
@@ -262,8 +270,32 @@ public class BuildMojo extends AbstractMojo {
         	throw new MojoExecutionException("Usupported platform: "+library.getPlatform());
         }
 
-        String toolset = System.getenv("PlatformToolset");
-        if( "Windows7.1SDK".equals(toolset) ) {
+        boolean useMSBuild = false;
+        String tool = windowsBuildTool.toLowerCase().trim();
+        if( "detect".equals(tool) ) {
+            String toolset = System.getenv("PlatformToolset");
+            if( "Windows7.1SDK".equals(toolset) ) {
+                useMSBuild = true;
+            } else {
+                String vcinstalldir = System.getenv("VCINSTALLDIR");
+                if( vcinstalldir!=null ) {
+                    if( vcinstalldir.contains("Microsoft Visual Studio 10") ||
+                        vcinstalldir.contains("Microsoft Visual Studio 11") ||
+                        vcinstalldir.contains("Microsoft Visual Studio 12")
+                      ) {
+                        useMSBuild = true;
+                    }
+                }
+            }
+        } else if( "msbuild".equals(tool) ) {
+            useMSBuild = true;
+        } else if( "vcbuild".equals(tool) ) {
+            useMSBuild = false;
+        } else {
+            throw new MojoExecutionException("Invalid setting for windowsBuildTool: "+windowsBuildTool);
+        }
+
+        if( useMSBuild ) {
             // vcbuild was removed.. use the msbuild tool instead.
             int rc = cli.system(buildDir, new String[]{"msbuild", "vs2010.vcxproj", "/property:Platform="+platform, "/property:Configuration="+configuration});
             if( rc != 0 ) {

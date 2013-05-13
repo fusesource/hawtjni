@@ -1,5 +1,14 @@
 #![HawtJNI](http://hawtjni.fusesource.org/images/project-logo.png)
 
+## [HawtJNI 1.8](http://hawtjni.fusesource.org/blog/releases/release-1-7.html), released 2013-05-13
+
+* Improved shared lib extraction logic.
+
+## [HawtJNI 1.7](http://hawtjni.fusesource.org/blog/releases/release-1-7.html), released 2013-03-20
+
+* Support explicitly configuring which build tool to use on windows.
+* Fix for automake 1.11
+
 ## [HawtJNI 1.6](http://hawtjni.fusesource.org/blog/releases/release-1-6.html), released 2012-08-09
 
 * Updating hawtjni generate projects so that they work on OS X Lion.

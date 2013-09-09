@@ -1,6 +1,11 @@
 #![HawtJNI](http://hawtjni.fusesource.org/images/project-logo.png)
 
-## [HawtJNI 1.8](http://hawtjni.fusesource.org/blog/releases/release-1-7.html), released 2013-05-13
+## [HawtJNI 1.9](http://hawtjni.fusesource.org/blog/releases/release-1-9.html), released 2013-09-09
+
+* Fix issue #7. We now do a write barrier before setting the 'cached' field to 1 so that reader don't see this get re-ordered before all the fields are readable.
+* Improve the auto generated build systems for windows/OS X
+
+## [HawtJNI 1.8](http://hawtjni.fusesource.org/blog/releases/release-1-8.html), released 2013-05-13
 
 * Improved shared lib extraction logic.
 

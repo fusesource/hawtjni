@@ -240,6 +240,8 @@ public class StructsGenerator extends JNIGenerator {
                 output("\"");
             outputln(");");
         }
+        // Makes sure compiler/cpu does not reorder the following write before the previous updates are done.
+        outputln("\thawtjni_w_barrier();");
         output("\t");
         output(simpleName);
         outputln("Fc.cached = 1;");

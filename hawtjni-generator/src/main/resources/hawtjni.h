@@ -168,6 +168,25 @@ void throwOutOfMemory(JNIEnv *env);
   #endif 
 #endif /* JNI64 */
 
+#ifdef __GNUC__
+  #define hawtjni_w_barrier() __sync_synchronize()
+#elif defined(SOLARIS2) && SOLARIS2 >= 10
+  #include <mbarrier.h>
+  #define hawtjni_w_barrier() __machine_w_barrier()
+#elif defined(__APPLE__)
+  #include <libkern/OSAtomic.h>
+  #define hawtjni_w_barrier() OSMemoryBarrier()
+#elif defined(_WIN32) || defined(_WIN64)
+  #include <intrin.h>
+  #define hawtjni_w_barrier() _mm_sfence(); _WriteBarrier()
+#else
+  #pragma message ( "Don't know how to do a memory barrier on this platform" )
+  #define hawtjni_w_barrier()
+#endif
+
+void hawtjni_atomic_set(jlong *target, jlong value);
+jlong hawtjni_atomic_get(jlong *target);
+
 #ifdef __cplusplus
 }
 #endif 

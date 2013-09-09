@@ -32,9 +32,9 @@ AC_CANONICAL_SYSTEM
 ## -----------------------------------------------
 @AC_PROG_CHECKS@
 AC_PROG_INSTALL
-AC_PROG_LIBTOOL([disable-static])
 # Make AM_PROG_AR work before automake 1.12
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+AC_PROG_LIBTOOL([disable-static])
 
 ## -----------------------------------------------
 ## API Checks
@@ -55,7 +55,7 @@ AC_SUBST(LDFLAGS)
 ## -----------------------------------------------------
 ## Generate the files
 ## -----------------------------------------------------
-AM_INIT_AUTOMAKE([no-dependencies -Wall -Werror foreign])
+AM_INIT_AUTOMAKE([subdir-objects no-dependencies -Wall -Werror foreign])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 

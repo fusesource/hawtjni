@@ -60,6 +60,7 @@ jint hawtjni_detach_thread() {
     if( JNI_ATTACH_THREAD_LOCAL_KEY ) {
       // Don't actually detach.. that will automatically
       // happen when the the thread dies.
+      return 0;
     } else {
       return (*JVM)->DetachCurrentThread(JVM);
     }

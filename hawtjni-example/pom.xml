@@ -21,19 +21,19 @@
   <parent>
     <groupId>org.fusesource.hawtjni</groupId>
     <artifactId>hawtjni-project</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.11-SNAPSHOT</version>
   </parent>
 
   <groupId>org.fusesource.hawtjni</groupId>
   <artifactId>hawtjni-example</artifactId>
-  <version>1.10-SNAPSHOT</version>
+  <version>1.11-SNAPSHOT</version>
   <name>HawtJNI Example</name>
   
   <dependencies>
     <dependency>
       <groupId>org.fusesource.hawtjni</groupId>
       <artifactId>hawtjni-runtime</artifactId>
-      <version>1.10-SNAPSHOT</version>
+      <version>1.11-SNAPSHOT</version>
     </dependency>
     
     <dependency>
@@ -64,7 +64,7 @@
       <plugin>
         <groupId>org.fusesource.hawtjni</groupId>
         <artifactId>maven-hawtjni-plugin</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.11-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>

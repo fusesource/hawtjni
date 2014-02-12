@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.fusesource.hawtjni</groupId>
     <artifactId>hawtjni-project</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.11-SNAPSHOT</version>
   </parent>
   
   <artifactId>hawtjni-website</artifactId>
@@ -80,7 +80,7 @@
     <dependency>
       <groupId>org.fusesource.hawtjni</groupId>
       <artifactId>hawtjni-runtime</artifactId>
-      <version>1.10-SNAPSHOT</version>
+      <version>1.11-SNAPSHOT</version>
       <classifier>javadoc</classifier>
       <scope>test</scope>
     </dependency>

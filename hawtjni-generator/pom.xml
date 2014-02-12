@@ -21,12 +21,12 @@
   <parent>
     <groupId>org.fusesource.hawtjni</groupId>
     <artifactId>hawtjni-project</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.11-SNAPSHOT</version>
   </parent>
 
   <groupId>org.fusesource.hawtjni</groupId>
   <artifactId>hawtjni-generator</artifactId>
-  <version>1.10-SNAPSHOT</version>
+  <version>1.11-SNAPSHOT</version>
 
   <name>HawtJNI Generator</name>
   <description>This module contains the JNI code generation tools.</description>
@@ -35,7 +35,7 @@
     <dependency>
       <groupId>org.fusesource.hawtjni</groupId>
       <artifactId>hawtjni-runtime</artifactId>
-      <version>1.10-SNAPSHOT</version>
+      <version>1.11-SNAPSHOT</version>
     </dependency>
     <dependency>
       <artifactId>xbean-finder</artifactId>    

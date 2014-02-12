@@ -21,12 +21,12 @@
   <parent>
     <groupId>org.fusesource.hawtjni</groupId>
     <artifactId>hawtjni-project</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.11-SNAPSHOT</version>
   </parent>
 
   <groupId>org.fusesource.hawtjni</groupId>
   <artifactId>hawtjni-runtime</artifactId>
-  <version>1.10-SNAPSHOT</version>
+  <version>1.11-SNAPSHOT</version>
 
   <name>HawtJNI Runtime</name>
   <description>The API that projects using HawtJNI should build against.</description>

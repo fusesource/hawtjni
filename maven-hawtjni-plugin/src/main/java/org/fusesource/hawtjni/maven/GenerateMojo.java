@@ -60,6 +60,13 @@ public class GenerateMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
+     * The directory where the native source files are located.
+     *
+     * @parameter
+     */
+    private File nativeSourceDirectory;
+
+    /**
      * The directory where the generated native source files are located.
      * 
      * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-src"
@@ -169,8 +176,20 @@ public class GenerateMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
     	cli.verbose = verbose;
     	cli.log = getLog();
-        generateNativeSourceFiles();
-        generateBuildSystem(); 
+        if (nativeSourceDirectory == null) {
+            generateNativeSourceFiles();
+        } else {
+            copyNativeSourceFiles();
+        }
+        generateBuildSystem();
+    }
+
+    private void copyNativeSourceFiles() throws MojoExecutionException {
+        try {
+            FileUtils.copyDirectory(nativeSourceDirectory, generatedNativeSourceDirectory);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Copy of Native source failed: "+e, e);
+        }
     }
 
     private void generateNativeSourceFiles() throws MojoExecutionException {
@@ -295,7 +314,7 @@ public class GenerateMojo extends AbstractMojo {
         if( !filter ) {
             return new FilterWrapper[0];
         }
-        
+
         final String startExp = "@";
         final String endExp = "@";
         final String escapeString = "\\";

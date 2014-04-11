@@ -24,18 +24,18 @@ import java.util.Map.Entry;
  * <li> Compile the native libraries defining the NATIVE_STATS flag.</li>
  * <li> Add the following code around the sections of
  *      interest to dump the native calls done in that section. 
- *      <code><pre>
+ *      <code>
  *      StatsInterface si = MyFooStatsInterface.INSTANCE;
  *      NativeStats stats = new NativeStats(si); 
  *      ... // your code
  *      stats.diff().dump(System.out);
- *      </pre></code>
+ *      </code>
  * </li>
  * <li> Or add the following code at a given point to dump a snapshot of
  *      the native calls done until that point.
- *      <code><pre>
+ *      <code>
  *      stats.snapshot().dump(System.out);
- *      </pre></code>
+ *      </code>
  * </li>
  * </ol>
  * 

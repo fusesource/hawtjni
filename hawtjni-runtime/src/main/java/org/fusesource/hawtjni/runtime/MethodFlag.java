@@ -47,7 +47,7 @@ public enum MethodFlag {
      */
     JNI,
     
-    /**
+    /*
      * Indicate that the native method represents a structure global 
      * variable and the address of it should be returned to Java. This is 
      * done by prepending &.

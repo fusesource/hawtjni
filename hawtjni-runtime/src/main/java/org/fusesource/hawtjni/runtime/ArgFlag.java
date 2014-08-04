@@ -33,7 +33,7 @@ public enum ArgFlag {
     
     /**
      * Indicate that GetPrimitiveArrayCritical() should be used instead 
-     * of Get<PrimitiveType>ArrayElements() when transferring array of 
+     * of Get&lt;PrimitiveType&gt;ArrayElements() when transferring array of 
      * primitives from/to C. This is an optimization to avoid copying 
      * memory and must be used carefully. It is ok to be used in
      * MoveMemory() and memmove() natives. 

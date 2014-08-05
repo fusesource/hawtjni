@@ -243,8 +243,10 @@ public class GenerateMojo extends AbstractMojo {
             if( "detect".equals(tool) ) {
                 copyTemplateResource("vs2008.vcproj", true);
                 copyTemplateResource("vs2010.vcxproj", true);
+                copyTemplateResource("vs2010.custom.props", true);
             } else if( "msbuild".equals(tool) ) {
                 copyTemplateResource("vs2010.vcxproj", true);
+                copyTemplateResource("vs2010.custom.props", true);
             } else if( "vcbuild".equals(tool) ) {
                 copyTemplateResource("vs2008.vcproj", true);
             } else if( "none".equals(tool) ) {

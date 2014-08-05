@@ -73,6 +73,7 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='debug|x64'">$(ProjectDir)/target/$(Platform)-$(Configuration)/obj\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='debug|x64'">true</LinkIncremental>
   </PropertyGroup>
+  <Import Project="vs2010.custom.props" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(JAVA_HOME)\include;$(JAVA_HOME)\include\win32;$(ProjectDir)\src\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

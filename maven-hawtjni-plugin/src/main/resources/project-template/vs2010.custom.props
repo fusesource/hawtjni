@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+  # This is just a stub.  If you wish to customize your vs2010.vcxproj
+  # just copy this file to src/main/native-package/vs2010.custom.props
+  # then replace add your msbuild statements here.
+  <PropertyGroup>
+  	<AdditionalIncludeDirectories>example;dirs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+  	<AdditionalDependencies>example;lib;files;%(AdditionalDependencies)</AdditionalDependencies>
+  </PropertyGroup>
+  -->
+</Project>

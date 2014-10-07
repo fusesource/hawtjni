@@ -262,6 +262,9 @@ public class Library {
 
     private File extract(ArrayList<String> errors, URL source, String prefix, String suffix, File directory) {
         File target = null;
+        if (directory != null) {
+          directory = directory.getAbsoluteFile();
+        }
         try {
             FileOutputStream os = null;
             InputStream is = null;

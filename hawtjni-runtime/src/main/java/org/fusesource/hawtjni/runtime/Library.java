@@ -35,6 +35,8 @@ import java.util.regex.Pattern;
  * and and then loaded.  This way you can embed your JNI libraries into your packaged JAR files.
  * They are looked up as resources in this order:
  *   <ol>
+ *   <li> "META-INF/native/${platform}/${arch}/${library}" : Store your library here if you want to embed
+ *   more than one platform JNI library on different processor archs in the jar.
  *   <li> "META-INF/native/${platform}/${library}" : Store your library here if you want to embed more
  *   than one platform JNI library in the jar.
  *   <li> "META-INF/native/${library}": Store your library here if your JAR is only going to embedding one
@@ -55,6 +57,7 @@ import java.util.regex.Pattern;
  * <li>"${os}" is your operating system, for example "osx", "linux", or "windows"</li> 
  * <li>"${bit-model}" is "64" if the JVM process is a 64 bit process, otherwise it's "32" if the 
  * JVM is a 32 bit process</li> 
+ * <li>"${arch}" is the architecture for the processor, for example "amd64" or "sparcv9"</li> 
  * <li>"${platform}" is "${os}${bit-model}", for example "linux32" or "osx64" </li> 
  * <li>"${library}": is the normal jni library name for the platform.  For example "${name}.dll" on
  *     windows, "lib${name}.jnilib" on OS X, and "lib${name}.so" on linux</li> 
@@ -169,6 +172,8 @@ public class Library {
         
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
+            if( exractAndLoad(errors, version, customPath, getArchSpecifcResourcePath()) )
+                return;
             if( exractAndLoad(errors, version, customPath, getPlatformSpecifcResourcePath()) ) 
                 return;
             if( exractAndLoad(errors, version, customPath, getOperatingSystemSpecifcResourcePath()) ) 
@@ -180,6 +185,10 @@ public class Library {
 
         /* Failed to find the library */
         throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
+    }
+
+    final public String getArchSpecifcResourcePath() {
+        return "META-INF/native/"+ getPlatform() + "/" + System.getProperty("os.arch") + "/" +map(name);
     }
 
     final public String getOperatingSystemSpecifcResourcePath() {

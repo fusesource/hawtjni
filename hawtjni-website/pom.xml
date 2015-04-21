@@ -155,6 +155,7 @@
             </goals>
             <phase>package</phase>
           </execution>
+          <!--
           <execution>
             <id>deploy</id>
             <goals>
@@ -162,6 +163,7 @@
             </goals>
             <phase>deploy</phase>
           </execution> 
+          -->
         </executions>
         
       </plugin>

@@ -402,7 +402,7 @@ public class HawtJNI {
     
     @SuppressWarnings("unchecked")
     private void collectMatchingClasses(ClassFinder finder, Class annotation, LinkedHashSet<Class<?>> collector) {
-        List<Class> annotated = finder.findAnnotatedClasses(annotation);
+        List<Class<?>> annotated = finder.findAnnotatedClasses(annotation);
         for (Class<?> clazz : annotated) {
             if( packages.isEmpty() ) {
                 collector.add(clazz);

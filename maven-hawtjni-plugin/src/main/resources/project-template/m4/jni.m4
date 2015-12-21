@@ -110,6 +110,7 @@ AC_DEFUN([CHECK_JNI_JDK],[
     case "$host_os" in
          bsdi*) __JNI_INCLUDE_EXTRAS="bsdos";;
         linux*) __JNI_INCLUDE_EXTRAS="linux genunix";;
+      freebsd*) __JNI_INCLUDE_EXTRAS="freebsd";;
           osf*) __JNI_INCLUDE_EXTRAS="alpha";;
       solaris*) __JNI_INCLUDE_EXTRAS="solaris";;
         mingw*) __JNI_INCLUDE_EXTRAS="win32";;

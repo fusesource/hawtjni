@@ -91,30 +91,28 @@ AC_DEFUN([CHECK_JNI_JDK],[
   AC_PREREQ([2.61])
   __JNI_JDK_HOME="$1"
   AC_MSG_CHECKING(if '$__JNI_JDK_HOME' is a JDK)
-  
+
   __JNI_INCLUDE="$__JNI_JDK_HOME/include"
-
   # OSX had to be a little different.
-  AS_IF(test -r "$__JNI_JDK_HOME/Headers/jni.h",[
-    __JNI_INCLUDE="$__JNI_JDK_HOME/Headers"
-  ])
-  
+  case "$host_os" in
+       darwin*) 
+        AS_IF(test -r "$__JNI_JDK_HOME/Headers/jni.h",[
+          __JNI_INCLUDE="$__JNI_JDK_HOME/Headers";
+        ])
+  esac  
+    
+
   AS_IF(test -r "$__JNI_INCLUDE/jni.h",[
-
-    AS_IF(test -r "$__JNI_JDK_HOME/Headers/jni.h",[
-      __JNI_INCLUDE="$__JNI_JDK_HOME/Headers"
-    ])
-
     # Also include the os specific include dirs in the JNI_CFLAGS
     __JNI_CFLAGS="-I$__JNI_INCLUDE"
     case "$host_os" in
+       darwin*) __JNI_INCLUDE_EXTRAS="darwin";;
          bsdi*) __JNI_INCLUDE_EXTRAS="bsdos";;
         linux*) __JNI_INCLUDE_EXTRAS="linux genunix";;
           osf*) __JNI_INCLUDE_EXTRAS="alpha";;
       solaris*) __JNI_INCLUDE_EXTRAS="solaris";;
         mingw*) __JNI_INCLUDE_EXTRAS="win32";;
        cygwin*) __JNI_INCLUDE_EXTRAS="win32";;
-       darwin*) __JNI_INCLUDE_EXTRAS="darwin";;
              *) __JNI_INCLUDE_EXTRAS="genunix";;
     esac
     

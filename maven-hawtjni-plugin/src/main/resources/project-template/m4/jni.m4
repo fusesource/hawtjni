@@ -64,6 +64,7 @@ AC_DEFUN([WITH_JNI_JDK],
       AS_IF(test -z "$JNI_JDK", [
         case "$host_os" in
            darwin*) __JNI_GUESS="/System/Library/Frameworks/JavaVM.framework";;
+          freebsd*) __JNI_GUESS=$(env JAVAVM_DRYRUN=yes /usr/local/bin/java | grep '^JAVA_HOME' | cut -c11-);;
                  *) __JNI_GUESS="/usr";;
         esac
         AC_MSG_NOTICE([Taking a guess as to where your OS installs the JDK by default...])
@@ -107,7 +108,7 @@ AC_DEFUN([CHECK_JNI_JDK],[
     __JNI_CFLAGS="-I$__JNI_INCLUDE"
     case "$host_os" in
        darwin*) __JNI_INCLUDE_EXTRAS="darwin";;
-         bsdi*) __JNI_INCLUDE_EXTRAS="bsdos";;
+      freebsd*) __JNI_INCLUDE_EXTRAS="freebsd";;
         linux*) __JNI_INCLUDE_EXTRAS="linux genunix";;
           osf*) __JNI_INCLUDE_EXTRAS="alpha";;
       solaris*) __JNI_INCLUDE_EXTRAS="solaris";;

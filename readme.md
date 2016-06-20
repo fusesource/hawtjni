@@ -67,13 +67,10 @@ To generate the JNI code, first compile your annotated class, then use the
 The above example expects your compiled java classes to be in the `target/classes`
 directory.  The generated JNI classes will be placed in the `target/native` directory.
 
-Readme TODO
+More Docs:
 -----------
 
-* Need to explain/show examples of struct handling
-* Need to explain/show examples of 32/64 bit variable types
-* Show the maven plugin
-* Show the OSX cocoa native code generation tool
+[http://fusesource.github.io/hawtjni/documentation/developer-guide.html](http://fusesource.github.io/hawtjni/documentation/developer-guide.html)
 
-[1]: http://http://hawtjni.fusesource.org/ "HawtJNI"
+[1]: http://fusesource.github.io/hawtjni "HawtJNI"
 [2]: http://www.eclipse.org/swt/jnigen.php

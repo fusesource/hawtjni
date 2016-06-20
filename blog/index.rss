@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<rss version="2.0">
+        <channel>
+          <title>The HawtJNI Blog</title>
+          <link>http://hawtjni.fusesource.org/blog/</link>
+          <description>Making JNI easy and fast.</description>
+          <pubDate>Mon, 20 Jun 2016 13:08:43 -0400</pubDate>
+          <lastBuildDate>Mon, 20 Jun 2016 13:08:43 -0400</lastBuildDate>
+          <generator>Scalate - http://scalate.fusesource.org/</generator>
+          <item>
+              <title>HawtJNI 1.7</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.7.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.7. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Support explicitly configuring which build tool to use on windows.&lt;/li&gt;
+&lt;li&gt;Fix for automake 1.11&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.9</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.9.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.9. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Fix issue #7. We now do a write barrier before setting the 'cached' field to 1 so that reader don't see this get re-ordered before all the fields are readable.&lt;/li&gt;
+&lt;li&gt;Improve the auto generated build systems for windows/OS X&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.6</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.6.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.6. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Updating hawtjni generate projects so that they work on OS X Lion.&lt;/li&gt;
+&lt;li&gt;Fixes issue #2 : Support passing the JNIEnv pointer to native methods.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.8</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.8.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.8. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Updating hawtjni generate projects so that they work on OS X Lion.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.5</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.5.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.6. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Only include config.h if it's available.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.4</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.4.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.4. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Add more options to the maven hawtjni plugin so that you can build jars containing
+native libs in a different module from the one which generates the native package for 
+the jar.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.3</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.3.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.3. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Add hawtjni&lt;em&gt;attach&lt;/em&gt;thread and hawtjni&lt;em&gt;dettach&lt;/em&gt;thread helper methods&lt;/li&gt;
+&lt;li&gt;Fully support and document binding against C++ source code / classes.&lt;/li&gt;
+&lt;li&gt;Support using private fields in struct bound classes.&lt;/li&gt;
+&lt;li&gt;Avoid &amp;ldquo;jump to label from here crosses initialization&amp;rdquo; compiler error message.&lt;/li&gt;
+&lt;li&gt;Provide better error messages when a user does not properly setup a C++ method binding.&lt;/li&gt;
+&lt;li&gt;Support mapping a class to a differently named structure name.&lt;/li&gt;
+&lt;li&gt;Support picking the OS X SDK version via a configure option.&lt;/li&gt;
+&lt;li&gt;Added pointer math support class to be able to do pointer math in java land without going into a JNI layer.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.2</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.2.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.2. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Adding bit model to the name of the extracted library to support hosts
+running both 32 and 64 bits JVM.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.1</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.1.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.1. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Release Highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Generate a .vcxproj for for compatibility with the new Windows 7.1 SDK&lt;/li&gt;
+&lt;li&gt;Fixed callback failures on 32 bit platforms&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item><item>
+              <title>HawtJNI 1.0</title>
+              <link>http://hawtjni.fusesource.org/blog/releases/release-1.0.html</link>
+              <description>&lt;p&gt;The &lt;a href=&quot;http://hawtjni.fusesource.org&quot;&gt;HawtJNI&lt;/a&gt; project is pleased to announce
+the availability of HawtJNI 1.0. HawtJNI is a code generator that produces
+the JNI code needed to implement java native methods. It is based on the
+&lt;a href=&quot;http://www.eclipse.org/swt/jnigen.php&quot;&gt;jnigen&lt;/a&gt; code generator that is part
+of the SWT Tools project which is used to generate all the JNI code which
+powers the eclipse platform.&lt;/p&gt;
+
+&lt;p&gt;Further information:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/documentation/developer-guide.html&quot;&gt;Documentation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://hawtjni.fusesource.org/community/index.html&quot;&gt;Feedback&lt;/a&gt; is always welcome!&lt;/p&gt;</description>
+            </item>
+        </channel>
+      </rss>

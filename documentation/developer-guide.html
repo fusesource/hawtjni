@@ -1,0 +1,1012 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd"> 
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  Architecture
+-->
+<html lang="en">
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta content="Making JNI easy and fast." name="description"/>
+    <meta content="jni,java,jna,c,objective-c,c++,c#" name="keywords"/>
+    <meta content="HawtJNI" name="author"/>
+    <link type="text/css" rel="stylesheet" href="../styles/impact/css/pygmentize.css"/>
+    <link type="text/css" rel="stylesheet" href="../styles/impact/css/site.css"/>
+    <title></title>
+  </head>
+  <body>
+    <div id="navigation">
+      <div class="wrapper">
+<ul>
+<li><a href="../index.html">HawtJNI 1.8</a></li>
+<li><a href="developer-guide.html">Docs</a></li>
+<li><a href="../community/index.html">Support</a></li>
+</ul>
+
+<!-- * [Download](../download.html)  -->        <div></div>
+      </div>
+    </div>
+    <div id="content">
+      <div class="wrapper">
+<h1 id = "HawtJNI_Developer_Guide">HawtJNI Developer Guide</h1>
+
+<p><div class="toc"><ul style="list-style:none;">
+  <li><a href="#features">Features</a></li>
+  <li><a href="#getting-started">Getting Started with HawtJNI</a></li>
+  <li><ul style="list-style:none;">
+    <li><a href="#Building_with_Maven">Building with Maven</a></li>
+  </ul></li>
+  <li><a href="#method-mapping">Mapping Native Methods</a></li>
+  <li><ul style="list-style:none;">
+    <li><a href="#Overview">Overview</a></li>
+    <li><a href="#Passing_Primitives_by_Reference">Passing Primitives by Reference</a></li>
+  </ul></li>
+  <li><a href="#mapping-native-structures">Mapping Native Structures</a></li>
+  <li><ul style="list-style:none;">
+    <li><a href="#Nested_Structures">Nested Structures</a></li>
+    <li><a href="#Passing_Structures_By_Value">Passing Structures By Value</a></li>
+    <li><a href="#Using_Typedefed_Structures">Using Typedefed Structures</a></li>
+    <li><a href="#Zero_Out_Structures">Zero Out Structures</a></li>
+    <li><a href="#Skipping_Fields">Skipping Fields</a></li>
+  </ul></li>
+  <li><a href="#Binding_to_C___Classes">Binding to C++ Classes</a></li>
+  <li><a href="#Advanced_Mapping_Topics">Advanced Mapping Topics</a></li>
+  <li><ul style="list-style:none;">
+    <li><a href="#platform-constants">Loading Constants</a></li>
+    <li><a href="#accessors">Renaming</a></li>
+    <li><a href="#pointers">Pointers</a></li>
+    <li><a href="#heap-structures">Using the Native Heap</a></li>
+    <li><a href="#Callbacks:_Calling_Java_methods_from_native_functions_">Callbacks: Calling Java methods from native functions.</a></li>
+    <li><a href="#Attaching_Native_Threads_to_the_JVM">Attaching Native Threads to the JVM</a></li>
+    <li><a href="#optimizations">Optimizations</a></li>
+    <li><a href="#conditionals">Conditionals</a></li>
+  </ul></li>
+  <li><a href="#adding-to-maven-build">Maven Plugin Reference</a></li>
+  <li><ul style="list-style:none;">
+    <li><a href="#Usage">Usage</a></li>
+    <li><a href="#Build_Phases">Build Phases</a></li>
+  </ul></li>
+  <li><a href="#Platform_Build_Tools_Requirements">Platform Build Tools Requirements</a></li>
+  <li><ul style="list-style:none;">
+    <li><a href="#Windows">Windows</a></li>
+    <li><a href="#Ubuntu_Linux">Ubuntu Linux</a></li>
+    <li><a href="#Fedora_Core_Linux">Fedora Core Linux</a></li>
+  </ul></li>
+</ul></div></p>
+
+<h2 id = "features">Features</h2>
+
+<ul>
+<li>Automatic mapping from Java to native functions, with simple mappings for all primitive data types</li>
+<li>Automatic conversion between C and Java strings</li>
+<li>Structure and Union arguments/return values</li>
+<li>Function Pointers, (callbacks from native code to Java) as arguments and/or members of a struct</li>
+<li>Nested structures</li>
+<li>Native long support (32 or 64 bit as appropriate)</li>
+<li>Customizable mapping from Java method to native function name</li>
+<li>Maven integration:
+<ul>
+<li>Generates an autoconf and msbuild projects for the the native library so it can be built on other platforms using the native toolchain.</li>
+<li>Native library is built before the test phase, so you can unit tests your JNI classes.</li>
+<li>Built native library is packaged as a jar resource and deployed to the maven repo for easy distribution of native code.</li>
+</ul></li>
+</ul>
+
+<h2 id = "getting-started">Getting Started with HawtJNI</h2>
+
+<p>Implementing JNI libraries is a piece of cake when you use HawtJNI.  It will code generate 
+the JNI code needed to access the native methods defined in your Java classes.  Lets say you 
+wanted to access to the c library's classic <code>printf</code> function:</p>
+
+<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
+int printf(const char *format, ...);
+</code></pre></div>
+
+<p>To do that, you would only need to define a simple Java class like:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+import org.fusesource.hawtjni.runtime.*
+
+@JniClass
+public class Simple {
+
+  private static final Library LIBRARY = new Library(&quot;simple&quot;, Simple.class);    
+  static {
+    LIBRARY.load();
+  }
+
+  public static native int printf(String message);
+}
+</code></pre></div>
+
+<p>That's it.  No JNI coding required.  It's composed of a static class initializer
+and a native method interface definition for the <code>printf</code> function.  For folks
+who have done JNI before this looks familiar except for the way the library is loaded.
+You could have also loaded the library the traditional textbook way:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  static {
+    System.loadLibrary(&quot;simple&quot;);
+  }
+</code></pre></div>
+
+<p>The benefit of using the Library class to load the native library is that it can
+automatically unpack the native library from a jar resource and use that so that
+you don't have to worry installing it to the java library path.</p>
+
+<p>The HawtJNI build process will take care of implementing your <code>simple</code> jni library
+by using some maven tooling which we will cover in the next example.</p>
+
+<h3 id = "Building_with_Maven">Building with Maven</h3>
+
+<p>If you are not familiar with Maven, please checkout 
+<a href="http://www.sonatype.com/books/mvnex-book/reference/public-book.html">Maven by Example</a>.</p>
+
+<p>The easiest way to get started with HawtJNI is copy and use 
+<a href="http://github.com/chirino/hawtjni/tree/master/hawtjni-example/">the example maven project</a> as a template for your module.</p>
+
+<p>At the root of the maven project run:</p>
+
+<div class="syntax"><pre name='code' class='brush: text; gutter: false;'><code>
+mvn install
+</code></pre></div>
+
+<p>The maven build will produce the following artifacts:</p>
+
+<ul>
+<li><code>target/${artifactId}-${version}.jar</code>: is the standard jar which maven produces that contains all your java classes.</li>
+<li><code>target/${artifactId}-${version}-native-src.zip</code>: is a source archive of
+a autoconf and msbuild based build project for the native library.  You can
+easily build this on other platforms using the platforms native toolchain.</li>
+<li><code>target/${artifactId}-${version}-${platform}.jar</code> is the platform specific
+jar which contains the your build JNI library as a resource.</li>
+</ul>
+
+<p>These artifacts will be deployed to the maven repository so that other users can
+easily use them as dependencies in their builds.</p>
+
+<p>You may also be interesting in 
+<a href="#adding-to-maven-build">How to Add HawtJNI to an Existing Maven Build</a>.</p>
+
+<h2 id = "method-mapping">Mapping Native Methods</h2>
+
+<h3 id = "Overview">Overview</h3>
+
+<p>HawtJNI looks for all classes annotated with <code>@JniClass</code>. For every static
+native method found, it will generate the corresponding JNI function which calls
+a the platform function of the same name as the java method.</p>
+
+<!-- TODO: Cover these JniClass flags
+
+    /**
+     * Indicate that the platform source is in C++
+     */
+    CPP,
+-->
+
+<p>The JNI method mapping can be customized by applying the <code>@JniMethod</code> annotation
+to the method and the <code>@JniArg</code> to each method argument.</p>
+
+<!-- TODO: Cover these JniMethod flags
+    /** 
+     * Indicate that the item should not be generated. For example, 
+     * custom natives are coded by hand. 
+     */
+    METHOD_SKIP,
+
+    /**
+     * Indicate that a native method should be looked up dynamically. It 
+     * is useful when having a dependence on a given library is not 
+     * desirable. The library name is specified in the *_custom.h file.
+     */
+    DYNAMIC,
+
+    /**
+     * Indicate that the native method represents a constant or global 
+     * variable instead of a function. This omits () from the generated 
+     * code.
+     */
+    CONSTANT_GETTER,
+
+    /**
+     * Indicate that the C function should be casted to a prototype 
+     * generated from the parameters of the native method. Useful for 
+     * variable argument C functions.
+     */
+    CAST,
+
+    /**
+     * Indicate that the native is part of the Java Native Interface. For 
+     * example: NewGlobalRef(). 
+     */
+    JNI,
+
+    /**
+     * Indicate that the native method represents a structure global 
+     * variable and the address of it should be returned to Java. This is 
+     * done by prepending &.
+     */
+    ADDRESS,
+
+    /**
+     * Indicate that the platform source is in C++
+     */
+    CPP,
+
+    /**
+     * Indicate that the native method is a C++ constructor that allocates 
+     * an object on the heap.
+     */
+    CPP_NEW,
+
+    /**
+     * Indicate that the native method is a C++ destructor that 
+     * deallocates an object from the heap.
+     */
+    CPP_DELETE,
+
+    /**
+     * Indicate that the native method is a C# constructor that allocates 
+     * an object on the managed (i.e. garbage collected) heap.
+     */
+    CS_NEW,
+
+    /**
+     * Indicate that the native method's return value is a 
+     * C# managed object.
+     */
+    CS_OBJECT,
+
+    /**
+     * Indicate that the native method takes 2 arguments, a collection and 
+     * an item, and the += operator is used to add the item to the 
+     * collection.
+     */
+    ADDER,
+-->
+
+<p>Without additional configuration native methods automatically convert the
+method arguments and return types to the corresponding type of the
+same size on the platform.</p>
+
+<table><tr><th>Java Type   </th><th>Native Type   </th><th>Description          </th><th>Windows Types   </th></tr><tr><td><code>byte</code>      </td><td><code>char</code>        </td><td>8-bit integer          </td><td><code>BYTE</code>, <code>TCHAR</code> </td></tr><tr><td><code>short</code>     </td><td><code>short</code>       </td><td>16-bit integer         </td><td><code>WORD</code>          </td></tr><tr><td><code>char</code>      </td><td><code>wchar_t</code>     </td><td>16 or 32-bit character </td><td><code>TCHAR</code>         </td></tr><tr><td><code>int</code>       </td><td><code>int</code>         </td><td>32-bit integer         </td><td><code>DWORD</code>         </td></tr><tr><td><code>long</code>      </td><td><code>long long</code>   </td><td>64-bit integer         </td><td><code>LONG</code>          </td></tr><tr><td><code>boolean</code>   </td><td><code>int</code>         </td><td>boolean value          </td><td><code>BOOL</code>          </td></tr><tr><td><code>float</code>     </td><td><code>float</code>       </td><td>32-bit FP              </td><td>                </td></tr><tr><td><code>double</code>    </td><td><code>double</code>      </td><td>64-bit FP              </td><td>                </td></tr></table>
+
+<p>If a primitive array type or String is used, it gets converted to the corresponding
+native array/pointer type.</p>
+
+<table><tr><th>Java Type   </th><th>Native Type   </th><th>Description          </th><th>Windows Types   </th></tr><tr><td><code>byte[]</code>    </td><td><code>char*</code>       </td><td>8-bit array            </td><td><code>BYTE</code>, <code>TCHAR</code> </td></tr><tr><td><code>short[]</code>   </td><td><code>short*</code>      </td><td>16-bit array           </td><td><code>WORD</code>          </td></tr><tr><td><code>char[]</code>    </td><td><code>wchar_t*</code>    </td><td>16 or 32-bit array     </td><td><code>TCHAR</code>         </td></tr><tr><td><code>int[]</code>     </td><td><code>int*</code>        </td><td>32-bit array           </td><td><code>DWORD</code>         </td></tr><tr><td><code>long[]</code>    </td><td><code>long long*</code>  </td><td>64-bit array           </td><td><code>LONG</code>          </td></tr><tr><td><code>float[]</code>   </td><td><code>float*</code>      </td><td>32-bit FP array        </td><td>                </td></tr><tr><td><code>double[]</code>  </td><td><code>double*</code>     </td><td>64-bit FP array        </td><td>                </td></tr><tr><td><code>String</code>    </td><td><code>char*</code>       </td><td>8-bit array            </td><td><code>LPTCSTR</code>       </td></tr></table>
+
+<p>It's important to note that when dealing with arrays and structures, HawtJNI must
+copy the contents of the java object to the native type since the JVM can any
+time move java objects in memory. It will then call the native function and then
+copy back the native array back over the original java array so that the original
+java array picks up any changes.</p>
+
+<p>When a Java string is converted to a <code>char *</code> it applies a UTF-8 conversion.  If your
+native code can handle wide character (i.e. double byte unicode characters), then you 
+annotate the argument with <code>UNICODE</code> flag.  For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  public static native int printf(
+    @JniArg(flags={UNICODE}) String message);
+</code></pre></div>
+
+<h3 id = "Passing_Primitives_by_Reference">Passing Primitives by Reference</h3>
+
+<p>It is common to run into native methods similar to the following:</p>
+
+<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
+void adder(int *result, int left, int right) {
+  *result = left + right;
+}
+</code></pre></div>
+
+<p>They use a pointer to a simple type to store the result of function call.  It may
+not be obvious at first, but this can be mapped in java using a primitive array.
+For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  public static native void adder(int []result, int left, int right);
+</code></pre></div>
+
+<p>Just make sure you use the method with 1 element array:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  byte[] result = new byte[1];
+  adder(result, 3, 4);
+  System.out.println(&quot;The result was: &quot;+result[0]);
+</code></pre></div>
+
+<h2 id = "mapping-native-structures">Mapping Native Structures</h2>
+
+<p>You define a Java class for each native structure that you want map and
+replicate all the fields that you will need to access as regular java fields.</p>
+
+<p>For example, say you had a C structure and function that was defined as follows:</p>
+
+<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
+struct COORD {
+  int x;
+  int y;
+};
+void display_coord(struct COORD* position);
+</code></pre></div>
+
+<p>Then the the corresponding Java class for the structure would look like:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+@JniClass(flags={STRUCT})
+public static class COORD {
+  public short x;
+  public short y;
+}
+</code></pre></div>
+
+<p>The native method definition can then just take COORD java object as an argument.</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+public static native void display_coord(COORD position);
+</code></pre></div>
+
+<h3 id = "Nested_Structures">Nested Structures</h3>
+
+<p>Nested native structures are also easy.  For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
+struct RECT {
+  struct COORD top_left;
+  struct COORD bottom_right;
+};
+</code></pre></div>
+
+<p>Would be mapped as:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+@JniClass(flags={STRUCT})
+public static class RECT {
+  public COORD top_left = new COORD();
+  public COORD bottom_right = new COORD();
+}
+</code></pre></div>
+
+<h3 id = "Passing_Structures_By_Value">Passing Structures By Value</h3>
+
+<p>You probably noticed that structures are passed by reference by default. If your
+native method accepts the structure by value instead, then you need to annotate the method argument with the <code>BY_VALUE</code> flag.  </p>
+
+<p>For example, if your native method was defined as:</p>
+
+<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
+int validate_coord(struct COORD position);
+</code></pre></div>
+
+<p>Then your Java method mapping would look like</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  public static native int validate_coord(
+    @JniArg(flags={BY_VALUE}) COORD position);
+</code></pre></div>
+
+<p>The passed object MUST not be <code>null</code>.</p>
+
+<h3 id = "Using_Typedefed_Structures">Using Typedefed Structures</h3>
+
+<p>If the structure name your mapping is actually a typedef, in other words, the type is referred to in native code by just the plain <code>name</code> and not the <code>struct name</code>, then you need to add the <code>TYPEDEF</code> flag to struct definition.</p>
+
+<p>For example, if the native definition was:</p>
+
+<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
+typedef struct _COORD {
+  int x;
+  int y;
+} COORD;
+</code></pre></div>
+
+<p>Then the the corresponding Java class for the structure would look like:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+@JniClass(flags={STRUCT,TYPEDEF})
+public static class COORD {
+  public short x;
+  public short y;
+}
+</code></pre></div>
+
+<h3 id = "Zero_Out_Structures">Zero Out Structures</h3>
+
+<p>You do NOT have to map all the native fields in a structure it's corresponding Java structure class. You will actually get better performance if you only map the fields that will be accessed by your Java application.</p>
+
+<p>If not all the fields of the structure are mapped, then when the native structure is created from a Java structure, the unmapped fields will have whatever random data was in the allocated memory location the native structure was allocated on.  If you prefer or NEED to zero out unmapped fields, then add the <code>ZERO_OUT</code> flag.  For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+@JniClass(flags={STRUCT,ZERO_OUT})
+public static class COORD {
+  public short x;
+}
+</code></pre></div>
+
+<h3 id = "Skipping_Fields">Skipping Fields</h3>
+
+<p>If you need to have a Java field which is not mapped to a native structure field, annotate it with <code>@JniField(flags={FIELD_SKIP})</code>. This can be useful,
+to holding java side computations of the structure.</p>
+
+<p>For example, if you want to cache the hash computation of the structure you could do the following:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+@JniClass(flags={STRUCT,ZERO_OUT})
+public static class COORD {
+  public short x;
+  public short y;
+
+  @JniField(flags={FIELD_SKIP})
+  public int hash;
+  public int hashCode() {
+    if( hash==0 ) {
+      hash = (x &lt;&lt; 16) &amp; y;
+    }
+    return hash;
+  }
+}
+</code></pre></div>
+
+<h2 id = "Binding_to_C___Classes">Binding to C++ Classes</h2>
+
+<p>HawtJNI support binding to C++ classes. Here's an example of bind to the &ldquo;std::string&rdquo; class.</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+@JniClass(name=&quot;std::string&quot;, flags={ClassFlag.CPP})
+private static class StdString {
+
+    @JniMethod(flags={CPP_NEW})
+    public static final native long create();
+
+    @JniMethod(flags={CPP_NEW})
+    public static final native long create(String value);
+
+    @JniMethod(flags={CPP_DELETE})
+    static final native void delete(long self);
+
+    @JniMethod(flags={CPP_METHOD}, cast=&quot;const char*&quot;)
+    public static final native long c_str_ptr (long self);
+
+    @JniMethod(flags={CPP_METHOD}, cast=&quot;size_t&quot;)
+    public static final native long length (long self);
+}
+</code></pre></div>
+
+<p>The <code>CPP_NEW</code> flagged methods are constructor methods.  They allocate
+a new instance of the class or structure on the native heap and return 
+a pointer to it.</p>
+
+<p>The <code>CPP_DELETE</code> flagged method is used to destruct a previously created object.
+The <code>CPP_METHOD</code> flagged methods are used to call methods on the object.</p>
+
+<p>You can also get and set fields on the object using the <code>GETTER</code> and <code>SETTER</code>
+method flags.  For example, if we had an object with a <code>int count</code> field.</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+    @JniMethod(flags={GETTER})
+    public static final native int count(long self);
+
+    @JniMethod(flags={SETTER})
+    public static final native void count(long self, int value);
+</code></pre></div>
+
+<p>Notice that the <code>CPP_DELETE</code>, <code>CPP_METHOD</code>, <code>GETTER</code>, and <code>SETTER</code> all take
+a pointer the object they operating against as the first argument of the java
+method definition.</p>
+
+<h2 id = "Advanced_Mapping_Topics">Advanced Mapping Topics</h2>
+
+<h3 id = "platform-constants">Loading Constants</h3>
+
+<p>Many times you need to access the value of platform constants.  To load
+platform constants you will need to:</p>
+
+<ol>
+<li><p>Define a constant initializer method which when called will sets all the
+static fields annotated as constant fields with the constant value.  Example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  @JniMethod(flags={CONSTANT_INITIALIZER})
+  private static final native void init();
+</code></pre></div></li>
+<li><p>For each constant you want to load define a static field for it with the 
+<code>@JniField(flags={CONSTANT})</code> annotation.  Example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  @JniField(flags={CONSTANT})
+  public static short FOREGROUND_BLUE;
+</code></pre></div></li>
+<li><p>Call the constant initializer method in the class initializer, after the 
+library is loaded.  For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  private static final Library LIBRARY = new Library(&quot;simple&quot;, Simple.class);    
+  static {
+    LIBRARY.load();
+    init();
+  }
+</code></pre></div></li>
+</ol>
+
+<h3 id = "accessors">Renaming</h3>
+
+<p>If you want to call your java method something different from the native method
+name, you can set the <code>accessor</code> attribute on a <code>@JniMethod</code> or <code>@JniField</code> annotation.</p>
+
+<p>For example, to call the native <code>printf</code> function from a Java <code>print</code> method,
+you would set it up as follows:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  @JniMethod(accessor=&quot;printf&quot;)
+  public static native int print(String message);
+</code></pre></div>
+
+<p>In the case of field on a structure this can be used to do simple renames or
+to map field to the field of a nested structure or union:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+
+  // Just a simple rename..
+  @JniField(accessor=&quot;dwSize&quot;)
+  public int size;
+
+  // Mapping to a nested field.
+  @JniField(accessor=&quot;u.pos&quot;)
+  public int deep;
+
+</code></pre></div>
+
+<p>The accessor also comes in handy when you want to load constants which 
+are not a simple symbol, for example the size of a structure:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  @JniField(accessor=&quot;sizeof(struct COORD)&quot;, flags={CONSTANT})
+  public static int SIZEOF_COORD;
+</code></pre></div>
+
+<h3 id = "pointers">Pointers</h3>
+
+<p>If you want the same java class to be able to work with 32 bit and 64 bit
+pointers, you should map pointers to Java <code>long</code>. If your only targeting 32 bit
+platforms you can map pointers to <code>int</code>.</p>
+
+<p>When HawtJNI is on a 32 bit platform but is mapping pointers to Java's 64 bit
+longs, it needs to know that the value it's working with is a pointer so that it
+properly up and down casts the pointer value.</p>
+
+<p>This is typically done by setting the <code>cast</code> attribute on the the <code>@JniMethod</code>,
+<code>@JniArg</code> and <code>@JniField</code> annotations to the pointer type. In general it's good
+practice to set the cast attribute to the defined type of value.</p>
+
+<p>For example, to let HawtJNI know that the <code>malloc</code> function returns a void
+pointer you would define it as follows:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  @JniMethod(cast=&quot;void *&quot;)
+  public static final native long malloc(
+    @JniArg(cast=&quot;size_t&quot;) long size);
+</code></pre></div>
+
+<p>If the cast end with <code>*</code> and it's being mapped to a Java <code>long</code> then HawtJNI knows that it's dealing with a pointer type.  But if your using a typedef to pointer, then you need to flag the condition with one of the following:</p>
+
+<ul>
+<li><code>@JniMethod(flag={POINTER_RETURN})</code></li>
+<li><code>@JniArg(flags={POINTER_ARG})</code></li>
+<li><code>@JniField(flags={POINTER_FIELD})</code></li>
+</ul>
+
+<p>This is very common on the Windows platform where tend to typedef pointer types like <code>LPTCSTR</code>. </p>
+
+<p>You may be tempted to do pointer arithmetic on the java side long value, but DON'T.  The native pointer is a combination of signed/unsigned, and 32/64 bit value which may more may not match java's memory model.  Adding offsets to the pointer on the java side will likely result in a invalid pointer location.</p>
+
+<h3 id = "heap-structures">Using the Native Heap</h3>
+
+<p>The memory associated with a passed structure or array is reclaimed at the end of every native method call.  Therefore, a method expects a passed array or structure reference to remain valid after the method call then that array or structure needs to be allocated on the native heap instead.</p>
+
+<p>This is accomplished using the standard native <code>malloc</code> function call.
+For example to create a char array 80 bytes big:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  long buffer = malloc(80);
+</code></pre></div>
+
+<p>To create a structure on the the heap, your going to need a couple of helper methods.</p>
+
+<ol>
+<li>You need to know the size of the structure.</li>
+<li>You need define a versions of memmove which copy to and from the your Java structure object and memory buffer (<code>void *</code>).</li>
+</ol>
+
+<p>I recommend keeping those defined in the structure class itself.  For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+@JniClass(flags={STRUCT})
+public static class COORD {
+
+  public short x;
+  public short y;
+
+  // To hand loading the SIZE_OF constant
+  @JniMethod(flags={CONSTANT_INITIALIZER})
+  private static final native void init();
+  @JniField(flags={CONSTANT}, accessor=&quot;sizeof(struct COORD)&quot;)
+  public static short SIZE_OF;
+  static {
+    init();
+  }
+
+  public static final native void memmove (
+    @JniArg(cast=&quot;void *&quot;, flags={NO_IN, CRITICAL})) COORD dest, 
+    @JniArg(cast=&quot;const void *&quot;, flags={NO_OUT, CRITICAL}) long src, 
+    @JniArg(cast=&quot;size_t&quot;) long size);
+
+  public static final native void memmove (
+    @JniArg(cast=&quot;void *&quot;, flags={NO_IN, CRITICAL})) long dest, 
+    @JniArg(cast=&quot;const void *&quot;, flags={NO_OUT, CRITICAL}) COORD src, 
+    @JniArg(cast=&quot;size_t&quot;) long size);
+}
+</code></pre></div>
+
+<p>Now you can allocate and initialize a structure on the heap:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  long buffer = malloc(COORD.SIZE_OF);
+  COORD tmp = new COORD()
+  tmp.x = 3;
+  tmp.y = 4;
+  COORD.memmove(buffer, tmp, COORD.SIZE_OF);
+</code></pre></div>
+
+<!-- TODO: talk about pointer arithmetic to index into an array of structs -->
+
+<h3 id = "Callbacks:_Calling_Java_methods_from_native_functions_">Callbacks: Calling Java methods from native functions.</h3>
+
+<p>Some native functions require a callback function pointer as an argument.  You can
+create one using a <code>Callback</code> object.  For example, lets say needed to call the following
+native function:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+long foo(void (*fp)(char *buffer, int n));
+</code></pre></div>
+
+<p>It you could map it in Java as:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  public static final native void foo (
+    @JniArg(cast=&quot;void *&quot;) long fp);
+</code></pre></div>
+
+<p>Next you need to create a java method that can accept the callback.  The method MUST
+return long and can have any number of arguments, but they must also all be longs.
+The method can be a static or instance method.</p>
+
+<p>For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+class MyObject {
+  public long mymethod(long buffer, long n) {
+    System.out.println(&quot;Was given a buffer &quot;+n+&quot; byte big at &quot;+buffer);
+  }
+}
+</code></pre></div>
+
+<p>Then to create a function pointer which points back to a Java method, you create
+a Callback object with a reference to the Java object, method name, and number of arguments
+on the method takes.</p>
+
+<p>For example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  MyObject object = new MyObject();
+  Callback callback = new Callback(object, &quot;mymethod&quot;, 2);
+  long fp = callback.getAddress();
+  foo(fp);
+</code></pre></div>
+
+<p>Warning: you can only create up to 128 Callbacks concurrently.  If you exceed this number
+<code>callback.getAddress()</code> returns zero.  You should use the <code>callback.dispose()</code> method
+to release a callback once it's not being used anymore.</p>
+
+<h3 id = "Attaching_Native_Threads_to_the_JVM">Attaching Native Threads to the JVM</h3>
+
+<p>If you have a thread that was not started by the JVM try to call into the 
+JVM you must first &ldquo;attach&rdquo; it to the JVM.  HawtDispatch provides some helper 
+methods to make it simpler and more efficient.  These methods are only available
+on JVMs supporting JNI 1.2.</p>
+
+<ul>
+<li><code>jint hawtjni_attach_thread(JNIEnv **env, const char *thread_name);</code></li>
+<li><code>jint hawtjni_detach_thread();</code></li>
+</ul>
+
+<p>If your platform supports pthreads and you have the <code>HAVE_PTHREAD_H</code> define enabled,
+then the attach operation is cached and the detach is only performed when the
+thread stops.</p>
+
+<h3 id = "optimizations">Optimizations</h3>
+
+<p>If you have performance sensitive method that works on an Array or Structure,
+setting on of the following flags may help your performance.</p>
+
+<ul>
+<li><p><strong><code>@JniArg(flags={NO_IN})</code></strong>:Indicate that a native method parameter is an out
+only variable. This only makes sense if the parameter is a structure or an
+array of primitives. It is an optimization to avoid copying the java memory to
+C memory on the way in.</p></li>
+<li><p><strong><code>@JniArg(flags={NO_OUT})</code></strong>: Indicate that a native method parameter is an in
+only variable. This only makes sense if the parameter is a structure or an
+array of primitives. It is an optimization to avoid copying the C memory from
+java memory on the way out.</p></li>
+<li><p><strong><code>@JniArg(flags={CRITICAL})</code></strong>: Uses a special JVM call which locks the java
+array in memory and disable garbage collection for the duration of the native
+call. This is an optimization to avoid copying memory and must only be used
+with low latency functions. This only makes sense if the parameter is an array</p></li>
+</ul>
+
+<p>These optimization flags are typically used for the <code>memmove</code> C library function.
+for example, to copy the the contents of a <code>byte[]</code> into a java <code>int[]</code>, you would
+define the <code>memmove</code> method as follows:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  public static final native void memmove (
+    @JniArg(cast=&quot;void *&quot;, flags={NO_IN, CRITICAL})) int[] dest, 
+    @JniArg(cast=&quot;const void *&quot;, flags={NO_OUT, CRITICAL}) byte[] src, 
+    @JniArg(cast=&quot;size_t&quot;) long size);
+</code></pre></div>
+
+<h3 id = "conditionals">Conditionals</h3>
+
+<p>You can use the <code>conditional</code> attribute on the <code>@JniClass</code>, <code>@JniMethod</code> and <code>@JniField</code> annotations to control if JNI code associated
+with the class, method, or field gets conditionally compiled out.</p>
+
+<p>This is very useful if your mapping to a native function, structure, or field
+that may not be available on all the platforms which your Java class is going to
+be made available to.</p>
+
+<p>Example:</p>
+
+<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
+  @JniMethod(conditional=&quot;defined(_WIN32)&quot;)
+  public static native int printf(String message);
+</code></pre></div>
+
+<p>Would produce a JNI <code>printf</code> method implementation which is surrounded by the
+following pre-processor directives:</p>
+
+<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
+  #if defined(_WIN32)
+  // ... the JNI method implementation would be here
+  #endif
+</code></pre></div>
+
+<p>The <code>conditional</code> on a <code>@JniMethod</code> or <code>@JniField</code> defaults to value configured on
+the enclosing <code>@JniClass</code>. So if most of the fields or methods in a class need to
+have have the same conditional applied, just set it on the <code>@JniClass</code> annotation.</p>
+
+<h2 id = "adding-to-maven-build">Maven Plugin Reference</h2>
+
+<p>The HawtJNI provides a maven plugin which makes it easy code generate and build
+the native library for your current platform.</p>
+
+<p>The maven tooling takes care of:</p>
+
+<ul>
+<li>Generating the native JNI source code from your annotated Java code</li>
+<li>Generating a GNU make and MS Build compatible source project for building the native library</li>
+<li>Attaches the source project as <code>native-src.zip</code> artifact to the maven build</li>
+<li>Kicking of a native build of the library using the platform's build tools</li>
+<li>Packages the native library in a <code>platform.jar</code> and attaches the artifact to the maven build.</li>
+<li>Updates the test build path so that unit tests can use the build native library.</li>
+</ul>
+
+<h3 id = "Usage">Usage</h3>
+
+<p>Once you have a working maven build for a java module, you can then update it to
+use HawtJNI to generate your JNI libraries. With the following steps:</p>
+
+<ol>
+<li><p>Add the hawtjni repositories to the <code>pom.xml</code> configuration.</p>
+
+<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
+&lt;pom&gt;
+  &lt;repositories&gt;
+    ...
+    &lt;repository&gt;
+      &lt;id&gt;hawtjni.snapshot.fusesource.org&lt;/id&gt;
+      &lt;name&gt;HawtJNI Snapshot Repo&lt;/name&gt;
+      &lt;url&gt;http://hawtjni.fusesource.org/repo/snapshot&lt;/url&gt;
+      &lt;releases&gt;
+        &lt;enabled&gt;false&lt;/enabled&gt;
+      &lt;/releases&gt;
+      &lt;snapshots&gt;
+        &lt;enabled&gt;true&lt;/enabled&gt;
+      &lt;/snapshots&gt;
+    &lt;/repository&gt;    
+    ...
+  &lt;/repositories&gt;
+  &lt;pluginRepositories&gt;
+    ...
+    &lt;pluginRepository&gt;
+      &lt;id&gt;hawtjni.snapshot.fusesource.org&lt;/id&gt;
+      &lt;name&gt;HawtJNI Snapshot Repo&lt;/name&gt;
+      &lt;url&gt;http://hawtjni.fusesource.org/repo/snapshot&lt;/url&gt;
+      &lt;releases&gt;
+        &lt;enabled&gt;false&lt;/enabled&gt;
+      &lt;/releases&gt;
+      &lt;snapshots&gt;
+        &lt;enabled&gt;true&lt;/enabled&gt;
+      &lt;/snapshots&gt;
+    &lt;/pluginRepository&gt;
+    ...
+  &lt;/pluginRepositories&gt;
+&lt;pom&gt;
+</code></pre></div></li>
+<li><p>Add the <code>hawtjni-runtime</code> dependency to pom. This small 19k jar file contains the HawtJNI annotations and a few Helper classes that
+you will be developing against.</p>
+
+<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
+&lt;pom&gt;
+  &lt;dependencies&gt;
+    ...
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.fusesource.hawtjni&lt;/groupId&gt;
+      &lt;artifactId&gt;hawtjni-runtime&lt;/artifactId&gt;
+      &lt;version&gt;{project_version:}&lt;/version&gt;
+    &lt;/dependency&gt;
+    ...
+  &lt;/dependencies&gt;
+&lt;pom&gt;
+</code></pre></div></li>
+<li><p>Add the HawtJNI maven plugin to the pom.</p>
+
+<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
+&lt;pom&gt;
+  &lt;build&gt;
+    &lt;plugins&gt;
+      ...
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.fusesource.hawtjni&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-hawtjni-plugin&lt;/artifactId&gt;
+        &lt;version&gt;{project_version:}&lt;/version&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;generate&lt;/goal&gt;
+              &lt;goal&gt;build&lt;/goal&gt;
+              &lt;goal&gt;package-jar&lt;/goal&gt;
+              &lt;goal&gt;package-source&lt;/goal&gt;
+            &lt;/goals&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;        
+      &lt;/plugin&gt;
+      ...
+    &lt;/plugins&gt;
+  &lt;/build&gt;
+&lt;pom&gt;
+</code></pre></div></li>
+<li><p>If you run into problems with <code>mvn clean</code> no deleting native files, make sure you are using at least version 2.3 of the maven clean plugin.  Previous
+versions would run into problems with symlinks.</p>
+
+<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
+&lt;pom&gt;
+  &lt;build&gt;
+    &lt;plugins&gt;
+      ...
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-clean-plugin&lt;/artifactId&gt;
+        &lt;version&gt;2.3&lt;/version&gt;
+      &lt;/plugin&gt;
+      ...
+    &lt;/plugins&gt;
+  &lt;/build&gt;
+&lt;pom&gt;
+</code></pre></div></li>
+</ol>
+
+<h3 id = "Build_Phases">Build Phases</h3>
+
+<p>You may have noticed that HawtJNI is generating a slew of code in different
+directories. Here is a breakdown of what gets generated where and during which
+maven build phase:</p>
+
+<ol>
+<li><p><strong>process-classes</strong>: Processes the annotated java classes:</p>
+
+<ol>
+<li><p>generates JNI .c and .h files to
+<code>target/generated-sources/hawtjni/native-src</code></p></li>
+<li><p>generates an autoconf and msbuild build project in the
+<code>target/generated-sources/hawtjni/native-package</code> directory</p></li>
+</ol></li>
+<li><p><strong>generate-test-resources</strong>: Compiles the native library:</p>
+
+<ol>
+<li><p>The project is built in <code>target/native-build</code></p></li>
+<li><p>The project installed the libraries to <code>target/native-dist</code></p></li>
+<li><p>The libraries are copied to <code>target/generated-sources/hawtjni/lib</code> which gets
+added as a test resource path.</p></li>
+</ol></li>
+<li><p><strong>package-jar</strong>: The contents of <code>target/generated-sources/hawtjni/lib</code> get
+jarred and attached to the maven build with a platform specific classifier.</p></li>
+<li><p><strong>package-source</strong>: The contents of
+<code>target/generated-sources/hawtjni/native-package</code> get zipped up into a platform
+agnostic source package for building the native library.</p></li>
+</ol>
+
+<h2 id = "Platform_Build_Tools_Requirements">Platform Build Tools Requirements</h2>
+
+<h3 id = "Windows">Windows</h3>
+
+<p>Download and install the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505">Microsoft Windows SDK</a>.  The SDK includes
+all the headers, libraries, and build tools needed to compile the JNI library.</p>
+
+<p>Set the <code>JAVA_HOME</code> environment variable to the location where your JDK is 
+installed.  </p>
+
+<p>Make sure the <code>vcbuild</code> tool is on in your system PATH.  The simplest way 
+to use SDK command prompt by following the following menu choices: 
+<code>Start &gt; All Programs &gt; Microsoft Windows SDK ... &gt; CMD</code></p>
+
+<h3 id = "Ubuntu_Linux">Ubuntu Linux</h3>
+
+<p>On Ubuntu you need a JDK and the <code>build-essential</code> package installed to do 
+native library builds.</p>
+
+<p>If you want to be able to generate the <code>native-src.zip</code> which contains a GNU style 
+make project, then you will also need the following packages installed:</p>
+
+<ul>
+<li>automake1.10</li>
+<li>libtool</li>
+</ul>
+
+<p>Install them is by running:</p>
+
+<pre><code>sudo apt-get install build-essential automake1.10 libtool</code></pre>
+
+<h3 id = "Fedora_Core_Linux">Fedora Core Linux</h3>
+
+<p>On Ubuntu you need a JDK and the and gcc package installed to do 
+native library builds.</p>
+
+<p>Install them is by running:</p>
+
+<pre><code>yum install gcc java-1.6.0-openjdk-devel</code></pre>
+
+<p>If you want to be able to generate the <code>native-src.zip</code> which contains a GNU style 
+make project, then you will also need the following packages installed:</p>
+
+<ul>
+<li>automake</li>
+<li>libtool</li>
+</ul>
+
+<p>Install them is by running:</p>
+
+<pre><code>yum install automake libtool</code></pre>
+
+<!-- TODO:
+### Using Autoconf to Detect Platform Features
+
+### custom header files ... linking
+-->
+        <div></div>
+      </div>
+    </div>
+  </body>
+</html>

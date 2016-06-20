@@ -10,10 +10,12 @@
 package org.fusesource.hawtjni.runtime;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -287,7 +289,7 @@ public class Library {
                     while ((read = is.read(buffer)) != -1) {
                         os.write(buffer, 0, read);
                     }
-                    chmod("755", target);
+                    chmod755(target);
                 }
                 target.deleteOnExit();
                 return target;
@@ -313,12 +315,39 @@ public class Library {
         }
     }
 
-    private void chmod(String permision, File path) {
+    private void chmod755(File file) {
         if (getPlatform().startsWith("windows"))
-            return; 
+            return;
+        // Use Files.setPosixFilePermissions if we are running Java 7+ to avoid forking the JVM for executing chmod
+        boolean chmodSuccessful = false;
         try {
-            Runtime.getRuntime().exec(new String[] { "chmod", permision, path.getCanonicalPath() }).waitFor(); 
-        } catch (Throwable e) {
+            ClassLoader classLoader = getClass().getClassLoader();
+            // Check if the PosixFilePermissions exists in the JVM, if not this will throw a ClassNotFoundException
+            Class<?> posixFilePermissionsClass = classLoader.loadClass("java.nio.file.attribute.PosixFilePermissions");
+            // Set <PosixFilePermission> permissionSet = PosixFilePermissions.fromString("rwxr-xr-x")
+            Method fromStringMethod = posixFilePermissionsClass.getMethod("fromString", String.class);
+            Object permissionSet = fromStringMethod.invoke(null, new Object[] {"rwxr-xr-x"});
+            // Path path = file.toPath()
+            Object path = file.getClass().getMethod("toPath").invoke(file);
+            // Files.setPosixFilePermissions(path, permissionSet)
+            Class<?> pathClass = classLoader.loadClass("java.nio.file.Path");
+            Class<?> filesClass = classLoader.loadClass("java.nio.file.Files");
+            Method setPosixFilePermissionsMethod = filesClass.getMethod("setPosixFilePermissions", pathClass, Set.class);
+            setPosixFilePermissionsMethod.invoke(null, new Object[] {path, permissionSet});
+            chmodSuccessful = true;
+        } catch (ClassNotFoundException ignored) {
+            // Ignored as we are probably running in a JVM < 7
+        } catch (Exception e) {
+            // NoSuchMethodException | InvocationTargetException | IllegalAccessException
+            System.err.println("Unable to use Files.setPosixFilePermissions: " + e.getMessage() +
+                    ", falling back to Runtime.exec");
+        }
+        if (!chmodSuccessful) {
+            // Fallback to starting a new process
+            try {
+                Runtime.getRuntime().exec(new String[]{"chmod", "755", file.getCanonicalPath()}).waitFor();
+            } catch (Throwable e) {
+            }
         }
     }
 

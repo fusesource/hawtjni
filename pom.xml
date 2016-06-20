@@ -26,7 +26,7 @@
 
   <groupId>org.fusesource.hawtjni</groupId>
   <artifactId>hawtjni-project</artifactId>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.14</version>
   <packaging>pom</packaging>
   
   <name>HawtJNI</name>
@@ -87,7 +87,7 @@
     <connection>scm:git:git://forge.fusesource.com/${forge-project-id}.git</connection>
     <developerConnection>scm:git:ssh://git@github.com:fusesources/hawtjni.git</developerConnection>
     <url>http://fusesource.com/forge/gitweb?p=${forge-project-id}.git</url>
-    <tag>HEAD</tag>
+    <tag>hawtjni-project-1.14</tag>
   </scm>
 
   <distributionManagement>

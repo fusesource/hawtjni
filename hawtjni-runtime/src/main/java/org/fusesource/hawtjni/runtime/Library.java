@@ -319,7 +319,6 @@ public class Library {
         if (getPlatform().startsWith("windows"))
             return;
         // Use Files.setPosixFilePermissions if we are running Java 7+ to avoid forking the JVM for executing chmod
-        boolean chmodSuccessful = false;
         try {
             ClassLoader classLoader = getClass().getClassLoader();
             // Check if the PosixFilePermissions exists in the JVM, if not this will throw a ClassNotFoundException
@@ -334,15 +333,7 @@ public class Library {
             Class<?> filesClass = classLoader.loadClass("java.nio.file.Files");
             Method setPosixFilePermissionsMethod = filesClass.getMethod("setPosixFilePermissions", pathClass, Set.class);
             setPosixFilePermissionsMethod.invoke(null, new Object[] {path, permissionSet});
-            chmodSuccessful = true;
-        } catch (ClassNotFoundException ignored) {
-            // Ignored as we are probably running in a JVM < 7
-        } catch (Exception e) {
-            // NoSuchMethodException | InvocationTargetException | IllegalAccessException
-            System.err.println("Unable to use Files.setPosixFilePermissions: " + e.getMessage() +
-                    ", falling back to Runtime.exec");
-        }
-        if (!chmodSuccessful) {
+        } catch (Throwable ignored) {
             // Fallback to starting a new process
             try {
                 Runtime.getRuntime().exec(new String[]{"chmod", "755", file.getCanonicalPath()}).waitFor();

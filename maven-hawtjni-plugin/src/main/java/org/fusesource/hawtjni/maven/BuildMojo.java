@@ -365,7 +365,7 @@ public class BuildMojo extends AbstractMojo {
                 }
                 
                 cli.setExecutable(configure);
-                int rc = cli.system(buildDir, new String[]{"./configure", "--disable-ccache", "--prefix="+distDirectory.getCanonicalPath()}, configureArgs);
+                int rc = cli.system(buildDir, new String[]{"./configure", "--disable-ccache", "--prefix="+distDirectory.getCanonicalPath(), "--libdir="+distDirectory.getCanonicalPath()+"/lib"}, configureArgs);
                 if( rc != 0 ) {
                     throw new MojoExecutionException("./configure failed with exit code: "+rc);
                 }

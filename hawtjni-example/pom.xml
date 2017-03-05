@@ -24,16 +24,14 @@
     <version>1.15-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.fusesource.hawtjni</groupId>
   <artifactId>hawtjni-example</artifactId>
-  <version>1.15-SNAPSHOT</version>
   <name>HawtJNI Example</name>
   
   <dependencies>
     <dependency>
       <groupId>org.fusesource.hawtjni</groupId>
       <artifactId>hawtjni-runtime</artifactId>
-      <version>1.15-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     
     <dependency>

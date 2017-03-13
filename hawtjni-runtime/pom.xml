@@ -24,10 +24,7 @@
     <version>1.15-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.fusesource.hawtjni</groupId>
   <artifactId>hawtjni-runtime</artifactId>
-  <version>1.15-SNAPSHOT</version>
-
   <name>HawtJNI Runtime</name>
   <description>The API that projects using HawtJNI should build against.</description>
   
@@ -36,11 +33,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        
-        <configuration>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
-        
         <executions>
           <execution>
             <id>attach-javadocs</id>

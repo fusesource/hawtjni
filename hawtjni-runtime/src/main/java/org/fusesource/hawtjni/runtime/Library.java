@@ -11,61 +11,61 @@ package org.fusesource.hawtjni.runtime;
 
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
- * Used to optionally extract and load a JNI library.
+ * Used to find and load a JNI library, eventually after having extracted it.
  * 
  * It will search for the library in order at the following locations:
  * <ol>
- * <li> in the custom library path: If the "library.${name}.path" System property is set to a directory 
+ * <li> in the custom library path: If the "<code>library.${name}.path</code>" System property is set to a directory 
  *   <ol>
- *   <li> "${name}-${version}" if the version can be determined.
- *   <li> "${name}"
+ *   <li> as "<code>${name}-${version}</code>" library name if the version can be determined.
+ *   <li> as "<code>${name}</code>" library name
  *   </ol>
  * <li> system library path: This is where the JVM looks for JNI libraries by default.
  *   <ol>
- *   <li> "${name}-${version}" if the version can be determined.
- *   <li> "${name}"
+ *   <li> as "<code>${name}-${version}</code>" library name if the version can be determined.
+ *   <li> as "<code>${name}</code>" library name
  *   </ol>
  * <li> classpath path: If the JNI library can be found on the classpath, it will get extracted
- * and and then loaded.  This way you can embed your JNI libraries into your packaged JAR files.
+ * and then loaded. This way you can embed your JNI libraries into your packaged JAR files.
  * They are looked up as resources in this order:
  *   <ol>
- *   <li> "META-INF/native/${platform}/${arch}/${library}" : Store your library here if you want to embed
+ *   <li> "<code>META-INF/native/${platform}/${arch}/${library}</code>": Store your library here if you want to embed
  *   more than one platform JNI library on different processor archs in the jar.
- *   <li> "META-INF/native/${platform}/${library}" : Store your library here if you want to embed more
+ *   <li> "<code>META-INF/native/${platform}/${library}</code>": Store your library here if you want to embed more
  *   than one platform JNI library in the jar.
- *   <li> "META-INF/native/${library}": Store your library here if your JAR is only going to embedding one
+ *   <li> "<code>META-INF/native/${os}/${library}</code>": Store your library here if you want to embed more
+ *   than one platform JNI library in the jar but don't want to take bit model into account.
+ *   <li> "<code>META-INF/native/${library}</code>": Store your library here if your JAR is only going to embedding one
  *   platform library.
  *   </ol>
  * The file extraction is attempted until it succeeds in the following directories.
  *   <ol>
- *   <li> The directory pointed to by the "library.${name}.path" System property (if set)
- *   <li> a temporary directory (uses the "java.io.tmpdir" System property)
+ *   <li> The directory pointed to by the "<code>library.${name}.path</code>" System property (if set)
+ *   <li> a temporary directory (uses the "<code>java.io.tmpdir</code>" System property)
  *   </ol>
  * </ol>
  * 
  * where: 
  * <ul>
- * <li>"${name}" is the name of library
- * <li>"${version}" is the value of "library.${name}.version" System property if set.
+ * <li>"<code>${name}</code>" is the name of library
+ * <li>"<code>${version}</code>" is the value of "<code>library.${name}.version</code>" System property if set.
  *       Otherwise it is set to the ImplementationVersion property of the JAR's Manifest</li> 
- * <li>"${os}" is your operating system, for example "osx", "linux", or "windows"</li> 
- * <li>"${bit-model}" is "64" if the JVM process is a 64 bit process, otherwise it's "32" if the 
+ * <li>"<code>${os}</code>" is your operating system, for example "<code>osx</code>", "<code>linux</code>", or "<code>windows</code>"</li> 
+ * <li>"<code>${bit-model}</code>" is "<code>64</code>" if the JVM process is a 64 bit process, otherwise it's "<code>32</code>" if the 
  * JVM is a 32 bit process</li> 
- * <li>"${arch}" is the architecture for the processor, for example "amd64" or "sparcv9"</li> 
- * <li>"${platform}" is "${os}${bit-model}", for example "linux32" or "osx64" </li> 
- * <li>"${library}": is the normal jni library name for the platform.  For example "${name}.dll" on
- *     windows, "lib${name}.jnilib" on OS X, and "lib${name}.so" on linux</li> 
+ * <li>"<code>${arch}</code>" is the architecture for the processor, for example "<code>amd64</code>" or "<code>sparcv9</code>"</li> 
+ * <li>"<code>${platform}</code>" is "<code>${os}${bit-model}</code>", for example "<code>linux32</code>" or "<code>osx64</code>" </li> 
+ * <li>"<code>${library}</code>": is the normal jni library name for the platform.  For example "<code>${name}.dll</code>" on
+ *     windows, "<code>lib${name}.jnilib</code>" on OS X, and "<code>lib${name}.so</code>" on linux</li> 
  * </ul>
  * 
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ * @see System#mapLibraryName(String)
  */
 public class Library {
 
@@ -174,14 +174,14 @@ public class Library {
         
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
-            if( exractAndLoad(errors, version, customPath, getArchSpecifcResourcePath()) )
+            if( extractAndLoad(errors, version, customPath, getArchSpecifcResourcePath()) )
                 return;
-            if( exractAndLoad(errors, version, customPath, getPlatformSpecifcResourcePath()) ) 
+            if( extractAndLoad(errors, version, customPath, getPlatformSpecifcResourcePath()) ) 
                 return;
-            if( exractAndLoad(errors, version, customPath, getOperatingSystemSpecifcResourcePath()) ) 
+            if( extractAndLoad(errors, version, customPath, getOperatingSystemSpecifcResourcePath()) ) 
                 return;
             // For the simpler case where only 1 platform lib is getting packed into the jar
-            if( exractAndLoad(errors, version, customPath, getResorucePath()) )
+            if( extractAndLoad(errors, version, customPath, getResourcePath()) )
                 return;
         }
 
@@ -190,9 +190,8 @@ public class Library {
     }
 
     final public String getArchSpecifcResourcePath() {
-        return "META-INF/native/"+ getPlatform() + "/" + System.getProperty("os.arch") + "/" +map(name);
+        return getPlatformSpecifcResourcePath(getPlatform() + "/" + System.getProperty("os.arch"));
     }
-
     final public String getOperatingSystemSpecifcResourcePath() {
         return getPlatformSpecifcResourcePath(getOperatingSystem());
     }
@@ -203,7 +202,12 @@ public class Library {
         return "META-INF/native/"+platform+"/"+map(name);
     }
 
+    @Deprecated
     final public String getResorucePath() {
+        return getResourcePath();
+    }
+
+    final public String getResourcePath() {
         return "META-INF/native/"+map(name);
     }
 
@@ -212,7 +216,7 @@ public class Library {
     }
 
     
-    private boolean exractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
+    private boolean extractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
         URL resource = classLoader.getResource(resourcePath);
         if( resource !=null ) {
 

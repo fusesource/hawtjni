@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (C) 2009-2011 FuseSource Corp.
  * Copyright (c) 2000, 2009 IBM Corporation and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,53 +16,66 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
- * Used to optionally extract and load a JNI library.
- * 
+ * Used to find and load a JNI library, eventually after having extracted it.
+ *
  * It will search for the library in order at the following locations:
  * <ol>
- * <li> in the custom library path: If the "library.${name}.path" System property is set to a directory 
+ * <li> in the custom library path: If the "<code>library.${name}.path</code>" System property is set to a directory,
+ * subdirectories are searched:
  *   <ol>
- *   <li> "${name}-${version}" if the version can be determined.
- *   <li> "${name}"
+ *   <li> "<code>${platform}/${arch}</code>"
+ *   <li> "<code>${platform}</code>"
+ *   <li> "<code>${os}</code>"
+ *   <li> "<code></code>"
+ *   </ol>
+ *   for 2 namings of the library:
+ *   <ol>
+ *   <li> as "<code>${name}-${version}</code>" library name if the version can be determined.
+ *   <li> as "<code>${name}</code>" library name
  *   </ol>
  * <li> system library path: This is where the JVM looks for JNI libraries by default.
  *   <ol>
- *   <li> "${name}-${version}" if the version can be determined.
- *   <li> "${name}"
+ *   <li> as "<code>${name}${bit-model}-${version}</code>" library name if the version can be determined.
+ *   <li> as "<code>${name}-${version}</code>" library name if the version can be determined.
+ *   <li> as "<code>${name}</code>" library name
  *   </ol>
  * <li> classpath path: If the JNI library can be found on the classpath, it will get extracted
- * and and then loaded.  This way you can embed your JNI libraries into your packaged JAR files.
+ * and then loaded. This way you can embed your JNI libraries into your packaged JAR files.
  * They are looked up as resources in this order:
  *   <ol>
- *   <li> "META-INF/native/${platform}/${arch}/${library}" : Store your library here if you want to embed
+ *   <li> "<code>META-INF/native/${platform}/${arch}/${library[-version]}</code>": Store your library here if you want to embed
  *   more than one platform JNI library on different processor archs in the jar.
- *   <li> "META-INF/native/${platform}/${library}" : Store your library here if you want to embed more
+ *   <li> "<code>META-INF/native/${platform}/${library[-version]}</code>": Store your library here if you want to embed more
  *   than one platform JNI library in the jar.
- *   <li> "META-INF/native/${library}": Store your library here if your JAR is only going to embedding one
+ *   <li> "<code>META-INF/native/${os}/${library[-version]}</code>": Store your library here if you want to embed more
+ *   than one platform JNI library in the jar but don't want to take bit model into account.
+ *   <li> "<code>META-INF/native/${library[-version]}</code>": Store your library here if your JAR is only going to embedding one
  *   platform library.
  *   </ol>
  * The file extraction is attempted until it succeeds in the following directories.
  *   <ol>
- *   <li> The directory pointed to by the "library.${name}.path" System property (if set)
- *   <li> a temporary directory (uses the "java.io.tmpdir" System property)
+ *   <li> The directory pointed to by the "<code>library.${name}.path</code>" System property (if set)
+ *   <li> a temporary directory (uses the "<code>java.io.tmpdir</code>" System property)
  *   </ol>
  * </ol>
- * 
- * where: 
+ *
+ * where:
  * <ul>
- * <li>"${name}" is the name of library
- * <li>"${version}" is the value of "library.${name}.version" System property if set.
- *       Otherwise it is set to the ImplementationVersion property of the JAR's Manifest</li> 
- * <li>"${os}" is your operating system, for example "osx", "linux", or "windows"</li> 
- * <li>"${bit-model}" is "64" if the JVM process is a 64 bit process, otherwise it's "32" if the 
- * JVM is a 32 bit process</li> 
- * <li>"${arch}" is the architecture for the processor, for example "amd64" or "sparcv9"</li> 
- * <li>"${platform}" is "${os}${bit-model}", for example "linux32" or "osx64" </li> 
- * <li>"${library}": is the normal jni library name for the platform.  For example "${name}.dll" on
- *     windows, "lib${name}.jnilib" on OS X, and "lib${name}.so" on linux</li> 
+ * <li>"<code>${name}</code>" is the name of library
+ * <li>"<code>${version}</code>" is the value of "<code>library.${name}.version</code>" System property if set.
+ *       Otherwise it is set to the ImplementationVersion property of the JAR's Manifest</li>
+ * <li>"<code>${os}</code>" is your operating system, for example "<code>osx</code>", "<code>linux</code>", or "<code>windows</code>"</li>
+ * <li>"<code>${bit-model}</code>" is "<code>64</code>" if the JVM process is a 64 bit process, otherwise it's "<code>32</code>" if the
+ * JVM is a 32 bit process</li>
+ * <li>"<code>${arch}</code>" is the architecture for the processor, for example "<code>amd64</code>" or "<code>sparcv9</code>"</li>
+ * <li>"<code>${platform}</code>" is "<code>${os}${bit-model}</code>", for example "<code>linux32</code>" or "<code>osx64</code>" </li>
+ * <li>"<code>${library[-version]}</code>": is the normal jni library name for the platform (eventually with <code>-${version}</code>) suffix.
+ *   For example "<code>${name}.dll</code>" on
+ *   windows, "<code>lib${name}.jnilib</code>" on OS X, and "<code>lib${name}.so</code>" on linux</li>
  * </ul>
- * 
+ *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ * @see System#mapLibraryName(String)
  */
 public class Library {
 
@@ -72,19 +85,19 @@ public class Library {
     final private String version;
     final private ClassLoader classLoader;
     private boolean loaded;
-    
+
     public Library(String name) {
         this(name, null, null);
     }
-    
+
     public Library(String name, Class<?> clazz) {
         this(name, version(clazz), clazz.getClassLoader());
     }
-    
+
     public Library(String name, String version) {
         this(name, version, null);
     }
-    
+
     public Library(String name, String version, ClassLoader classLoader) {
         if( name == null ) {
             throw new IllegalArgumentException("name cannot be null");
@@ -93,7 +106,7 @@ public class Library {
         this.version = version;
         this.classLoader= classLoader;
     }
-    
+
     private static String version(Class<?> clazz) {
         try {
             return clazz.getPackage().getImplementationVersion();
@@ -114,26 +127,26 @@ public class Library {
             return "windows";
         }
         return name.replaceAll("\\W+", "_");
-        
+
     }
 
     public static String getPlatform() {
         return getOperatingSystem()+getBitModel();
     }
-    
+
     public static int getBitModel() {
-        String prop = System.getProperty("sun.arch.data.model"); 
+        String prop = System.getProperty("sun.arch.data.model");
         if (prop == null) {
             prop = System.getProperty("com.ibm.vm.bitmode");
         }
         if( prop!=null ) {
             return Integer.parseInt(prop);
         }
-        return -1; // we don't know..  
+        return -1; // we don't know..
     }
 
     /**
-     * 
+     *
      */
     synchronized public void load() {
         if( loaded ) {
@@ -142,44 +155,47 @@ public class Library {
         doLoad();
         loaded = true;
     }
-    
+
     private void doLoad() {
         /* Perhaps a custom version is specified */
-        String version = System.getProperty("library."+name+".version"); 
+        String version = System.getProperty("library."+name+".version");
         if (version == null) {
-            version = this.version; 
+            version = this.version;
         }
         ArrayList<Throwable> errors = new ArrayList<Throwable>();
+
+        String[] specificDirs = getSpecificSearchDirs();
+        String libFilename = map(name);
+        String versionlibFilename = (version == null) ? null : map(name + "-" + version);
 
         /* Try loading library from a custom library path */
         String customPath = System.getProperty("library."+name+".path");
         if (customPath != null) {
-            if( version!=null && load(errors, file(customPath, map(name + "-" + version))) ) 
-                return;
-            if( load(errors, file(customPath, map(name))) )
-                return;
+            for ( String dir: specificDirs ) {
+                if( version!=null && load(errors, file(customPath, dir, versionlibFilename)) )
+                    return;
+                if( load(errors, file(customPath, dir, libFilename)) )
+                    return;
+            }
         }
 
         /* Try loading library from java library path */
-        if( version!=null && load(errors, name + getBitModel() + "-" + version) ) 
-            return;        
-        if( version!=null && load(errors, name + "-" + version) ) 
-            return;        
+        if( version!=null && load(errors, name + getBitModel() + "-" + version) )
+            return;
+        if( version!=null && load(errors, name + "-" + version) )
+            return;
         if( load(errors, name ) )
             return;
-        
-        
+
+
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
-            if( extractAndLoad(errors, version, customPath, getArchSpecificResourcePath()) )
-                return;
-            if( extractAndLoad(errors, version, customPath, getPlatformSpecificResourcePath()) )
-                return;
-            if( extractAndLoad(errors, version, customPath, getOperatingSystemSpecificResourcePath()) )
-                return;
-            // For the simpler case where only 1 platform lib is getting packed into the jar
-            if( extractAndLoad(errors, version, customPath, getResourcePath()) )
-                return;
+            for ( String dir: specificDirs ) {
+                if( version!=null && extractAndLoad(errors, customPath, dir, versionlibFilename) )
+                    return;
+                if( extractAndLoad(errors, customPath, dir, libFilename) )
+                    return;
+            }
         }
 
         /* Failed to find the library */
@@ -236,16 +252,28 @@ public class Library {
         return map(name);
     }
 
-    
-    private boolean extractAndLoad(ArrayList<Throwable> errors, String version, String customPath, String resourcePath) {
+    /**
+     * Search directories for library:<ul>
+     * <li><code>${platform}/${arch}</code> to enable platform JNI library for different processor archs</li>
+     * <li><code>${platform}</code> to enable platform JNI library</li>
+     * <li><code>${os}</code> to enable OS JNI library</li>
+     * <li>no directory</li>
+     * </ul>
+     * @return the list
+     */
+    final public String[] getSpecificSearchDirs() {
+        return new String[] {
+                getPlatform() + "/" + System.getProperty("os.arch"),
+                getPlatform(),
+                getOperatingSystem()
+        };
+    }
+
+    private boolean extractAndLoad(ArrayList<Throwable> errors, String customPath, String dir, String libName) {
+        String resourcePath = "META-INF/native/" + ( dir == null ? "" : (dir + '/')) + libName;
         URL resource = classLoader.getResource(resourcePath);
         if( resource !=null ) {
 
-            String libName = name + "-" + getBitModel();
-            if( version !=null) {
-                libName += "-" + version;
-            }
-            libName = map(libName);
             int idx = libName.lastIndexOf('.');
             String prefix = libName.substring(0, idx)+"-";
             String suffix = libName.substring(idx);
@@ -259,7 +287,7 @@ public class Library {
                     }
                 }
             }
-            
+
             // Fall back to extracting to the tmp dir
             customPath = System.getProperty("java.io.tmpdir");
             File target = extract(errors, resource, prefix, suffix, file(customPath));
@@ -277,22 +305,22 @@ public class Library {
         for (String path : paths) {
             if( rc == null ) {
                 rc = new File(path);
-            } else {
+            } else if( path != null ) {
                 rc = new File(rc, path);
             }
         }
         return rc;
     }
-    
+
     private String map(String libName) {
         /*
          * libraries in the Macintosh use the extension .jnilib but the some
          * VMs map to .dylib.
          */
         libName = System.mapLibraryName(libName);
-        String ext = ".dylib"; 
+        String ext = ".dylib";
         if (libName.endsWith(ext)) {
-            libName = libName.substring(0, libName.length() - ext.length()) + ".jnilib"; 
+            libName = libName.substring(0, libName.length() - ext.length()) + ".jnilib";
         }
         return libName;
     }
@@ -300,7 +328,7 @@ public class Library {
     private File extract(ArrayList<Throwable> errors, URL source, String prefix, String suffix, File directory) {
         File target = null;
         if (directory != null) {
-          directory = directory.getAbsoluteFile();
+            directory = directory.getAbsoluteFile();
         }
         try {
             FileOutputStream os = null;
@@ -384,7 +412,7 @@ public class Library {
         }
         return false;
     }
-    
+
     private boolean load(ArrayList<Throwable> errors, String lib) {
         try {
             System.loadLibrary(lib);

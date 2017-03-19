@@ -20,13 +20,22 @@ import java.util.Set;
  * 
  * It will search for the library in order at the following locations:
  * <ol>
- * <li> in the custom library path: If the "<code>library.${name}.path</code>" System property is set to a directory 
+ * <li> in the custom library path: If the "<code>library.${name}.path</code>" System property is set to a directory,
+ * subdirectories are searched:
+ *   <ol>
+ *   <li> "<code>${platform}/${arch}</code>"
+ *   <li> "<code>${platform}</code>"
+ *   <li> "<code>${os}</code>"
+ *   <li> "<code></code>"
+ *   </ol>
+ *   for 2 namings of the library:
  *   <ol>
  *   <li> as "<code>${name}-${version}</code>" library name if the version can be determined.
  *   <li> as "<code>${name}</code>" library name
  *   </ol>
  * <li> system library path: This is where the JVM looks for JNI libraries by default.
  *   <ol>
+ *   <li> as "<code>${name}${bit-model}-${version}</code>" library name if the version can be determined.
  *   <li> as "<code>${name}-${version}</code>" library name if the version can be determined.
  *   <li> as "<code>${name}</code>" library name
  *   </ol>
@@ -34,13 +43,13 @@ import java.util.Set;
  * and then loaded. This way you can embed your JNI libraries into your packaged JAR files.
  * They are looked up as resources in this order:
  *   <ol>
- *   <li> "<code>META-INF/native/${platform}/${arch}/${library}</code>": Store your library here if you want to embed
+ *   <li> "<code>META-INF/native/${platform}/${arch}/${library[-version]}</code>": Store your library here if you want to embed
  *   more than one platform JNI library on different processor archs in the jar.
- *   <li> "<code>META-INF/native/${platform}/${library}</code>": Store your library here if you want to embed more
+ *   <li> "<code>META-INF/native/${platform}/${library[-version]}</code>": Store your library here if you want to embed more
  *   than one platform JNI library in the jar.
- *   <li> "<code>META-INF/native/${os}/${library}</code>": Store your library here if you want to embed more
+ *   <li> "<code>META-INF/native/${os}/${library[-version]}</code>": Store your library here if you want to embed more
  *   than one platform JNI library in the jar but don't want to take bit model into account.
- *   <li> "<code>META-INF/native/${library}</code>": Store your library here if your JAR is only going to embedding one
+ *   <li> "<code>META-INF/native/${library[-version]}</code>": Store your library here if your JAR is only going to embedding one
  *   platform library.
  *   </ol>
  * The file extraction is attempted until it succeeds in the following directories.
@@ -60,8 +69,9 @@ import java.util.Set;
  * JVM is a 32 bit process</li> 
  * <li>"<code>${arch}</code>" is the architecture for the processor, for example "<code>amd64</code>" or "<code>sparcv9</code>"</li> 
  * <li>"<code>${platform}</code>" is "<code>${os}${bit-model}</code>", for example "<code>linux32</code>" or "<code>osx64</code>" </li> 
- * <li>"<code>${library}</code>": is the normal jni library name for the platform.  For example "<code>${name}.dll</code>" on
- *     windows, "<code>lib${name}.jnilib</code>" on OS X, and "<code>lib${name}.so</code>" on linux</li> 
+ * <li>"<code>${library[-version]}</code>": is the normal jni library name for the platform (eventually with <code>-${version}</code>) suffix.
+ *   For example "<code>${name}.dll</code>" on
+ *   windows, "<code>lib${name}.jnilib</code>" on OS X, and "<code>lib${name}.so</code>" on linux</li> 
  * </ul>
  * 
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -154,13 +164,19 @@ public class Library {
         }
         ArrayList<String> errors = new ArrayList<String>();
 
+        String[] specificDirs = getSpecificSearchDirs();
+        String libFilename = map(name);
+        String versionlibFilename = (version == null) ? null : map(name + "-" + version);
+
         /* Try loading library from a custom library path */
         String customPath = System.getProperty("library."+name+".path");
         if (customPath != null) {
-            if( version!=null && load(errors, file(customPath, map(name + "-" + version))) ) 
-                return;
-            if( load(errors, file(customPath, map(name))) )
-                return;
+            for ( String dir: specificDirs ) {
+                if( version!=null && load(errors, file(customPath, dir, versionlibFilename)) ) 
+                    return;
+                if( load(errors, file(customPath, dir, libFilename)) )
+                    return;
+            }
         }
 
         /* Try loading library from java library path */
@@ -174,30 +190,59 @@ public class Library {
         
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
-            if( extractAndLoad(errors, version, customPath, getArchSpecifcResourcePath()) )
-                return;
-            if( extractAndLoad(errors, version, customPath, getPlatformSpecifcResourcePath()) ) 
-                return;
-            if( extractAndLoad(errors, version, customPath, getOperatingSystemSpecifcResourcePath()) ) 
-                return;
-            // For the simpler case where only 1 platform lib is getting packed into the jar
-            if( extractAndLoad(errors, version, customPath, getResourcePath()) )
-                return;
+            for ( String dir: specificDirs ) {
+                if( version!=null && extractAndLoad(errors, customPath, dir, versionlibFilename) ) 
+                    return;
+                if( extractAndLoad(errors, customPath, dir, libFilename) )
+                    return;
+            }
         }
 
         /* Failed to find the library */
         throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
     }
 
+    /**
+     * Search directories for library:<ul>
+     * <li><code>${platform}/${arch}</code> to enable platform JNI library for different processor archs</li>
+     * <li><code>${platform}</code> to enable platform JNI library</li>
+     * <li><code>${os}</code> to enable OS JNI library</li>
+     * <li>no directory</li>
+     * </ul>
+     * @return the list
+     */
+    final public String[] getSpecificSearchDirs() {
+        return new String[] {
+            getPlatform() + "/" + System.getProperty("os.arch"),
+            getPlatform(),
+            getOperatingSystem(),
+            null
+        };
+    }
+
+    @Deprecated
     final public String getArchSpecifcResourcePath() {
         return getPlatformSpecifcResourcePath(getPlatform() + "/" + System.getProperty("os.arch"));
     }
-    final public String getOperatingSystemSpecifcResourcePath() {
-        return getPlatformSpecifcResourcePath(getOperatingSystem());
-    }
+    @Deprecated
     final public String getPlatformSpecifcResourcePath() {
         return getPlatformSpecifcResourcePath(getPlatform());
     }
+    @Deprecated
+    final public String getOperatingSystemSpecifcResourcePath() {
+        return getPlatformSpecifcResourcePath(getOperatingSystem());
+    }
+    @Deprecated
+    final public String getResourcePath() {
+        return "META-INF/native/"+map(name);
+    }
+
+    @Deprecated
+    final public String getLibraryFileName() {
+        return map(name);
+    }
+
+    @Deprecated
     final public String getPlatformSpecifcResourcePath(String platform) {
         return "META-INF/native/"+platform+"/"+map(name);
     }
@@ -207,30 +252,29 @@ public class Library {
         return getResourcePath();
     }
 
-    final public String getResourcePath() {
-        return "META-INF/native/"+map(name);
-    }
-
-    final public String getLibraryFileName() {
-        return map(name);
-    }
-
-    
-    private boolean extractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
+    /**
+     * Extract <code>META-INF/native/${dir}/${filename}</code> resource to a temporary file
+     * in customPath (if defined) or java.io.tmpdir
+     * @param errors list of error messages gathered during the whole loading mechanism
+     * @param customPath custom path to store the temporary file (can be null)
+     * @param dir the directory
+     * @param filename the file name
+     * @return a boolean telling if the library was found and loaded
+     */
+    private boolean extractAndLoad(ArrayList<String> errors, String customPath, String dir, String filename) {
+        String resourcePath = "META-INF/native/" + ( dir == null ? "" : (dir + '/')) + filename;
         URL resource = classLoader.getResource(resourcePath);
-        if( resource !=null ) {
 
-            String libName = name + "-" + getBitModel();
-            if( version !=null) {
-                libName += "-" + version;
-            }
-            String []libNameParts = map(libName).split("\\.");
-            String prefix = libNameParts[0]+"-";
-            String suffix = "."+libNameParts[1];
+        if( resource ==null ) {
+            errors.add( "resource " + resourcePath + " not found" );
+        } else {
+            String []libNameParts = resourcePath.substring(16).replace('/','_').split("\\.");
+            String tmpFilePrefix = libNameParts[0]+"-";
+            String tmpFileSuffix = "."+libNameParts[1];
 
             if( customPath!=null ) {
                 // Try to extract it to the custom path...
-                File target = extract(errors, resource, prefix, suffix, file(customPath));
+                File target = extracttoTmpFile(errors, resource, tmpFilePrefix, tmpFileSuffix, file(customPath));
                 if( target!=null ) {
                     if( load(errors, target) ) {
                         return true;
@@ -240,7 +284,7 @@ public class Library {
             
             // Fall back to extracting to the tmp dir
             customPath = System.getProperty("java.io.tmpdir");
-            File target = extract(errors, resource, prefix, suffix, file(customPath));
+            File target = extracttoTmpFile(errors, resource, tmpFilePrefix, tmpFileSuffix, file(customPath));
             if( target!=null ) {
                 if( load(errors, target) ) {
                     return true;
@@ -255,7 +299,7 @@ public class Library {
         for (String path : paths) {
             if( rc == null ) {
                 rc = new File(path);
-            } else {
+            } else if( path != null ) {
                 rc = new File(rc, path);
             }
         }
@@ -275,7 +319,7 @@ public class Library {
         return libName;
     }
 
-    private File extract(ArrayList<String> errors, URL source, String prefix, String suffix, File directory) {
+    private File extracttoTmpFile(ArrayList<String> errors, URL source, String tmpFilePrefix, String tpmFileSuffix, File directory) {
         File target = null;
         if (directory != null) {
           directory = directory.getAbsoluteFile();
@@ -284,7 +328,7 @@ public class Library {
             FileOutputStream os = null;
             InputStream is = null;
             try {
-                target = File.createTempFile(prefix, suffix, directory);
+                target = File.createTempFile(tmpFilePrefix, tpmFileSuffix, directory);
                 is = source.openStream();
                 if (is != null) {
                     byte[] buffer = new byte[4096];

@@ -342,14 +342,14 @@ public class Library {
             Class<?> posixFilePermissionsClass = classLoader.loadClass("java.nio.file.attribute.PosixFilePermissions");
             // Set <PosixFilePermission> permissionSet = PosixFilePermissions.fromString("rwxr-xr-x")
             Method fromStringMethod = posixFilePermissionsClass.getMethod("fromString", String.class);
-            Object permissionSet = fromStringMethod.invoke(null, new Object[] {"rwxr-xr-x"});
+            Object permissionSet = fromStringMethod.invoke(null, "rwxr-xr-x");
             // Path path = file.toPath()
             Object path = file.getClass().getMethod("toPath").invoke(file);
             // Files.setPosixFilePermissions(path, permissionSet)
             Class<?> pathClass = classLoader.loadClass("java.nio.file.Path");
             Class<?> filesClass = classLoader.loadClass("java.nio.file.Files");
             Method setPosixFilePermissionsMethod = filesClass.getMethod("setPosixFilePermissions", pathClass, Set.class);
-            setPosixFilePermissionsMethod.invoke(null, new Object[] {path, permissionSet});
+            setPosixFilePermissionsMethod.invoke(null, path, permissionSet);
         } catch (Throwable ignored) {
             // Fallback to starting a new process
             try {

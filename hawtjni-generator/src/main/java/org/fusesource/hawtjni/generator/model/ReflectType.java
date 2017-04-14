@@ -11,7 +11,6 @@
 package org.fusesource.hawtjni.generator.model;
 
 import org.fusesource.hawtjni.runtime.JniClass;
-import org.fusesource.hawtjni.runtime.JniMethod;
 
 /**
  * 

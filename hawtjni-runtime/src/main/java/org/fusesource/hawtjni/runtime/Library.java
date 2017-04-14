@@ -11,12 +11,9 @@ package org.fusesource.hawtjni.runtime;
 
 import java.io.*;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Used to optionally extract and load a JNI library.

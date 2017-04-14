@@ -174,14 +174,14 @@ public class Library {
         
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
-            if( exractAndLoad(errors, version, customPath, getArchSpecifcResourcePath()) )
+            if( extractAndLoad(errors, version, customPath, getArchSpecificResourcePath()) )
                 return;
-            if( exractAndLoad(errors, version, customPath, getPlatformSpecifcResourcePath()) ) 
+            if( extractAndLoad(errors, version, customPath, getPlatformSpecificResourcePath()) )
                 return;
-            if( exractAndLoad(errors, version, customPath, getOperatingSystemSpecifcResourcePath()) ) 
+            if( extractAndLoad(errors, version, customPath, getOperatingSystemSpecificResourcePath()) )
                 return;
             // For the simpler case where only 1 platform lib is getting packed into the jar
-            if( exractAndLoad(errors, version, customPath, getResorucePath()) )
+            if( extractAndLoad(errors, version, customPath, getResourcePath()) )
                 return;
         }
 
@@ -189,21 +189,41 @@ public class Library {
         throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
     }
 
+    @Deprecated
     final public String getArchSpecifcResourcePath() {
+        return getArchSpecificResourcePath();
+    }
+    final public String getArchSpecificResourcePath() {
         return "META-INF/native/"+ getPlatform() + "/" + System.getProperty("os.arch") + "/" +map(name);
     }
 
+    @Deprecated
     final public String getOperatingSystemSpecifcResourcePath() {
-        return getPlatformSpecifcResourcePath(getOperatingSystem());
+        return getOperatingSystemSpecificResourcePath();
     }
+    final public String getOperatingSystemSpecificResourcePath() {
+        return getPlatformSpecificResourcePath(getOperatingSystem());
+    }
+    @Deprecated
     final public String getPlatformSpecifcResourcePath() {
-        return getPlatformSpecifcResourcePath(getPlatform());
+        return getPlatformSpecificResourcePath();
     }
+    final public String getPlatformSpecificResourcePath() {
+        return getPlatformSpecificResourcePath(getPlatform());
+    }
+    @Deprecated
     final public String getPlatformSpecifcResourcePath(String platform) {
+        return getPlatformSpecificResourcePath(platform);
+    }
+    final public String getPlatformSpecificResourcePath(String platform) {
         return "META-INF/native/"+platform+"/"+map(name);
     }
 
+    @Deprecated
     final public String getResorucePath() {
+        return getResourcePath();
+    }
+    final public String getResourcePath() {
         return "META-INF/native/"+map(name);
     }
 
@@ -212,7 +232,7 @@ public class Library {
     }
 
     
-    private boolean exractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
+    private boolean extractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
         URL resource = classLoader.getResource(resourcePath);
         if( resource !=null ) {
 

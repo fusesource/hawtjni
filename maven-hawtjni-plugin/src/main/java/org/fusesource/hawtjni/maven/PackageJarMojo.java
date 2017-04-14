@@ -157,7 +157,7 @@ public class PackageJarMojo extends AbstractMojo {
     
     public String getNativeCodeValue(Library library) {
         if (osgiPlatforms == null || osgiPlatforms.isEmpty() ) {
-            return library.getPlatformSpecifcResourcePath(platform) + ";" +"osname=" + getOsgiOSName() + ";processor=" + getOsgiProcessor()+ ",*";
+            return library.getPlatformSpecificResourcePath(platform) + ";" +"osname=" + getOsgiOSName() + ";processor=" + getOsgiProcessor()+ ",*";
         }
         boolean first=true;
         String rc = "";
@@ -169,7 +169,7 @@ public class PackageJarMojo extends AbstractMojo {
             if( "*".equals(s) ) {
                 rc += s;
             } else {
-                rc += library.getPlatformSpecifcResourcePath(platform) + ";"+s;
+                rc += library.getPlatformSpecificResourcePath(platform) + ";"+s;
             }
         }
         return rc;

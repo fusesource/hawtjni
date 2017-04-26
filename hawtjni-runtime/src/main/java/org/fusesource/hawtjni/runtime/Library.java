@@ -245,9 +245,10 @@ public class Library {
             if( version !=null) {
                 libName += "-" + version;
             }
-            String []libNameParts = map(libName).split("\\.");
-            String prefix = libNameParts[0]+"-";
-            String suffix = "."+libNameParts[1];
+            libName = map(libName);
+            int idx = libName.lastIndexOf('.');
+            String prefix = libName.substring(0, idx)+"-";
+            String suffix = libName.substring(idx);
 
             if( customPath!=null ) {
                 // Try to extract it to the custom path...

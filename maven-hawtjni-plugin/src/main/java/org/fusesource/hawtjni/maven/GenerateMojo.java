@@ -171,8 +171,10 @@ public class GenerateMojo extends AbstractMojo {
 
     /**
      * The name of the msbuild/vcbuild project to use.
-     * Defaults to 'vs2010.vcxproj' for 'msbuild'
-     * and 'vs2008.vcproj' for 'vcbuild'.
+     * Defaults to 'vs2010' for 'msbuild'
+     * and 'vs2008' for 'vcbuild'.
+     *
+     * @parameter
      */
     private String windowsProjectName;
 
@@ -248,12 +250,12 @@ public class GenerateMojo extends AbstractMojo {
             // To support windows based builds..
             String tool = windowsBuildTool.toLowerCase().trim();
             if( "detect".equals(tool) ) {
-                copyTemplateResource("vs2008.vcproj", true);
-                copyTemplateResource("vs2010.vcxproj", true);
+                copyTemplateResource("vs2008.vcproj", (windowsProjectName != null ? windowsProjectName : "vs2008") + ".vcproj", true);
+                copyTemplateResource("vs2010.vcxproj", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", true);
             } else if( "msbuild".equals(tool) ) {
-                copyTemplateResource("vs2010.vcxproj", windowsProjectName != null ? windowsProjectName : "vs2010.vcxproj", true);
+                copyTemplateResource("vs2010.vcxproj", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", true);
             } else if( "vcbuild".equals(tool) ) {
-                copyTemplateResource("vs2008.vcproj", windowsProjectName != null ? windowsProjectName : "vs2008.vcproj", true);
+                copyTemplateResource("vs2008.vcproj", (windowsProjectName != null ? windowsProjectName : "vs2008") + ".vcproj", true);
             } else if( "none".equals(tool) ) {
             } else {
                 throw new MojoExecutionException("Invalid setting for windowsBuildTool: "+windowsBuildTool);

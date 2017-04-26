@@ -232,8 +232,8 @@ public class BuildMojo extends AbstractMojo {
 
     /**
      * The name of the msbuild/vcbuild project to use.
-     * Defaults to 'vs2010.vcxproj' for 'msbuild'
-     * and 'vs2008.vcproj' for 'vcbuild'.
+     * Defaults to 'vs2010' for 'msbuild'
+     * and 'vs2008' for 'vcbuild'.
      *
      * @parameter
      */
@@ -306,13 +306,13 @@ public class BuildMojo extends AbstractMojo {
 
         if( useMSBuild ) {
             // vcbuild was removed.. use the msbuild tool instead.
-            int rc = cli.system(buildDir, new String[]{"msbuild", windowsProjectName != null ? windowsProjectName : "vs2010.vcxproj", "/property:Platform="+platform, "/property:Configuration="+configuration});
+            int rc = cli.system(buildDir, new String[]{"msbuild", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", "/property:Platform="+platform, "/property:Configuration="+configuration});
             if( rc != 0 ) {
                 throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
             }
         } else {
             // try to use a vcbuild..
-            int rc = cli.system(buildDir, new String[]{"vcbuild", "/platform:"+platform, windowsProjectName != null ? windowsProjectName : "vs2008.vcproj", configuration});
+            int rc = cli.system(buildDir, new String[]{"vcbuild", "/platform:"+platform, (windowsProjectName != null ? windowsProjectName : "vs2008") + ".vcproj", configuration});
             if( rc != 0 ) {
                 throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
             }

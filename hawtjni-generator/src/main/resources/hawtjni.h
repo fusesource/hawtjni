@@ -35,7 +35,7 @@ extern "C" {
 extern int IS_JNI_1_2;
 
 #ifndef JNI64
-#if __x86_64__
+#if defined(_LP64)
 #define JNI64
 #endif
 #endif

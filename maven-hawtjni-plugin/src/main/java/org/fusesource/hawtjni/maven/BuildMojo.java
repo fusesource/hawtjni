@@ -259,14 +259,15 @@ public class BuildMojo extends AbstractMojo {
         FileUtils.copyDirectoryStructureIfModified(packageDirectory, buildDir);
 
         Library library = new Library(name);
+        String libPlatform = this.platform != null ? this.platform : Library.getPlatform();
         String platform;
         String configuration="release";
-        if( "windows32".equals(library.getPlatform()) ) {
+        if( "windows32".equals(libPlatform) ) {
         	platform = "Win32";
-        } else if( "windows64".equals(library.getPlatform()) ) {
+        } else if( "windows64".equals(libPlatform) ) {
         	platform = "x64";
         } else {
-        	throw new MojoExecutionException("Usupported platform: "+library.getPlatform());
+        	throw new MojoExecutionException("Usupported platform: "+libPlatform);
         }
 
         boolean useMSBuild = false;

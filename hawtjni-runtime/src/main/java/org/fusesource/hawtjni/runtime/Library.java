@@ -149,7 +149,7 @@ public class Library {
         if (version == null) {
             version = this.version; 
         }
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<Throwable> errors = new ArrayList<Throwable>();
 
         /* Try loading library from a custom library path */
         String customPath = System.getProperty("library."+name+".path");
@@ -183,7 +183,15 @@ public class Library {
         }
 
         /* Failed to find the library */
-        throw new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString()); 
+        UnsatisfiedLinkError e  = new UnsatisfiedLinkError("Could not load library. Reasons: " + errors.toString());
+        try {
+            Method method = Throwable.class.getMethod("addSuppressed", Throwable.class);
+            for (Throwable t : errors) {
+                method.invoke(e, t);
+            }
+        } catch (Throwable ignore) {
+        }
+        throw e;
     }
 
     @Deprecated
@@ -229,7 +237,7 @@ public class Library {
     }
 
     
-    private boolean extractAndLoad(ArrayList<String> errors, String version, String customPath, String resourcePath) {
+    private boolean extractAndLoad(ArrayList<Throwable> errors, String version, String customPath, String resourcePath) {
         URL resource = classLoader.getResource(resourcePath);
         if( resource !=null ) {
 
@@ -288,7 +296,7 @@ public class Library {
         return libName;
     }
 
-    private File extract(ArrayList<String> errors, URL source, String prefix, String suffix, File directory) {
+    private File extract(ArrayList<Throwable> errors, URL source, String prefix, String suffix, File directory) {
         File target = null;
         if (directory != null) {
           directory = directory.getAbsoluteFile();
@@ -315,10 +323,15 @@ public class Library {
                 close(is);
             }
         } catch (Throwable e) {
+            IOException io;
             if( target!=null ) {
                 target.delete();
+                io = new IOException("Unable to extract library from " + source + " to " + target);
+            } else {
+                io = new IOException("Unable to create temporary file in " + directory);
             }
-            errors.add(e.getMessage());
+            io.initCause(e);
+            errors.add(io);
         }
         return null;
     }
@@ -359,22 +372,26 @@ public class Library {
         }
     }
 
-    private boolean load(ArrayList<String> errors, File lib) {
+    private boolean load(ArrayList<Throwable> errors, File lib) {
         try {
             System.load(lib.getPath());
             return true;
         } catch (UnsatisfiedLinkError e) {
-            errors.add(e.getMessage());
+            LinkageError le = new LinkageError("Unable to load library from " + lib);
+            le.initCause(e);
+            errors.add(le);
         }
         return false;
     }
     
-    private boolean load(ArrayList<String> errors, String lib) {
+    private boolean load(ArrayList<Throwable> errors, String lib) {
         try {
             System.loadLibrary(lib);
             return true;
         } catch (UnsatisfiedLinkError e) {
-            errors.add(e.getMessage());
+            LinkageError le = new LinkageError("Unable to load library " + lib);
+            le.initCause(e);
+            errors.add(le);
         }
         return false;
     }

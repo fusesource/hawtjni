@@ -169,6 +169,13 @@ public class GenerateMojo extends AbstractMojo {
      */
     private String windowsBuildTool;
 
+    /**
+     * The name of the msbuild/vcbuild project to use.
+     * Defaults to 'vs2010.vcxproj' for 'msbuild'
+     * and 'vs2008.vcproj' for 'vcbuild'.
+     */
+    private String windowsProjectName;
+
     private File targetSrcDir;
     
     private CLI cli = new CLI();
@@ -244,9 +251,9 @@ public class GenerateMojo extends AbstractMojo {
                 copyTemplateResource("vs2008.vcproj", true);
                 copyTemplateResource("vs2010.vcxproj", true);
             } else if( "msbuild".equals(tool) ) {
-                copyTemplateResource("vs2010.vcxproj", true);
+                copyTemplateResource("vs2010.vcxproj", windowsProjectName != null ? windowsProjectName : "vs2010.vcxproj", true);
             } else if( "vcbuild".equals(tool) ) {
-                copyTemplateResource("vs2008.vcproj", true);
+                copyTemplateResource("vs2008.vcproj", windowsProjectName != null ? windowsProjectName : "vs2008.vcproj", true);
             } else if( "none".equals(tool) ) {
             } else {
                 throw new MojoExecutionException("Invalid setting for windowsBuildTool: "+windowsBuildTool);
@@ -291,8 +298,12 @@ public class GenerateMojo extends AbstractMojo {
     }
 
     private void copyTemplateResource(String file, boolean filter) throws MojoExecutionException {
+        copyTemplateResource(file, file, filter);
+    }
+
+    private void copyTemplateResource(String file, String output, boolean filter) throws MojoExecutionException {
         try {
-            File target = FileUtils.resolveFile(packageDirectory, file);
+            File target = FileUtils.resolveFile(packageDirectory, output);
             if( target.isFile() && target.canRead() ) {
                 return;
             }

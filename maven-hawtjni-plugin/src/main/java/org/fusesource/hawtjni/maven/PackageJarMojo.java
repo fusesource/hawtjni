@@ -91,7 +91,7 @@ public class PackageJarMojo extends AbstractMojo {
      * The platform identifier of this build.  If not specified,
      * it will be automatically detected.
      * 
-     * @parameter default-value="${hawtjni-platform}"
+     * @parameter
      */
     private String platform;     
 
@@ -115,8 +115,8 @@ public class PackageJarMojo extends AbstractMojo {
         try {
 
             Library library = new Library(name);
-            if (platform == null || platform.trim().length()==0 ) {
-                platform = library.getPlatform();
+            if (platform == null) {
+                platform = Library.getPlatform();
             }
 
             String classifier = null;

@@ -325,7 +325,7 @@ public class BuildMojo extends AbstractMojo {
             throw new MojoExecutionException("vcbuild did not generate: "+libFile);
         }        
 
-        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecificResourcePath());
+        File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecificResourcePath(libPlatform));
         FileUtils.copyFile(libFile, target);
 
 	}

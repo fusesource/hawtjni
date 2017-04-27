@@ -13,6 +13,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -190,10 +191,11 @@ public class Library {
 
         /* Try extracting the library from the jar */
         if( classLoader!=null ) {
+            String targetLibName = version != null ? versionlibFilename : libFilename;
             for ( String dir: specificDirs ) {
-                if( version!=null && extractAndLoad(errors, customPath, dir, versionlibFilename) )
+                if( version!=null && extractAndLoad(errors, customPath, dir, versionlibFilename, targetLibName) )
                     return;
-                if( extractAndLoad(errors, customPath, dir, libFilename) )
+                if( extractAndLoad(errors, customPath, dir, libFilename, targetLibName) )
                     return;
             }
         }
@@ -269,31 +271,30 @@ public class Library {
         };
     }
 
-    private boolean extractAndLoad(ArrayList<Throwable> errors, String customPath, String dir, String libName) {
+    private boolean extractAndLoad(ArrayList<Throwable> errors, String customPath, String dir, String libName, String targetLibName) {
         String resourcePath = "META-INF/native/" + ( dir == null ? "" : (dir + '/')) + libName;
         URL resource = classLoader.getResource(resourcePath);
         if( resource !=null ) {
 
-            int idx = libName.lastIndexOf('.');
-            String prefix = libName.substring(0, idx)+"-";
-            String suffix = libName.substring(idx);
+            int idx = targetLibName.lastIndexOf('.');
+            String prefix = targetLibName.substring(0, idx)+"-";
+            String suffix = targetLibName.substring(idx);
 
-            if( customPath!=null ) {
-                // Try to extract it to the custom path...
-                File target = extract(errors, resource, prefix, suffix, file(customPath));
-                if( target!=null ) {
-                    if( load(errors, target) ) {
-                        return true;
+            // Use the user provided path,
+            // then fallback to the java temp directory,
+            // and last, use the user home folder
+            for (File path : Arrays.asList(
+                                    customPath != null ? file(customPath) : null,
+                                    file(System.getProperty("java.io.tmpdir")),
+                                    file(System.getProperty("user.home"), ".hawtjni", name))) {
+                if( path!=null ) {
+                    // Try to extract it to the custom path...
+                    File target = extract(errors, resource, prefix, suffix, path);
+                    if( target!=null ) {
+                        if( load(errors, target) ) {
+                            return true;
+                        }
                     }
-                }
-            }
-
-            // Fall back to extracting to the tmp dir
-            customPath = System.getProperty("java.io.tmpdir");
-            File target = extract(errors, resource, prefix, suffix, file(customPath));
-            if( target!=null ) {
-                if( load(errors, target) ) {
-                    return true;
                 }
             }
         }
@@ -327,8 +328,12 @@ public class Library {
 
     private File extract(ArrayList<Throwable> errors, URL source, String prefix, String suffix, File directory) {
         File target = null;
-        if (directory != null) {
-            directory = directory.getAbsoluteFile();
+        directory = directory.getAbsoluteFile();
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                errors.add(new IOException("Unable to create directory: " + directory));
+                return null;
+            }
         }
         try {
             FileOutputStream os = null;

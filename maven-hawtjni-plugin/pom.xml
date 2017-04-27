@@ -142,7 +142,7 @@
             <tagletArtifact>
               <groupId>org.apache.maven.plugin-tools</groupId>
               <artifactId>maven-plugin-tools-javadoc</artifactId>
-              <version>2.5.1</version>
+              <version>3.5</version>
             </tagletArtifact>
           </tagletArtifacts>
         </configuration>

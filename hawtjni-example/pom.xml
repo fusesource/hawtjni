@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.fusesource.hawtjni</groupId>
     <artifactId>hawtjni-project</artifactId>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.15</version>
   </parent>
 
   <artifactId>hawtjni-example</artifactId>
@@ -62,7 +62,7 @@
       <plugin>
         <groupId>org.fusesource.hawtjni</groupId>
         <artifactId>maven-hawtjni-plugin</artifactId>
-        <version>1.15-SNAPSHOT</version>
+        <version>1.15</version>
         <executions>
           <execution>
             <goals>

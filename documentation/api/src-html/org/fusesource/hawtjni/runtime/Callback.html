@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/*******************************************************************************<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Copyright (c) 2000, 2007 IBM Corporation and others.<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * All rights reserved. This program and the accompanying materials<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * are made available under the terms of the Eclipse Public License v1.0<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * which accompanies this distribution, and is available at<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * http://www.eclipse.org/legal/epl-v10.html<a name="line.6"></a>
+<span class="sourceLineNo">007</span> *<a name="line.7"></a>
+<span class="sourceLineNo">008</span> * Contributors:<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *     IBM Corporation - initial API and implementation<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *******************************************************************************/<a name="line.10"></a>
+<span class="sourceLineNo">011</span>package org.fusesource.hawtjni.runtime;<a name="line.11"></a>
+<span class="sourceLineNo">012</span><a name="line.12"></a>
+<span class="sourceLineNo">013</span>/**<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * Instances of this class represent entry points into Java which can be invoked<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * from operating system level callback routines.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> * &lt;p&gt;<a name="line.16"></a>
+<span class="sourceLineNo">017</span> * IMPORTANT: A callback is only valid when invoked on the thread which created<a name="line.17"></a>
+<span class="sourceLineNo">018</span> * it. The results are undefined (and typically bad) when a callback is passed<a name="line.18"></a>
+<span class="sourceLineNo">019</span> * out to the operating system (or other code) in such a way that the callback<a name="line.19"></a>
+<span class="sourceLineNo">020</span> * is called from a different thread.<a name="line.20"></a>
+<span class="sourceLineNo">021</span> */<a name="line.21"></a>
+<span class="sourceLineNo">022</span><a name="line.22"></a>
+<span class="sourceLineNo">023</span>public class Callback {<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>    Object object;<a name="line.25"></a>
+<span class="sourceLineNo">026</span><a name="line.26"></a>
+<span class="sourceLineNo">027</span>    String method, signature;<a name="line.27"></a>
+<span class="sourceLineNo">028</span><a name="line.28"></a>
+<span class="sourceLineNo">029</span>    int argCount;<a name="line.29"></a>
+<span class="sourceLineNo">030</span><a name="line.30"></a>
+<span class="sourceLineNo">031</span>    long /* int */ address, errorResult;<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span>    boolean isStatic, isArrayBased;<a name="line.33"></a>
+<span class="sourceLineNo">034</span><a name="line.34"></a>
+<span class="sourceLineNo">035</span>    static final String PTR_SIGNATURE = "J"; /* C.PTR_SIZEOF == 4 ? "I" : "J"; */<a name="line.35"></a>
+<span class="sourceLineNo">036</span><a name="line.36"></a>
+<span class="sourceLineNo">037</span>    static final String SIGNATURE_0 = getSignature(0);<a name="line.37"></a>
+<span class="sourceLineNo">038</span>    static final String SIGNATURE_1 = getSignature(1);<a name="line.38"></a>
+<span class="sourceLineNo">039</span>    static final String SIGNATURE_2 = getSignature(2);<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    static final String SIGNATURE_3 = getSignature(3);<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    static final String SIGNATURE_4 = getSignature(4);<a name="line.41"></a>
+<span class="sourceLineNo">042</span><a name="line.42"></a>
+<span class="sourceLineNo">043</span>    static final String SIGNATURE_N = "([" + PTR_SIGNATURE + ")" + PTR_SIGNATURE; <a name="line.43"></a>
+<span class="sourceLineNo">044</span><a name="line.44"></a>
+<span class="sourceLineNo">045</span>    /**<a name="line.45"></a>
+<span class="sourceLineNo">046</span>     * Constructs a new instance of this class given an object to send the<a name="line.46"></a>
+<span class="sourceLineNo">047</span>     * message to, a string naming the method to invoke and an argument count.<a name="line.47"></a>
+<span class="sourceLineNo">048</span>     * Note that, if the object is an instance of &lt;code&gt;Class&lt;/code&gt; it is<a name="line.48"></a>
+<span class="sourceLineNo">049</span>     * assumed that the method is a static method on that class.<a name="line.49"></a>
+<span class="sourceLineNo">050</span>     * <a name="line.50"></a>
+<span class="sourceLineNo">051</span>     * @param object<a name="line.51"></a>
+<span class="sourceLineNo">052</span>     *            the object to send the message to<a name="line.52"></a>
+<span class="sourceLineNo">053</span>     * @param method<a name="line.53"></a>
+<span class="sourceLineNo">054</span>     *            the name of the method to invoke<a name="line.54"></a>
+<span class="sourceLineNo">055</span>     * @param argCount<a name="line.55"></a>
+<span class="sourceLineNo">056</span>     *            the number of arguments that the method takes<a name="line.56"></a>
+<span class="sourceLineNo">057</span>     */<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    public Callback(Object object, String method, int argCount) {<a name="line.58"></a>
+<span class="sourceLineNo">059</span>        this(object, method, argCount, false);<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    }<a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>    /**<a name="line.62"></a>
+<span class="sourceLineNo">063</span>     * Constructs a new instance of this class given an object to send the<a name="line.63"></a>
+<span class="sourceLineNo">064</span>     * message to, a string naming the method to invoke, an argument count and a<a name="line.64"></a>
+<span class="sourceLineNo">065</span>     * flag indicating whether or not the arguments will be passed in an array.<a name="line.65"></a>
+<span class="sourceLineNo">066</span>     * Note that, if the object is an instance of &lt;code&gt;Class&lt;/code&gt; it is<a name="line.66"></a>
+<span class="sourceLineNo">067</span>     * assumed that the method is a static method on that class.<a name="line.67"></a>
+<span class="sourceLineNo">068</span>     * <a name="line.68"></a>
+<span class="sourceLineNo">069</span>     * @param object<a name="line.69"></a>
+<span class="sourceLineNo">070</span>     *            the object to send the message to<a name="line.70"></a>
+<span class="sourceLineNo">071</span>     * @param method<a name="line.71"></a>
+<span class="sourceLineNo">072</span>     *            the name of the method to invoke<a name="line.72"></a>
+<span class="sourceLineNo">073</span>     * @param argCount<a name="line.73"></a>
+<span class="sourceLineNo">074</span>     *            the number of arguments that the method takes<a name="line.74"></a>
+<span class="sourceLineNo">075</span>     * @param isArrayBased<a name="line.75"></a>
+<span class="sourceLineNo">076</span>     *            &lt;code&gt;true&lt;/code&gt; if the arguments should be passed in an<a name="line.76"></a>
+<span class="sourceLineNo">077</span>     *            array and false otherwise<a name="line.77"></a>
+<span class="sourceLineNo">078</span>     */<a name="line.78"></a>
+<span class="sourceLineNo">079</span>    public Callback(Object object, String method, int argCount, boolean isArrayBased) {<a name="line.79"></a>
+<span class="sourceLineNo">080</span>        this(object, method, argCount, isArrayBased, 0);<a name="line.80"></a>
+<span class="sourceLineNo">081</span>    }<a name="line.81"></a>
+<span class="sourceLineNo">082</span><a name="line.82"></a>
+<span class="sourceLineNo">083</span>    /**<a name="line.83"></a>
+<span class="sourceLineNo">084</span>     * Constructs a new instance of this class given an object to send the<a name="line.84"></a>
+<span class="sourceLineNo">085</span>     * message to, a string naming the method to invoke, an argument count, a<a name="line.85"></a>
+<span class="sourceLineNo">086</span>     * flag indicating whether or not the arguments will be passed in an array<a name="line.86"></a>
+<span class="sourceLineNo">087</span>     * and a value to return when an exception happens. Note that, if the object<a name="line.87"></a>
+<span class="sourceLineNo">088</span>     * is an instance of &lt;code&gt;Class&lt;/code&gt; it is assumed that the method is a<a name="line.88"></a>
+<span class="sourceLineNo">089</span>     * static method on that class.<a name="line.89"></a>
+<span class="sourceLineNo">090</span>     * <a name="line.90"></a>
+<span class="sourceLineNo">091</span>     * @param object<a name="line.91"></a>
+<span class="sourceLineNo">092</span>     *            the object to send the message to<a name="line.92"></a>
+<span class="sourceLineNo">093</span>     * @param method<a name="line.93"></a>
+<span class="sourceLineNo">094</span>     *            the name of the method to invoke<a name="line.94"></a>
+<span class="sourceLineNo">095</span>     * @param argCount<a name="line.95"></a>
+<span class="sourceLineNo">096</span>     *            the number of arguments that the method takes<a name="line.96"></a>
+<span class="sourceLineNo">097</span>     * @param isArrayBased<a name="line.97"></a>
+<span class="sourceLineNo">098</span>     *            &lt;code&gt;true&lt;/code&gt; if the arguments should be passed in an<a name="line.98"></a>
+<span class="sourceLineNo">099</span>     *            array and false otherwise<a name="line.99"></a>
+<span class="sourceLineNo">100</span>     * @param errorResult<a name="line.100"></a>
+<span class="sourceLineNo">101</span>     *            the return value if the java code throws an exception<a name="line.101"></a>
+<span class="sourceLineNo">102</span>     */<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    public Callback(Object object, String method, int argCount, boolean isArrayBased, long /* int */errorResult) {<a name="line.103"></a>
+<span class="sourceLineNo">104</span><a name="line.104"></a>
+<span class="sourceLineNo">105</span>        /* Set the callback fields */<a name="line.105"></a>
+<span class="sourceLineNo">106</span>        this.object = object;<a name="line.106"></a>
+<span class="sourceLineNo">107</span>        this.method = method;<a name="line.107"></a>
+<span class="sourceLineNo">108</span>        this.argCount = argCount;<a name="line.108"></a>
+<span class="sourceLineNo">109</span>        this.isStatic = object instanceof Class&lt;?&gt;;<a name="line.109"></a>
+<span class="sourceLineNo">110</span>        this.isArrayBased = isArrayBased;<a name="line.110"></a>
+<span class="sourceLineNo">111</span>        this.errorResult = errorResult;<a name="line.111"></a>
+<span class="sourceLineNo">112</span><a name="line.112"></a>
+<span class="sourceLineNo">113</span>        /* Inline the common cases */<a name="line.113"></a>
+<span class="sourceLineNo">114</span>        if (isArrayBased) {<a name="line.114"></a>
+<span class="sourceLineNo">115</span>            signature = SIGNATURE_N;<a name="line.115"></a>
+<span class="sourceLineNo">116</span>        } else {<a name="line.116"></a>
+<span class="sourceLineNo">117</span>            switch (argCount) {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>            case 0:<a name="line.118"></a>
+<span class="sourceLineNo">119</span>                signature = SIGNATURE_0;<a name="line.119"></a>
+<span class="sourceLineNo">120</span>                break; //$NON-NLS-1$<a name="line.120"></a>
+<span class="sourceLineNo">121</span>            case 1:<a name="line.121"></a>
+<span class="sourceLineNo">122</span>                signature = SIGNATURE_1;<a name="line.122"></a>
+<span class="sourceLineNo">123</span>                break; //$NON-NLS-1$<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            case 2:<a name="line.124"></a>
+<span class="sourceLineNo">125</span>                signature = SIGNATURE_2;<a name="line.125"></a>
+<span class="sourceLineNo">126</span>                break; //$NON-NLS-1$<a name="line.126"></a>
+<span class="sourceLineNo">127</span>            case 3:<a name="line.127"></a>
+<span class="sourceLineNo">128</span>                signature = SIGNATURE_3;<a name="line.128"></a>
+<span class="sourceLineNo">129</span>                break; //$NON-NLS-1$<a name="line.129"></a>
+<span class="sourceLineNo">130</span>            case 4:<a name="line.130"></a>
+<span class="sourceLineNo">131</span>                signature = SIGNATURE_4;<a name="line.131"></a>
+<span class="sourceLineNo">132</span>                break; //$NON-NLS-1$<a name="line.132"></a>
+<span class="sourceLineNo">133</span>            default:<a name="line.133"></a>
+<span class="sourceLineNo">134</span>                signature = getSignature(argCount);<a name="line.134"></a>
+<span class="sourceLineNo">135</span>            }<a name="line.135"></a>
+<span class="sourceLineNo">136</span>        }<a name="line.136"></a>
+<span class="sourceLineNo">137</span><a name="line.137"></a>
+<span class="sourceLineNo">138</span>        /* Bind the address */<a name="line.138"></a>
+<span class="sourceLineNo">139</span>        address = bind(this, object, method, signature, argCount, isStatic, isArrayBased, errorResult);<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    }<a name="line.140"></a>
+<span class="sourceLineNo">141</span><a name="line.141"></a>
+<span class="sourceLineNo">142</span>    /**<a name="line.142"></a>
+<span class="sourceLineNo">143</span>     * Allocates the native level resources associated with the callback. This<a name="line.143"></a>
+<span class="sourceLineNo">144</span>     * method is only invoked from within the constructor for the argument.<a name="line.144"></a>
+<span class="sourceLineNo">145</span>     * <a name="line.145"></a>
+<span class="sourceLineNo">146</span>     * @param callback<a name="line.146"></a>
+<span class="sourceLineNo">147</span>     *            the callback to bind<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     * @param object<a name="line.148"></a>
+<span class="sourceLineNo">149</span>     *            the callback's object<a name="line.149"></a>
+<span class="sourceLineNo">150</span>     * @param method<a name="line.150"></a>
+<span class="sourceLineNo">151</span>     *            the callback's method<a name="line.151"></a>
+<span class="sourceLineNo">152</span>     * @param signature<a name="line.152"></a>
+<span class="sourceLineNo">153</span>     *            the callback's method signature<a name="line.153"></a>
+<span class="sourceLineNo">154</span>     * @param argCount<a name="line.154"></a>
+<span class="sourceLineNo">155</span>     *            the callback's method argument count<a name="line.155"></a>
+<span class="sourceLineNo">156</span>     * @param isStatic<a name="line.156"></a>
+<span class="sourceLineNo">157</span>     *            whether the callback's method is static<a name="line.157"></a>
+<span class="sourceLineNo">158</span>     * @param isArrayBased<a name="line.158"></a>
+<span class="sourceLineNo">159</span>     *            whether the callback's method is array based<a name="line.159"></a>
+<span class="sourceLineNo">160</span>     * @param errorResult<a name="line.160"></a>
+<span class="sourceLineNo">161</span>     *            the callback's error result<a name="line.161"></a>
+<span class="sourceLineNo">162</span>     */<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    static native synchronized long /* int */ bind(Callback callback, Object object, String method, String signature, int argCount, boolean isStatic, boolean isArrayBased,<a name="line.163"></a>
+<span class="sourceLineNo">164</span>            long /* int */errorResult);<a name="line.164"></a>
+<span class="sourceLineNo">165</span><a name="line.165"></a>
+<span class="sourceLineNo">166</span>    /**<a name="line.166"></a>
+<span class="sourceLineNo">167</span>     * Releases the native level resources associated with the callback, and<a name="line.167"></a>
+<span class="sourceLineNo">168</span>     * removes all references between the callback and other objects. This helps<a name="line.168"></a>
+<span class="sourceLineNo">169</span>     * to prevent (bad) application code from accidentally holding onto<a name="line.169"></a>
+<span class="sourceLineNo">170</span>     * extraneous garbage.<a name="line.170"></a>
+<span class="sourceLineNo">171</span>     */<a name="line.171"></a>
+<span class="sourceLineNo">172</span>    public void dispose() {<a name="line.172"></a>
+<span class="sourceLineNo">173</span>        if (object == null)<a name="line.173"></a>
+<span class="sourceLineNo">174</span>            return;<a name="line.174"></a>
+<span class="sourceLineNo">175</span>        unbind(this);<a name="line.175"></a>
+<span class="sourceLineNo">176</span>        object = method = signature = null;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>        address = 0;<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    }<a name="line.178"></a>
+<span class="sourceLineNo">179</span><a name="line.179"></a>
+<span class="sourceLineNo">180</span>    /**<a name="line.180"></a>
+<span class="sourceLineNo">181</span>     * Returns the address of a block of machine code which will invoke the<a name="line.181"></a>
+<span class="sourceLineNo">182</span>     * callback represented by the receiver.<a name="line.182"></a>
+<span class="sourceLineNo">183</span>     * <a name="line.183"></a>
+<span class="sourceLineNo">184</span>     * @return the callback address<a name="line.184"></a>
+<span class="sourceLineNo">185</span>     */<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    public long /* int */getAddress() {<a name="line.186"></a>
+<span class="sourceLineNo">187</span>        return address;<a name="line.187"></a>
+<span class="sourceLineNo">188</span>    }<a name="line.188"></a>
+<span class="sourceLineNo">189</span><a name="line.189"></a>
+<span class="sourceLineNo">190</span>    /**<a name="line.190"></a>
+<span class="sourceLineNo">191</span>     * Returns the SWT platform name.<a name="line.191"></a>
+<span class="sourceLineNo">192</span>     * <a name="line.192"></a>
+<span class="sourceLineNo">193</span>     * @return the platform name of the currently running SWT<a name="line.193"></a>
+<span class="sourceLineNo">194</span>     */<a name="line.194"></a>
+<span class="sourceLineNo">195</span>    public static native String getPlatform();<a name="line.195"></a>
+<span class="sourceLineNo">196</span><a name="line.196"></a>
+<span class="sourceLineNo">197</span>    /**<a name="line.197"></a>
+<span class="sourceLineNo">198</span>     * Returns the number of times the system has been recursively entered<a name="line.198"></a>
+<span class="sourceLineNo">199</span>     * through a callback.<a name="line.199"></a>
+<span class="sourceLineNo">200</span>     * &lt;p&gt;<a name="line.200"></a>
+<span class="sourceLineNo">201</span>     * Note: This should not be called by application code.<a name="line.201"></a>
+<span class="sourceLineNo">202</span>     * &lt;/p&gt;<a name="line.202"></a>
+<span class="sourceLineNo">203</span>     * <a name="line.203"></a>
+<span class="sourceLineNo">204</span>     * @return the entry count<a name="line.204"></a>
+<span class="sourceLineNo">205</span>     * <a name="line.205"></a>
+<span class="sourceLineNo">206</span>     * @since 2.1<a name="line.206"></a>
+<span class="sourceLineNo">207</span>     */<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    public static native int getEntryCount();<a name="line.208"></a>
+<span class="sourceLineNo">209</span><a name="line.209"></a>
+<span class="sourceLineNo">210</span>    static String getSignature(int argCount) {<a name="line.210"></a>
+<span class="sourceLineNo">211</span>        String signature = "("; //$NON-NLS-1$<a name="line.211"></a>
+<span class="sourceLineNo">212</span>        for (int i = 0; i &lt; argCount; i++)<a name="line.212"></a>
+<span class="sourceLineNo">213</span>            signature += PTR_SIGNATURE;<a name="line.213"></a>
+<span class="sourceLineNo">214</span>        signature += ")" + PTR_SIGNATURE; //$NON-NLS-1$<a name="line.214"></a>
+<span class="sourceLineNo">215</span>        return signature;<a name="line.215"></a>
+<span class="sourceLineNo">216</span>    }<a name="line.216"></a>
+<span class="sourceLineNo">217</span><a name="line.217"></a>
+<span class="sourceLineNo">218</span>    /**<a name="line.218"></a>
+<span class="sourceLineNo">219</span>     * Indicates whether or not callbacks which are triggered at the native<a name="line.219"></a>
+<span class="sourceLineNo">220</span>     * level should cause the messages described by the matching<a name="line.220"></a>
+<span class="sourceLineNo">221</span>     * &lt;code&gt;Callback&lt;/code&gt; objects to be invoked. This method is used to<a name="line.221"></a>
+<span class="sourceLineNo">222</span>     * safely shut down SWT when it is run within environments which can<a name="line.222"></a>
+<span class="sourceLineNo">223</span>     * generate spurious events.<a name="line.223"></a>
+<span class="sourceLineNo">224</span>     * &lt;p&gt;<a name="line.224"></a>
+<span class="sourceLineNo">225</span>     * Note: This should not be called by application code.<a name="line.225"></a>
+<span class="sourceLineNo">226</span>     * &lt;/p&gt;<a name="line.226"></a>
+<span class="sourceLineNo">227</span>     * <a name="line.227"></a>
+<span class="sourceLineNo">228</span>     * @param enable<a name="line.228"></a>
+<span class="sourceLineNo">229</span>     *            true if callbacks should be invoked<a name="line.229"></a>
+<span class="sourceLineNo">230</span>     */<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    public static final native synchronized void setEnabled(boolean enable);<a name="line.231"></a>
+<span class="sourceLineNo">232</span><a name="line.232"></a>
+<span class="sourceLineNo">233</span>    /**<a name="line.233"></a>
+<span class="sourceLineNo">234</span>     * Returns whether or not callbacks which are triggered at the native level<a name="line.234"></a>
+<span class="sourceLineNo">235</span>     * should cause the messages described by the matching &lt;code&gt;Callback&lt;/code&gt;<a name="line.235"></a>
+<span class="sourceLineNo">236</span>     * objects to be invoked. This method is used to safely shut down SWT when<a name="line.236"></a>
+<span class="sourceLineNo">237</span>     * it is run within environments which can generate spurious events.<a name="line.237"></a>
+<span class="sourceLineNo">238</span>     * &lt;p&gt;<a name="line.238"></a>
+<span class="sourceLineNo">239</span>     * Note: This should not be called by application code.<a name="line.239"></a>
+<span class="sourceLineNo">240</span>     * &lt;/p&gt;<a name="line.240"></a>
+<span class="sourceLineNo">241</span>     * <a name="line.241"></a>
+<span class="sourceLineNo">242</span>     * @return true if callbacks should not be invoked<a name="line.242"></a>
+<span class="sourceLineNo">243</span>     */<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    public static final native synchronized boolean getEnabled();<a name="line.244"></a>
+<span class="sourceLineNo">245</span><a name="line.245"></a>
+<span class="sourceLineNo">246</span>    /**<a name="line.246"></a>
+<span class="sourceLineNo">247</span>     * Immediately wipes out all native level state associated with &lt;em&gt;all&lt;/em&gt;<a name="line.247"></a>
+<span class="sourceLineNo">248</span>     * callbacks.<a name="line.248"></a>
+<span class="sourceLineNo">249</span>     * &lt;p&gt;<a name="line.249"></a>
+<span class="sourceLineNo">250</span>     * &lt;b&gt;WARNING:&lt;/b&gt; This operation is &lt;em&gt;extremely&lt;/em&gt; dangerous, and<a name="line.250"></a>
+<span class="sourceLineNo">251</span>     * should never be performed by application code.<a name="line.251"></a>
+<span class="sourceLineNo">252</span>     * &lt;/p&gt;<a name="line.252"></a>
+<span class="sourceLineNo">253</span>     */<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    public static final native synchronized void reset();<a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>    /**<a name="line.256"></a>
+<span class="sourceLineNo">257</span>     * Releases the native level resources associated with the callback.<a name="line.257"></a>
+<span class="sourceLineNo">258</span>     * <a name="line.258"></a>
+<span class="sourceLineNo">259</span>     * @see #dispose<a name="line.259"></a>
+<span class="sourceLineNo">260</span>     */<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    static final native synchronized void unbind(Callback callback);<a name="line.261"></a>
+<span class="sourceLineNo">262</span><a name="line.262"></a>
+<span class="sourceLineNo">263</span>}<a name="line.263"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

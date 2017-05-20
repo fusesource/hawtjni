@@ -86,6 +86,8 @@ public class Library {
     final private String version;
     final private ClassLoader classLoader;
     private boolean loaded;
+    private String nativeLibraryPath;
+    private URL nativeLibrarySourceUrl;
 
     public Library(String name) {
         this(name, null, null);
@@ -114,6 +116,24 @@ public class Library {
         } catch (Throwable e) {
         }
         return null;
+    }
+
+    /**
+     * Get the path to the native library loaded.
+     * @return the path (should not be null once the library is loaded)
+     * @since 1.16
+     */
+    public String getNativeLibraryPath() {
+        return nativeLibraryPath;
+    }
+
+    /**
+     * Get the URL to the native library source that has been extracted (if it was extracted).
+     * @return the url to the source (in classpath)
+     * @since 1.16
+     */
+    public URL getNativeLibrarySourceUrl() {
+        return nativeLibrarySourceUrl;
     }
 
     public static String getOperatingSystem() {
@@ -147,7 +167,7 @@ public class Library {
     }
 
     /**
-     *
+     * Load the native library.
      */
     synchronized public void load() {
         if( loaded ) {
@@ -181,11 +201,11 @@ public class Library {
         }
 
         /* Try loading library from java library path */
-        if( version!=null && load(errors, name + getBitModel() + "-" + version) )
+        if( version!=null && loadLibrary(errors, name + getBitModel() + "-" + version) )
             return;
-        if( version!=null && load(errors, name + "-" + version) )
+        if( version!=null && loadLibrary(errors, name + "-" + version) )
             return;
-        if( load(errors, name ) )
+        if( loadLibrary(errors, name) )
             return;
 
 
@@ -262,6 +282,7 @@ public class Library {
      * <li>no directory</li>
      * </ul>
      * @return the list
+     * @since 1.15
      */
     final public String[] getSpecificSearchDirs() {
         return new String[] {
@@ -292,6 +313,7 @@ public class Library {
                     File target = extract(errors, resource, prefix, suffix, path);
                     if( target!=null ) {
                         if( load(errors, target) ) {
+                            nativeLibrarySourceUrl = resource;
                             return true;
                         }
                     }
@@ -409,6 +431,7 @@ public class Library {
     private boolean load(ArrayList<Throwable> errors, File lib) {
         try {
             System.load(lib.getPath());
+            nativeLibraryPath = lib.getPath();
             return true;
         } catch (UnsatisfiedLinkError e) {
             LinkageError le = new LinkageError("Unable to load library from " + lib);
@@ -418,9 +441,10 @@ public class Library {
         return false;
     }
 
-    private boolean load(ArrayList<Throwable> errors, String lib) {
+    private boolean loadLibrary(ArrayList<Throwable> errors, String lib) {
         try {
             System.loadLibrary(lib);
+            nativeLibraryPath = "java.library.path,sun.boot.library.pathlib:" + lib;
             return true;
         } catch (UnsatisfiedLinkError e) {
             LinkageError le = new LinkageError("Unable to load library " + lib);

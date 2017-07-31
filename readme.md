@@ -17,7 +17,7 @@ Features
 Synopsis
 --------
 
-There are many open source JNI code generators available, but if your performance sensitive,
+There are many open source JNI code generators available, but if you're performance sensitive,
 the code generator used by the eclipse SWT project is by far the best option.  The biggest 
 problem is that it was not developed to be reused by other projects.  It was tightly coupled
 to producing the SWT jni libraries and it could only be run within the eclipse platform.

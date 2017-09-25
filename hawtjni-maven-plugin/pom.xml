@@ -24,7 +24,7 @@
     <version>1.16-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-hawtjni-plugin</artifactId>
+  <artifactId>hawtjni-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
   <name>HawtJNI Maven Plugin</name>

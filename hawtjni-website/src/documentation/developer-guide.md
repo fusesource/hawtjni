@@ -68,23 +68,23 @@ If you are not familiar with Maven, please checkout
 [Maven by Example](http://www.sonatype.com/books/mvnex-book/reference/public-book.html).
 
 The easiest way to get started with HawtJNI is copy and use 
-[the example maven project](http://github.com/chirino/hawtjni/tree/master/hawtjni-example/) as a template for your module.
+[the example maven project](http://github.com/fusersource/hawtjni/tree/master/hawtjni-example/) as a template for your module.
 
-At the root of the maven project run:
+At the root of the Maven project run:
 {pygmentize:: text}
 mvn install
 {pygmentize}
 
-The maven build will produce the following artifacts:
+The Maven build will produce the following artifacts:
 
-* `target/${artifactId}-${version}.jar`: is the standard jar which maven produces that contains all your java classes. 
+* `target/${artifactId}-${version}.jar`: is the standard jar which Maven produces that contains all your java classes. 
 * `target/${artifactId}-${version}-native-src.zip`: is a source archive of
 a autoconf and msbuild based build project for the native library.  You can
 easily build this on other platforms using the platforms native toolchain.
 * `target/${artifactId}-${version}-${platform}.jar` is the platform specific
 jar which contains the your build JNI library as a resource.
 
-These artifacts will be deployed to the maven repository so that other users can
+These artifacts will be deployed to the Maven repository so that other users can
 easily use them as dependencies in their builds.
 
 You may also be interesting in 
@@ -702,60 +702,24 @@ have have the same conditional applied, just set it on the `@JniClass` annotatio
 
 ## Maven Plugin Reference {#adding-to-maven-build}
 
-The HawtJNI provides a maven plugin which makes it easy code generate and build
+The HawtJNI provides a Maven plugin which makes it easy code generate and build
 the native library for your current platform.
 
-The maven tooling takes care of:
+The Maven tooling takes care of:
 
 * Generating the native JNI source code from your annotated Java code
 * Generating a GNU make and MS Build compatible source project for building the native library
-* Attaches the source project as `native-src.zip` artifact to the maven build
+* Attaches the source project as `native-src.zip` artifact to the Maven build
 * Kicking of a native build of the library using the platform's build tools
-* Packages the native library in a `platform.jar` and attaches the artifact to the maven build.
+* Packages the native library in a `platform.jar` and attaches the artifact to the Maven build.
 * Updates the test build path so that unit tests can use the build native library.
 
 ### Usage
 
-Once you have a working maven build for a java module, you can then update it to
+Once you have a working Maven build for a java module, you can then update it to
 use HawtJNI to generate your JNI libraries. With the following steps:
 
-1.  Add the hawtjni repositories to the `pom.xml` configuration.
-    {pygmentize:: xml}
-    <pom>
-      <repositories>
-        ...
-        <repository>
-          <id>hawtjni.snapshot.fusesource.org</id>
-          <name>HawtJNI Snapshot Repo</name>
-          <url>http://hawtjni.fusesource.org/repo/snapshot</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>    
-        ...
-      </repositories>
-      <pluginRepositories>
-        ...
-        <pluginRepository>
-          <id>hawtjni.snapshot.fusesource.org</id>
-          <name>HawtJNI Snapshot Repo</name>
-          <url>http://hawtjni.fusesource.org/repo/snapshot</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </pluginRepository>
-        ...
-      </pluginRepositories>
-    <pom>
-    {pygmentize}
-
-2.  Add the `hawtjni-runtime` dependency to pom. This small 19k jar file contains the HawtJNI annotations and a few Helper classes that
+1.  Add the `hawtjni-runtime` dependency to pom. This small 19k jar file contains the HawtJNI annotations and a few helper classes that
     you will be developing against.
     {pygmentize:: xml}
     <pom>
@@ -771,7 +735,7 @@ use HawtJNI to generate your JNI libraries. With the following steps:
     <pom>
     {pygmentize}
     
-3.  Add the HawtJNI maven plugin to the pom.
+2.  Add the HawtJNI Maven plugin to the pom.
     {pygmentize:: xml}
     <pom>
       <build>
@@ -779,7 +743,7 @@ use HawtJNI to generate your JNI libraries. With the following steps:
           ...
           <plugin>
             <groupId>org.fusesource.hawtjni</groupId>
-            <artifactId>maven-hawtjni-plugin</artifactId>
+            <artifactId>hawtjni-maven-plugin</artifactId><!-- was maven-hawtjni-plugin until 1.14 -->
             <version>{project_version:}</version>
             <executions>
               <execution>
@@ -791,24 +755,6 @@ use HawtJNI to generate your JNI libraries. With the following steps:
                 </goals>
               </execution>
             </executions>        
-          </plugin>
-          ...
-        </plugins>
-      </build>
-    <pom>
-    {pygmentize}
-    
-4.  If you run into problems with `mvn clean` no deleting native files, make sure you are using at least version 2.3 of the maven clean plugin.  Previous
-    versions would run into problems with symlinks.
-    {pygmentize:: xml}
-    <pom>
-      <build>
-        <plugins>
-          ...
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-clean-plugin</artifactId>
-            <version>2.3</version>
           </plugin>
           ...
         </plugins>

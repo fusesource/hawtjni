@@ -21,6 +21,10 @@ import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
@@ -37,40 +41,31 @@ import org.fusesource.hawtjni.runtime.Library;
  * This platform specific jar is attached with a classifier which matches the
  * current platform.
  * 
- * @goal package-jar
- * @phase prepare-package
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
+@Mojo(name = "package-jar", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class PackageJarMojo extends AbstractMojo {
 
     /**
      * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
 
     /**
      * The base name of the library, used to determine generated file names.
-     * 
-     * @parameter default-value="${project.artifactId}"
      */
+    @Parameter(defaultValue = "${project.artifactId}")
     private String name;
 
     /**
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private ArchiverManager archiverManager;
 
     /**
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private MavenProjectHelper projectHelper;
 
     /**
@@ -81,10 +76,8 @@ public class PackageJarMojo extends AbstractMojo {
      * The library will placed under the META-INF/native/${platform} directory
      * that the HawtJNI Library uses to find JNI libraries as classpath
      * resources.
-     * 
-     * @parameter 
-     *            default-value="${project.build.directory}/generated-sources/hawtjni/lib"
      */
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/hawtjni/lib")
     private File libDirectory;
     
     /**
@@ -93,22 +86,21 @@ public class PackageJarMojo extends AbstractMojo {
      * 
      * @parameter
      */
+    @Parameter
     private String platform;     
 
     /**
      * Should a classifier of the native jar be set
      * to match the platform?
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private boolean classified;
 
     /**
      * The osgi platforms that the library match for.  Example value:
      * osname=MacOS;processor=x86-64
-     * 
-     * @parameter 
      */
+    @Parameter
     private List<String> osgiPlatforms;
 
     public void execute() throws MojoExecutionException {

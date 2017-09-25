@@ -30,6 +30,10 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
@@ -44,76 +48,56 @@ import org.fusesource.hawtjni.runtime.Library;
  * to the test resource path so that unit tests can load 
  * the freshly built JNI library.
  * 
- * @goal build
- * @phase generate-test-resources
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
+@Mojo(name = "build", defaultPhase = LifecyclePhase.GENERATE_TEST_RESOURCES)
 public class BuildMojo extends AbstractMojo {
 
     /**
      * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
     
     /**
      * Remote repositories
-     *
-     * @parameter expression="${project.remoteArtifactRepositories}"
-     * @required
-     * @readonly
      */
+    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
     protected List remoteArtifactRepositories;
 
     /**
      * Local maven repository.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter(defaultValue = "${localRepository}", readonly = true)
     protected ArtifactRepository localRepository;
 
     /**
      * Artifact factory, needed to download the package source file
-     *
-     * @component role="org.apache.maven.artifact.factory.ArtifactFactory"
-     * @required
-     * @readonly
      */
+    @Component
     protected ArtifactFactory artifactFactory;
 
     /**
      * Artifact resolver, needed to download the package source file
-     *
-     * @component role="org.apache.maven.artifact.resolver.ArtifactResolver"
-     * @required
-     * @readonly
      */
+    @Component
     protected ArtifactResolver artifactResolver;
     
     /**
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private ArchiverManager archiverManager;    
 
     /**
      * The base name of the library, used to determine generated file names.
-     * 
-     * @parameter default-value="${project.artifactId}"
      */
+    @Parameter(defaultValue = "${project.artifactId}")
     private String name;
     
     /**
      * Where the unpacked build package is located.
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-package"
      */
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/hawtjni/native-package")
     private File packageDirectory;
 
     /**
@@ -122,121 +106,105 @@ public class BuildMojo extends AbstractMojo {
      * 
      * The library will placed under the META-INF/native/${platform} directory that the HawtJNI
      * Library uses to find JNI libraries as classpath resources.
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/lib"
      */
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/hawtjni/lib")
     private File libDirectory;
 
     /**
      * The directory where the build will be produced.  It creates a native-build and native-dist directory
      * under the specified directory.
-     * 
-     * @parameter default-value="${project.build.directory}"
      */
+    @Parameter(defaultValue = "${project.build.directory}")
     private File buildDirectory;
 
     /**
      * Should we skip executing the autogen.sh file.
-     * 
-     * @parameter default-value="${skip-autogen}"
      */
+    @Parameter(defaultValue = "${skip-autogen}")
     private boolean skipAutogen;
     
     /**
      * Should we force executing the autogen.sh file.
-     * 
-     * @parameter default-value="${force-autogen}"
      */
+    @Parameter(defaultValue = "${force-autogen}")
     private boolean forceAutogen;
     
     /**
      * Extra arguments you want to pass to the autogen.sh command.
-     * 
-     * @parameter
      */
+    @Parameter
     private List<String> autogenArgs;
 
     /**
      * Should we skip executing the configure command.
-     * 
-     * @parameter default-value="${skip-configure}"
      */
+    @Parameter(defaultValue = "${skip-configure}")
     private boolean skipConfigure;
 
     /**
      * Should we force executing the configure command.
-     * 
-     * @parameter default-value="${force-configure}"
      */
+    @Parameter(defaultValue = "${force-configure}")
     private boolean forceConfigure;
     
     /**
      * Should we display all the native build output?
-     * 
-     * @parameter default-value="${hawtjni-verbose}"
      */
+    @Parameter(defaultValue = "${hawtjni-verbose}")
     private boolean verbose;
 
     /**
      * Extra arguments you want to pass to the configure command.
-     * 
-     * @parameter
      */
+    @Parameter
     private List<String> configureArgs;
     
     /**
      * The platform identifier of this build.  If not specified,
      * it will be automatically detected.
-     * 
-     * @parameter
      */
+    @Parameter
     private String platform;    
     
     /**
      * The classifier of the package archive that will be created.
-     * 
-     * @parameter default-value="native-src"
      */
+    @Parameter(defaultValue = "native-src")
     private String sourceClassifier;  
     
     /**
      * If the source build could not be fully generated, perhaps the autotools
      * were not available on this platform, should we attempt to download
      * a previously deployed source package and build that?
-     * 
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private boolean downloadSourcePackage = true;  
 
     /**
      * The dependency to download to get the native sources.
-     *
-     * @parameter
      */
+    @Parameter
     private Dependency nativeSrcDependency;
 
     /**
      * URL to where we can down the source package
-     *
-     * @parameter default-value="${native-src-url}"
      */
+    @Parameter(defaultValue = "${native-src-url}")
     private String nativeSrcUrl;
 
     /**
      * The build tool to use on Windows systems.  Set
      * to 'msbuild', 'vcbuild', or 'detect'
-     *
-     * @parameter default-value="detect"
      */
+    @Parameter(defaultValue = "detect")
     private String windowsBuildTool;
 
     /**
      * The name of the msbuild/vcbuild project to use.
      * Defaults to 'vs2010' for 'msbuild'
      * and 'vs2008' for 'vcbuild'.
-     *
-     * @parameter
      */
+    @Parameter
     private String windowsProjectName;
 
     private final CLI cli = new CLI();
@@ -276,7 +244,7 @@ public class BuildMojo extends AbstractMojo {
         } else if( "windows64".equals(libPlatform) ) {
         	platform = "x64";
         } else {
-        	throw new MojoExecutionException("Usupported platform: "+libPlatform);
+        	throw new MojoExecutionException("Unsupported platform: "+libPlatform);
         }
 
         boolean useMSBuild = false;

@@ -8,3 +8,4 @@
 webgen/out
 webgen/webgen.cache
 target
+dependency-reduced-pom.xml

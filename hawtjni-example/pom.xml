@@ -61,8 +61,8 @@
         
       <plugin>
         <groupId>org.fusesource.hawtjni</groupId>
-        <artifactId>maven-hawtjni-plugin</artifactId>
-        <version>1.16-SNAPSHOT</version>
+        <artifactId>hawtjni-maven-plugin</artifactId>
+        <version>${project.version}</version>
         <executions>
           <execution>
             <goals>
@@ -127,7 +127,7 @@
         <plugins>
           <plugin>
             <groupId>org.fusesource.hawtjni</groupId>
-            <artifactId>maven-hawtjni-plugin</artifactId>
+            <artifactId>hawtjni-maven-plugin</artifactId>
             <configuration>
               <osgiPlatforms>
                 <osgiPlatform>osname=MacOS;processor=x86-64</osgiPlatform>

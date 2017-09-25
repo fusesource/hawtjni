@@ -779,7 +779,7 @@ use HawtJNI to generate your JNI libraries. With the following steps:
           ...
           <plugin>
             <groupId>org.fusesource.hawtjni</groupId>
-            <artifactId>maven-hawtjni-plugin</artifactId>
+            <artifactId>hawtjni-maven-plugin</artifactId>
             <version>{project_version:}</version>
             <executions>
               <execution>

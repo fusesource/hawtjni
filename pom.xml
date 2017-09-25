@@ -181,9 +181,9 @@
   <reporting>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jxr-maven-plugin</artifactId>
-        <version>2.0-beta-1</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.5</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>
@@ -200,7 +200,7 @@
           <reportSet>
             <reports>
               <report>index</report>
-              <report>sumary</report>
+              <report>summary</report>
               <report>plugins</report>
               <report>dependencies</report>
               <report>mailing-list</report>
@@ -214,7 +214,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>surefire-report-maven-plugin</artifactId>
-        <version>2.20</version>
       </plugin>
     </plugins>
   </reporting>
@@ -222,7 +221,7 @@
   <modules>
     <module>hawtjni-runtime</module>
     <module>hawtjni-generator</module>
-    <module>maven-hawtjni-plugin</module>
+    <module>hawtjni-maven-plugin</module>
     <module>hawtjni-example</module>
     <!--
     <module>hawtjni-website</module>

@@ -20,6 +20,10 @@ import java.io.File;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.archiver.Archiver;
@@ -30,54 +34,43 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
  * module and attaches it to the build so that it can get 
  * deployed.
  * 
- * @goal package-source
- * @phase package
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
+@Mojo(name = "package-source", defaultPhase = LifecyclePhase.PACKAGE)
 public class PackageSourceMojo extends AbstractMojo {
 
     /**
      * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
 
     /**
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private ArchiverManager archiverManager;
     
     /**
-     * @component
-     * @required
-     * @readonly
      */
+    @Component
     private MavenProjectHelper projectHelper;    
     
     /**
      * The directory where the generated native files are located..
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-package"
      */
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/hawtjni/native-package")
     private File packageDirectory;
     
     /**
      * The classifier of the package archive that will be created.
-     * 
-     * @parameter default-value="native-src"
      */
+    @Parameter(defaultValue = "native-src")
     private String sourceClassifier;
     
     /**
      * Should we skip executing the autogen.sh file.
-     * 
-     * @parameter default-value="${skip-autogen}"
      */
+    @Parameter(defaultValue = "${skip-autogen}")
     private boolean skipAutogen;
     
     
@@ -96,7 +89,7 @@ public class PackageSourceMojo extends AbstractMojo {
                 getLog().info("");
                 getLog().warn("Will NOT package the native sources to: "+packageFile);
                 getLog().info("  Native source build directory did not contain a 'configure' script.");
-                getLog().info("  To ignore this warnning and package it up anyways configure the plugin with: <skipAutogen>true</skipAutogen>");
+                getLog().info("  To ignore this warning and package it up anyways, configure the plugin with: <skipAutogen>true</skipAutogen>");
                 getLog().info("");
                 return;
             }        

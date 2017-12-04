@@ -29,6 +29,9 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -44,138 +47,118 @@ import org.fusesource.hawtjni.generator.ProgressMonitor;
  * build a JNI library for any HawtJNI annotated
  * classes in your maven project.
  * 
- * @goal generate
- * @phase process-classes
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class GenerateMojo extends AbstractMojo {
 
     /**
      * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
 
     /**
      * The directory where the native source files are located.
-     *
-     * @parameter
      */
+    @Parameter
     private File nativeSourceDirectory;
 
     /**
      * The directory where the generated native source files are located.
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-src"
      */
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/hawtjni/native-src")
     private File generatedNativeSourceDirectory;
 
     /**
      * The base name of the library, used to determine generated file names.
-     * 
-     * @parameter default-value="${project.artifactId}"
      */
+    @Parameter(defaultValue = "${project.artifactId}")
     private String name;
 
     /**
      * The copyright header template that will be added to the generated source files.
      * Use the '%END_YEAR%' token to have it replaced with the current year.  
-     * 
-     * @parameter default-value=""
      */
+    @Parameter(defaultValue = "")
     private String copyright;
 
     /**
      * Restrict looking for JNI classes to the specified package.
-     *  
-     * @parameter
      */
+    @Parameter
     private List<String> packages = new ArrayList<String>();
 
     /**
      * The directory where the java classes files are located.
-     * 
-     * @parameter default-value="${project.build.outputDirectory}"
      */
+    @Parameter(defaultValue = "${project.build.outputDirectory}")
     private File classesDirectory;
     
     /**
      * The directory where the generated build package is located..
-     * 
-     * @parameter default-value="${project.build.directory}/generated-sources/hawtjni/native-package"
      */
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/hawtjni/native-package")
     private File packageDirectory;
     
     /**
      * The list of additional files to be included in the package will be
      * placed.
-     * 
-     * @parameter default-value="${basedir}/src/main/native-package"
      */
+    @Parameter(defaultValue = "${basedir}/src/main/native-package")
     private File customPackageDirectory;
 
     /**
      * The text encoding of the files.
-     * 
-     * @parameter default-value="UTF-8"
      */
+    @Parameter(defaultValue = "UTF-8")
     private String encoding;
 
     /**
      * Should we skip executing the autogen.sh file.
-     * 
-     * @parameter default-value="${skip-autogen}"
      */
+    @Parameter(defaultValue = "${skip-autogen}")
     private boolean skipAutogen;
     
     /**
      * Should we force executing the autogen.sh file.
-     * 
-     * @parameter default-value="${force-autogen}"
      */
+    @Parameter(defaultValue = "${force-autogen}")
     private boolean forceAutogen;
 
     /**
      * Should we display all the native build output?
-     * 
-     * @parameter default-value="${hawtjni-verbose}"
      */
+    @Parameter(defaultValue = "${hawtjni-verbose}")
     private boolean verbose;
 
     /**
      * Extra arguments you want to pass to the autogen.sh command.
-     * 
-     * @parameter
      */
+    @Parameter
     private List<String> autogenArgs;
     
     /**
      * Set this value to false to disable the callback support in HawtJNI.
      * Disabling callback support can substantially reduce the size
      * of the generated native library.  
-     * 
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private boolean callbacks;
     
     /**
      * The build tool to use on Windows systems.  Set
      * to 'msbuild', 'vcbuild', or 'detect'
-     *
-     * @parameter default-value="detect"
      */
+    @Parameter(defaultValue = "detect")
     private String windowsBuildTool;
 
     /**
      * The name of the msbuild/vcbuild project to use.
      * Defaults to 'vs2010' for 'msbuild'
      * and 'vs2008' for 'vcbuild'.
-     *
-     * @parameter
      */
+    @Parameter
     private String windowsProjectName;
 
     private File targetSrcDir;

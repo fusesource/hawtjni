@@ -14,10 +14,13 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
 
+import java.lang.annotation.Documented;
+
 /**
  * 
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
+@Documented
 @Target({METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JniMethod {

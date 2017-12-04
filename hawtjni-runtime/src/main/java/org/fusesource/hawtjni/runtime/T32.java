@@ -13,6 +13,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 
+import java.lang.annotation.Documented;
+
+@Documented
 @Target({FIELD, METHOD, PARAMETER, LOCAL_VARIABLE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface T32 {

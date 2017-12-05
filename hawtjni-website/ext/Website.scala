@@ -34,10 +34,12 @@ object Website {
   val project_forums_url= "http://groups.google.com/group/hawtjni"
   val project_wiki_url= "https://github.com/fusesource/hawtjni/wiki"
   val project_logo= "/images/project-logo.png"
-  val project_version= "1.14"
-  val project_snapshot_version= "1.15-SNAPSHOT"
+  val project_version= "1.16"
+  val project_snapshot_version= "1.16-SNAPSHOT"
   val project_versions = List(
         project_version,
+        "1.15",
+        "1.14",
         "1.13",
         "1.12",
         "1.11",
@@ -64,5 +66,5 @@ object Website {
   val project_maven_groupId= "org.fusesource.hawtjni"
   val project_maven_artifactId= "hawtjni-runtime"
 
-  val website_base_url= "http://hawtjni.fusesource.org"
+  val website_base_url= "http://fusesource.github.io/hawtjni/"
 }

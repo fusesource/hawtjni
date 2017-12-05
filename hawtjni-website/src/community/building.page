@@ -39,7 +39,7 @@ dependencies between modules.
 
 ### Maven options
 
-To build ${project_name} maven has to be configured to use more memory
+To build ${project_name} Maven has to be configured to use more memory
 
     set MAVEN_OPTS=-Xmx512m -XX:MaxPermSize=128m
 
@@ -61,7 +61,7 @@ test running phase and not the building part
 ### Using an IDE
 
 If you prefer to use an IDE then you can auto-generate the IDE's project
-files using maven plugins. e.g.
+files using Maven plugins. e.g.
 
     mvn eclipse:eclipse
         

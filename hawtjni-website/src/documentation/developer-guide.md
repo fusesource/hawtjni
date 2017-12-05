@@ -14,7 +14,7 @@
 * Maven integration:
   * Generates an autoconf and msbuild projects for the the native library so it can be built on other platforms using the native toolchain.
   * Native library is built before the test phase, so you can unit tests your JNI classes.
-  * Built native library is packaged as a jar resource and deployed to the maven repo for easy distribution of native code.
+  * Built native library is packaged as a jar resource and deployed to the Maven repo for easy distribution of native code.
 
 ## Getting Started with HawtJNI  {#getting-started}
 
@@ -60,7 +60,7 @@ automatically unpack the native library from a jar resource and use that so that
 you don't have to worry installing it to the java library path.
 
 The HawtJNI build process will take care of implementing your `simple` jni library
-by using some maven tooling which we will cover in the next example.
+by using some Maven tooling which we will cover in the next example.
 
 ### Building with Maven 
 
@@ -68,7 +68,7 @@ If you are not familiar with Maven, please checkout
 [Maven by Example](http://www.sonatype.com/books/mvnex-book/reference/public-book.html).
 
 The easiest way to get started with HawtJNI is copy and use 
-[the example maven project](http://github.com/fusersource/hawtjni/tree/master/hawtjni-example/) as a template for your module.
+[the example Maven project](http://github.com/fusersource/hawtjni/tree/master/hawtjni-example/) as a template for your module.
 
 At the root of the Maven project run:
 {pygmentize:: text}
@@ -728,7 +728,7 @@ use HawtJNI to generate your JNI libraries. With the following steps:
         <dependency>
           <groupId>org.fusesource.hawtjni</groupId>
           <artifactId>hawtjni-runtime</artifactId>
-          <version>{project_version:}</version>
+          <version>${project_version}</version>
         </dependency>
         ...
       </dependencies>
@@ -737,14 +737,14 @@ use HawtJNI to generate your JNI libraries. With the following steps:
     
 2.  Add the HawtJNI Maven plugin to the pom.
     {pygmentize:: xml}
-    <pom>
+    <project>
       <build>
         <plugins>
           ...
           <plugin>
             <groupId>org.fusesource.hawtjni</groupId>
-            <artifactId>hawtjni-maven-plugin</artifactId><!-- was maven-hawtjni-plugin until 1.14 -->
-            <version>{project_version:}</version>
+            <artifactId>hawtjni-maven-plugin</artifactId><!-- was maven-hawtjni-plugin until 1.15 -->
+            <version>${project_version}</version>
             <executions>
               <execution>
                 <goals>
@@ -759,14 +759,14 @@ use HawtJNI to generate your JNI libraries. With the following steps:
           ...
         </plugins>
       </build>
-    <pom>
+    <project>
     {pygmentize}
 
 ### Build Phases
 
 You may have noticed that HawtJNI is generating a slew of code in different
 directories. Here is a breakdown of what gets generated where and during which
-maven build phase:
+Maven build phase:
 
 1. __process-classes__: Processes the annotated java classes:
 
@@ -786,7 +786,7 @@ maven build phase:
     added as a test resource path.
 
 3. __package-jar__: The contents of `target/generated-sources/hawtjni/lib` get
-jarred and attached to the maven build with a platform specific classifier.
+jarred and attached to the Maven build with a platform specific classifier.
 
 4. __package-source__: The contents of
 `target/generated-sources/hawtjni/native-package` get zipped up into a platform

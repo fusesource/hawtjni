@@ -21,10 +21,13 @@
 <span class="sourceLineNo">013</span>import java.lang.annotation.Target;<a name="line.13"></a>
 <span class="sourceLineNo">014</span>import static java.lang.annotation.ElementType.*;<a name="line.14"></a>
 <span class="sourceLineNo">015</span><a name="line.15"></a>
-<span class="sourceLineNo">016</span>@Target({FIELD, METHOD, PARAMETER, LOCAL_VARIABLE})<a name="line.16"></a>
-<span class="sourceLineNo">017</span>@Retention(RetentionPolicy.RUNTIME)<a name="line.17"></a>
-<span class="sourceLineNo">018</span>public @interface T32 {<a name="line.18"></a>
-<span class="sourceLineNo">019</span>}<a name="line.19"></a>
+<span class="sourceLineNo">016</span>import java.lang.annotation.Documented;<a name="line.16"></a>
+<span class="sourceLineNo">017</span><a name="line.17"></a>
+<span class="sourceLineNo">018</span>@Documented<a name="line.18"></a>
+<span class="sourceLineNo">019</span>@Target({FIELD, METHOD, PARAMETER, LOCAL_VARIABLE})<a name="line.19"></a>
+<span class="sourceLineNo">020</span>@Retention(RetentionPolicy.RUNTIME)<a name="line.20"></a>
+<span class="sourceLineNo">021</span>public @interface T32 {<a name="line.21"></a>
+<span class="sourceLineNo">022</span>}<a name="line.22"></a>
 
 
 

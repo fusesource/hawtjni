@@ -30,7 +30,7 @@
     <div id="navigation">
       <div class="wrapper">
 <ul>
-<li><a href="../index.html">HawtJNI 1.15</a></li>
+<li><a href="../index.html">HawtJNI 1.16</a></li>
 <li><a href="developer-guide.html">Docs</a></li>
 <li><a href="../community/index.html">Support</a></li>
 </ul>
@@ -100,7 +100,7 @@
 <ul>
 <li>Generates an autoconf and msbuild projects for the the native library so it can be built on other platforms using the native toolchain.</li>
 <li>Native library is built before the test phase, so you can unit tests your JNI classes.</li>
-<li>Built native library is packaged as a jar resource and deployed to the maven repo for easy distribution of native code.</li>
+<li>Built native library is packaged as a jar resource and deployed to the Maven repo for easy distribution of native code.</li>
 </ul></li>
 </ul>
 
@@ -147,7 +147,7 @@ automatically unpack the native library from a jar resource and use that so that
 you don't have to worry installing it to the java library path.</p>
 
 <p>The HawtJNI build process will take care of implementing your <code>simple</code> jni library
-by using some maven tooling which we will cover in the next example.</p>
+by using some Maven tooling which we will cover in the next example.</p>
 
 <h3 id = "Building_with_Maven">Building with Maven</h3>
 
@@ -155,18 +155,18 @@ by using some maven tooling which we will cover in the next example.</p>
 <a href="http://www.sonatype.com/books/mvnex-book/reference/public-book.html">Maven by Example</a>.</p>
 
 <p>The easiest way to get started with HawtJNI is copy and use 
-<a href="http://github.com/chirino/hawtjni/tree/master/hawtjni-example/">the example maven project</a> as a template for your module.</p>
+<a href="http://github.com/fusersource/hawtjni/tree/master/hawtjni-example/">the example Maven project</a> as a template for your module.</p>
 
-<p>At the root of the maven project run:</p>
+<p>At the root of the Maven project run:</p>
 
 <div class="syntax"><pre name='code' class='brush: text; gutter: false;'><code>
 mvn install
 </code></pre></div>
 
-<p>The maven build will produce the following artifacts:</p>
+<p>The Maven build will produce the following artifacts:</p>
 
 <ul>
-<li><code>target/${artifactId}-${version}.jar</code>: is the standard jar which maven produces that contains all your java classes.</li>
+<li><code>target/${artifactId}-${version}.jar</code>: is the standard jar which Maven produces that contains all your java classes.</li>
 <li><code>target/${artifactId}-${version}-native-src.zip</code>: is a source archive of
 a autoconf and msbuild based build project for the native library.  You can
 easily build this on other platforms using the platforms native toolchain.</li>
@@ -174,7 +174,7 @@ easily build this on other platforms using the platforms native toolchain.</li>
 jar which contains the your build JNI library as a resource.</li>
 </ul>
 
-<p>These artifacts will be deployed to the maven repository so that other users can
+<p>These artifacts will be deployed to the Maven repository so that other users can
 easily use them as dependencies in their builds.</p>
 
 <p>You may also be interesting in 
@@ -799,63 +799,27 @@ have have the same conditional applied, just set it on the <code>@JniClass</code
 
 <h2 id = "adding-to-maven-build">Maven Plugin Reference</h2>
 
-<p>The HawtJNI provides a maven plugin which makes it easy code generate and build
+<p>The HawtJNI provides a Maven plugin which makes it easy code generate and build
 the native library for your current platform.</p>
 
-<p>The maven tooling takes care of:</p>
+<p>The Maven tooling takes care of:</p>
 
 <ul>
 <li>Generating the native JNI source code from your annotated Java code</li>
 <li>Generating a GNU make and MS Build compatible source project for building the native library</li>
-<li>Attaches the source project as <code>native-src.zip</code> artifact to the maven build</li>
+<li>Attaches the source project as <code>native-src.zip</code> artifact to the Maven build</li>
 <li>Kicking of a native build of the library using the platform's build tools</li>
-<li>Packages the native library in a <code>platform.jar</code> and attaches the artifact to the maven build.</li>
+<li>Packages the native library in a <code>platform.jar</code> and attaches the artifact to the Maven build.</li>
 <li>Updates the test build path so that unit tests can use the build native library.</li>
 </ul>
 
 <h3 id = "Usage">Usage</h3>
 
-<p>Once you have a working maven build for a java module, you can then update it to
+<p>Once you have a working Maven build for a java module, you can then update it to
 use HawtJNI to generate your JNI libraries. With the following steps:</p>
 
 <ol>
-<li><p>Add the hawtjni repositories to the <code>pom.xml</code> configuration.</p>
-
-<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
-&lt;pom&gt;
-  &lt;repositories&gt;
-    ...
-    &lt;repository&gt;
-      &lt;id&gt;hawtjni.snapshot.fusesource.org&lt;/id&gt;
-      &lt;name&gt;HawtJNI Snapshot Repo&lt;/name&gt;
-      &lt;url&gt;http://hawtjni.fusesource.org/repo/snapshot&lt;/url&gt;
-      &lt;releases&gt;
-        &lt;enabled&gt;false&lt;/enabled&gt;
-      &lt;/releases&gt;
-      &lt;snapshots&gt;
-        &lt;enabled&gt;true&lt;/enabled&gt;
-      &lt;/snapshots&gt;
-    &lt;/repository&gt;    
-    ...
-  &lt;/repositories&gt;
-  &lt;pluginRepositories&gt;
-    ...
-    &lt;pluginRepository&gt;
-      &lt;id&gt;hawtjni.snapshot.fusesource.org&lt;/id&gt;
-      &lt;name&gt;HawtJNI Snapshot Repo&lt;/name&gt;
-      &lt;url&gt;http://hawtjni.fusesource.org/repo/snapshot&lt;/url&gt;
-      &lt;releases&gt;
-        &lt;enabled&gt;false&lt;/enabled&gt;
-      &lt;/releases&gt;
-      &lt;snapshots&gt;
-        &lt;enabled&gt;true&lt;/enabled&gt;
-      &lt;/snapshots&gt;
-    &lt;/pluginRepository&gt;
-    ...
-  &lt;/pluginRepositories&gt;
-&lt;pom&gt;
-</code></pre></div></li>
-<li><p>Add the <code>hawtjni-runtime</code> dependency to pom. This small 19k jar file contains the HawtJNI annotations and a few Helper classes that
+<li><p>Add the <code>hawtjni-runtime</code> dependency to pom. This small 19k jar file contains the HawtJNI annotations and a few helper classes that
 you will be developing against.</p>
 
 <div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
@@ -865,23 +829,23 @@ you will be developing against.</p>
     &lt;dependency&gt;
       &lt;groupId&gt;org.fusesource.hawtjni&lt;/groupId&gt;
       &lt;artifactId&gt;hawtjni-runtime&lt;/artifactId&gt;
-      &lt;version&gt;{project_version:}&lt;/version&gt;
+      &lt;version&gt;1.16&lt;/version&gt;
     &lt;/dependency&gt;
     ...
   &lt;/dependencies&gt;
 &lt;pom&gt;
 </code></pre></div></li>
-<li><p>Add the HawtJNI maven plugin to the pom.</p>
+<li><p>Add the HawtJNI Maven plugin to the pom.</p>
 
 <div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
-&lt;pom&gt;
+&lt;project&gt;
   &lt;build&gt;
     &lt;plugins&gt;
       ...
       &lt;plugin&gt;
         &lt;groupId&gt;org.fusesource.hawtjni&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-hawtjni-plugin&lt;/artifactId&gt;
-        &lt;version&gt;{project_version:}&lt;/version&gt;
+        &lt;artifactId&gt;hawtjni-maven-plugin&lt;/artifactId&gt;&lt;!-- was maven-hawtjni-plugin until 1.15 --&gt;
+        &lt;version&gt;1.16&lt;/version&gt;
         &lt;executions&gt;
           &lt;execution&gt;
             &lt;goals&gt;
@@ -896,25 +860,7 @@ you will be developing against.</p>
       ...
     &lt;/plugins&gt;
   &lt;/build&gt;
-&lt;pom&gt;
-</code></pre></div></li>
-<li><p>If you run into problems with <code>mvn clean</code> no deleting native files, make sure you are using at least version 2.3 of the maven clean plugin.  Previous
-versions would run into problems with symlinks.</p>
-
-<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
-&lt;pom&gt;
-  &lt;build&gt;
-    &lt;plugins&gt;
-      ...
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-clean-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.3&lt;/version&gt;
-      &lt;/plugin&gt;
-      ...
-    &lt;/plugins&gt;
-  &lt;/build&gt;
-&lt;pom&gt;
+&lt;project&gt;
 </code></pre></div></li>
 </ol>
 
@@ -922,7 +868,7 @@ versions would run into problems with symlinks.</p>
 
 <p>You may have noticed that HawtJNI is generating a slew of code in different
 directories. Here is a breakdown of what gets generated where and during which
-maven build phase:</p>
+Maven build phase:</p>
 
 <ol>
 <li><p><strong>process-classes</strong>: Processes the annotated java classes:</p>
@@ -942,7 +888,7 @@ maven build phase:</p>
 added as a test resource path.</p></li>
 </ol></li>
 <li><p><strong>package-jar</strong>: The contents of <code>target/generated-sources/hawtjni/lib</code> get
-jarred and attached to the maven build with a platform specific classifier.</p></li>
+jarred and attached to the Maven build with a platform specific classifier.</p></li>
 <li><p><strong>package-source</strong>: The contents of
 <code>target/generated-sources/hawtjni/native-package</code> get zipped up into a platform
 agnostic source package for building the native library.</p></li>

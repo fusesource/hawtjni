@@ -1,5 +1,15 @@
 # ![HawtJNI](http://fusesource.github.io/hawtjni/images/project-logo.png)
 
+## HawtJNI 1.16, released 2018-02-02
+
+* [`2e99592`](https://github.com/fusesource/hawtjni/commit/2e99592f7be976a935beeed7d7395d4a5787e04e) fixed site build
+* [`14f1d05`](https://github.com/fusesource/hawtjni/commit/14f1d0564d6e2c71c74288e537fcfa4acf7f4c18) renamed maven-hawtjni-plugin to hawtjni-maven-plugin
+* [`743d57b`](https://github.com/fusesource/hawtjni/commit/743d57b25337dc1e0b5dcfc7dce63b15a4433f78) switched Maven plugin from javadoc annotations to Java5 annotations
+* [`4a42ee6`](https://github.com/fusesource/hawtjni/commit/4a42ee611ad66c71a6d4b32d41b78ca02ca225e4) [#36](http://github.com/fusesource/hawtjni/issues/36) added info on loaded native library
+* [`16c5d82`](https://github.com/fusesource/hawtjni/commit/16c5d820e84864fe437ce77a33011b50b2a6f66d) Merge pull request [#37](http://github.com/fusesource/hawtjni/issues/37) from ghost/patch-1
+* [`45e8a55`](https://github.com/fusesource/hawtjni/commit/45e8a557788a8dbf9fd134df6f8e99f456e3324f) [#43](http://github.com/fusesource/hawtjni/issues/43) mark HawtJNI annotations @Documented
+* [`f0c3b54`](https://github.com/fusesource/hawtjni/commit/f0c3b547aeecd508498871583595ab7adff54ea3) s/your/you're/
+
 ## [HawtJNI 1.15](http://fusesource.github.io/hawtjni/blog/releases/release-1-15.html), released 2017-05-04
 
 * [`7537b9d`](https://github.com/fusesource/hawtjni/commit/7537b9d19be9806b210674ccad4b96d90a11d50b) Update changelog

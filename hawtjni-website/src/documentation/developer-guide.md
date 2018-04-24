@@ -800,13 +800,12 @@ Download and install the free [Microsoft Windows SDK][ms_sdk].  The SDK includes
 all the headers, libraries, and build tools needed to compile the JNI library.
 
 Set the `JAVA_HOME` environment variable to the location where your JDK is 
-installed.  
+installed.
 
-Make sure the `vcbuild` tool is on in your system PATH.  The simplest way 
-to use SDK command prompt by following the following menu choices: 
-`Start > All Programs > Microsoft Windows SDK ... > CMD`
+Make sure the `msbuild` (`vcbuild` for legacy SDK versions) tool is on in your system PATH.  The simplest way 
+is to use SDK command prompt.
     
-[ms_sdk]: http://www.microsoft.com/downloads/details.aspx?FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505
+[ms_sdk]: https://developer.microsoft.com/en-us/windows/downloads
 
 ### Ubuntu Linux
 

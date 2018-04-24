@@ -42,11 +42,16 @@ all the headers, libraries, and build tools needed to compile the JNI library.
 Set the `JAVA_HOME` environment variable to the location where your JDK is 
 installed.  
 
-Use the "Start>All Programs>Microsoft Windows SDK vX.X>CMD" command window 
-and change to the directory that this file is located in and then run: 
+Use the installed command window and change to the directory that this file is located in and then run: 
 
-    vcbuild vs2008.vcproj
+For recent SDK Versions:
+
+		msbuild vs2010.vcxproj (or )
+
+For legacy SDK Versions:
+
+		vcbuild vs2008.vcproj
 
 The dll files will be located under the target directory.
     
-[1]: http://www.microsoft.com/downloads/details.aspx?FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505
+[1]: https://developer.microsoft.com/en-us/windows/downloads

@@ -68,7 +68,7 @@ If you are not familiar with Maven, please checkout
 [Maven by Example](http://www.sonatype.com/books/mvnex-book/reference/public-book.html).
 
 The easiest way to get started with HawtJNI is copy and use 
-[the example Maven project](http://github.com/fusersource/hawtjni/tree/master/hawtjni-example/) as a template for your module.
+[the example Maven project](http://github.com/fusesource/hawtjni/tree/master/hawtjni-example/) as a template for your module.
 
 At the root of the Maven project run:
 {pygmentize:: text}

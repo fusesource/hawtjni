@@ -252,6 +252,7 @@ public class StructsGenerator extends JNIGenerator {
         JNIClass superclazz = clazz.getSuperclass();
         String clazzName = clazz.getNativeName();
         String superName = superclazz.getNativeName();
+	String Methodname;
         if (!superclazz.getName().equals("java.lang.Object")) {
             /*
              * Windows exception - cannot call get/set function of super class
@@ -281,6 +282,37 @@ public class StructsGenerator extends JNIGenerator {
             if (accessor == null || accessor.length() == 0)
                 accessor = field.getName();
             if (type.isPrimitive()) {
+		if(field.isSharedPointer()){
+		output("\tlpStruct->");
+                output(accessor);
+                output(" = ");
+		output("std::shared_ptr");
+		output("<");
+		Methodname =field.getCast();
+		String Method =Methodname.replace("*", ">");
+		Method =Method.replace("(", "");
+		Method =Method.replace(")", "");
+		output(Method);
+		output("(");
+                output(field.getCast());
+                output("(intptr_t)");
+                if (isCPP) {
+                     output("env->Get");
+                 } else {
+                     output("(*env)->Get");
+                    }
+                output(type.getTypeSignature1(!type.equals(type64)));
+                if (isCPP) {
+                     output("Field(lpObject, ");
+                    } else {
+                     output("Field(env, lpObject, ");
+                   }
+                output(field.getDeclaringClass().getSimpleName());
+                output("Fc.");
+                output(field.getName());
+		output(")");
+                output(");");
+            	}else {
                 output("\tlpStruct->");
                 output(accessor);
                 output(" = ");
@@ -288,6 +320,7 @@ public class StructsGenerator extends JNIGenerator {
                 if( field.isPointer() ) {
                     output("(intptr_t)");
                 }
+             
                 if (isCPP) {
                     output("env->Get");
                 } else {
@@ -303,6 +336,7 @@ public class StructsGenerator extends JNIGenerator {
                 output("Fc.");
                 output(field.getName());
                 output(");");
+                }
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
                 if (componentType.isPrimitive()) {
@@ -455,8 +489,15 @@ public class StructsGenerator extends JNIGenerator {
                 if( field.isPointer() ) {
                     output("(intptr_t)");
                 }
+		if( field.isSharedPointer() ) {
+                    output("(&");
+                }if(field.isSharedPointer() ) {
+                    output("lpStruct->"+accessor);
+                    output("));");
+                }else {
                 output("lpStruct->"+accessor);
                 output(");");
+		}
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
                 if (componentType.isPrimitive()) {

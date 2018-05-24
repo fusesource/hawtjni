@@ -31,5 +31,11 @@ public enum FieldFlag {
      * Indicate that the field is a pointer.
      */
     POINTER_FIELD,
+
+    /**
+     * Indicate that the field is a shared pointer.
+     */
+    
+    SHARED_PTR,
     
 }

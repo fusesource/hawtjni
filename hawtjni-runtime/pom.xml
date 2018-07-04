@@ -27,9 +27,20 @@
   <artifactId>hawtjni-runtime</artifactId>
   <name>HawtJNI Runtime</name>
   <description>The API that projects using HawtJNI should build against.</description>
-  
+
   <build>
-    <plugins>          
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>org.fusesource.hawtjni.runtime</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -42,7 +53,7 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>          
+    </plugins>
   </build>
 
 </project>

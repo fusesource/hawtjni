@@ -491,7 +491,6 @@ public class StructsGenerator extends JNIGenerator {
                 }
 		if( field.isSharedPointer() ) {
                     output("(&");
-                }if(field.isSharedPointer() ) {
                     output("lpStruct->"+accessor);
                     output("));");
                 }else {

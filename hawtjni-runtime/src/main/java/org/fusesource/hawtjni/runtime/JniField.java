@@ -27,6 +27,8 @@ public @interface JniField {
 
     String cast() default "";
     String accessor() default "";
+    String getter() default "";
+    String setter() default "";
     String conditional() default "";
     FieldFlag[] flags() default {};
 

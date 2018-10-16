@@ -12,10 +12,12 @@ package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIField;
+import org.fusesource.hawtjni.generator.model.JNIFieldAccessor;
 import org.fusesource.hawtjni.generator.model.JNIType;
 import org.fusesource.hawtjni.runtime.ClassFlag;
 
@@ -28,6 +30,8 @@ public class StructsGenerator extends JNIGenerator {
     boolean header;
 
     static final boolean GLOBAL_REF = false;
+
+    private HashMap<JNIClass, ArrayList<JNIField>> structFields = new HashMap<JNIClass, ArrayList<JNIField>>();
 
     public StructsGenerator(boolean header) {
         this.header = header;
@@ -60,15 +64,19 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     private ArrayList<JNIField> getStructFields(JNIClass clazz) {
-        ArrayList<JNIField> rc = new ArrayList<JNIField>();
-        List<JNIField> fields = clazz.getDeclaredFields();
-        for (JNIField field : fields) {
-            int mods = field.getModifiers();
-            if ( (mods & Modifier.STATIC) == 0 && (mods & Modifier.TRANSIENT) == 0) {
-                rc.add(field);
+        if (!structFields.containsKey(clazz)) {
+            ArrayList<JNIField> rc = new ArrayList<JNIField>();
+            List<JNIField> fields = clazz.getDeclaredFields();
+            for (JNIField field : fields) {
+                int mods = field.getModifiers();
+                if ((mods & Modifier.STATIC) == 0 && (mods & Modifier.TRANSIENT) == 0) {
+                    rc.add(field);
+                }
             }
+
+            structFields.put(clazz, rc);
         }
-        return rc;
+        return structFields.get(clazz);
     }
 
     void generateHeaderFile(JNIClass clazz) {
@@ -194,7 +202,7 @@ public class StructsGenerator extends JNIGenerator {
         output(simpleName);
         outputln("Fc.cached) return;");
         JNIClass superclazz = clazz.getSuperclass();
-        if (!superclazz.getName().equals("java.lang.Object")) {
+        if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             String superName = superclazz.getSimpleName();
             output("\tcache");
             output(superName);
@@ -253,7 +261,7 @@ public class StructsGenerator extends JNIGenerator {
         JNIClass superclazz = clazz.getSuperclass();
         String clazzName = clazz.getNativeName();
         String superName = superclazz.getNativeName();
-        if (!superclazz.getName().equals("java.lang.Object")) {
+        if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             /*
              * Windows exception - cannot call get/set function of super class
              * in this case
@@ -406,7 +414,7 @@ public class StructsGenerator extends JNIGenerator {
         JNIClass superclazz = clazz.getSuperclass();
         String clazzName = clazz.getNativeName();
         String superName = superclazz.getNativeName();
-        if (!superclazz.getName().equals("java.lang.Object")) {
+        if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             /*
              * Windows exception - cannot call get/set function of super class
              * in this case
@@ -559,6 +567,12 @@ public class StructsGenerator extends JNIGenerator {
     boolean ignoreField(JNIField field) {
         int mods = field.getModifiers();
         return field.ignore() || ((mods & Modifier.FINAL) != 0) || ((mods & Modifier.STATIC) != 0);
+    }
+
+    boolean hasNonIgnoredFields(JNIClass clazz) {
+        for (JNIField field : getStructFields(clazz))
+            if (!ignoreField(field)) return true;
+        return false;
     }
 
 }

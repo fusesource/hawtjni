@@ -165,13 +165,14 @@ public class StructsGenerator extends JNIGenerator {
         outputln("_FID_CACHE {");
         outputln("\tint cached;");
         outputln("\tjclass clazz;");
-        output("\tjfieldID ");
         List<JNIField> fields = clazz.getDeclaredFields();
         boolean first = true;
         for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
-            if (!first)
+            if (first)
+                output("\tjfieldID ");
+            else
                 output(", ");
             output(field.getName());
             first = false;

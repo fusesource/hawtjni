@@ -258,7 +258,9 @@ public class BuildMojo extends AbstractMojo {
                 if( vcinstalldir!=null ) {
                     if( vcinstalldir.contains("Microsoft Visual Studio 10") ||
                         vcinstalldir.contains("Microsoft Visual Studio 11") ||
-                        vcinstalldir.contains("Microsoft Visual Studio 12")
+                        vcinstalldir.contains("Microsoft Visual Studio 12") ||
+                        vcinstalldir.contains("Microsoft Visual Studio 14") ||
+                        vcinstalldir.contains("Microsoft Visual Studio\\2017")
                       ) {
                         useMSBuild = true;
                     }
@@ -285,8 +287,6 @@ public class BuildMojo extends AbstractMojo {
                 throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
             }
         }
-
-
 
         File libFile=FileUtils.resolveFile(buildDir, "target/"+platform+"-"+configuration+"/lib/"+library.getLibraryFileName());
         if( !libFile.exists() ) {
@@ -318,7 +318,7 @@ public class BuildMojo extends AbstractMojo {
         
         File distDirectory = new File(buildDir, "target");
         File distLibDirectory = new File(distDirectory, "lib");
-		distLibDirectory.mkdirs();
+        distLibDirectory.mkdirs();
         
         if( autogen.exists() && !skipAutogen ) {
             if( (!configure.exists() && !CLI.IS_WINDOWS) || forceAutogen ) {

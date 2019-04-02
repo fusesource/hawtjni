@@ -148,7 +148,7 @@ public class GenerateMojo extends AbstractMojo {
     
     /**
      * The build tool to use on Windows systems.  Set
-     * to 'msbuild', 'vcbuild', or 'detect'
+     * to 'msbuild', 'vcbuild', or 'detect' or 'none'
      */
     @Parameter(defaultValue = "detect")
     private String windowsBuildTool;
@@ -160,6 +160,33 @@ public class GenerateMojo extends AbstractMojo {
      */
     @Parameter
     private String windowsProjectName;
+    
+    /**
+     * Set this value to true to include the import of a custom properties file in your vcxproj (not applicable
+     * to vs2008). This greatly simplifies the configurability of your project.
+     */
+    @Parameter(defaultValue = "false")
+    private boolean windowsCustomProps;
+    
+    /**
+     * The tools version used in the header of your vcxproj (not applicable to vs2008).
+     */
+    @Parameter(defaultValue = "4.0")
+    private String windowsToolsVersion;
+    
+    /**
+     * The target platform version used in your vcxproj (not applicable to vs2008). 
+     * Not supplied by default.
+     */
+    @Parameter
+    private String windowsTargetPlatformVersion;
+    
+    /**
+     * The platform toolset version used in your vcxproj (not applicable to vs2008). 
+     * Not supplied by default.
+     */
+    @Parameter
+    private String windowsPlatformToolset;
 
     private File targetSrcDir;
     
@@ -235,8 +262,14 @@ public class GenerateMojo extends AbstractMojo {
             if( "detect".equals(tool) ) {
                 copyTemplateResource("vs2008.vcproj", (windowsProjectName != null ? windowsProjectName : "vs2008") + ".vcproj", true);
                 copyTemplateResource("vs2010.vcxproj", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", true);
+                if (windowsCustomProps) {
+                	copyTemplateResource("vs2010.custom.props", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".custom.props", true);
+                }
             } else if( "msbuild".equals(tool) ) {
                 copyTemplateResource("vs2010.vcxproj", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", true);
+                if (windowsCustomProps) {
+                	copyTemplateResource("vs2010.custom.props", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".custom.props", true);
+                }
             } else if( "vcbuild".equals(tool) ) {
                 copyTemplateResource("vs2008.vcproj", (windowsProjectName != null ? windowsProjectName : "vs2008") + ".vcproj", true);
             } else if( "none".equals(tool) ) {
@@ -340,8 +373,8 @@ public class GenerateMojo extends AbstractMojo {
             }
             sources += "  src/"+f;
             
-            xml_sources+="      <File RelativePath=\".\\src\\"+ (f.replace('/', '\\')) +"\"/>\n";
-            vs10_sources+="    <ClCompile Include=\".\\src\\"+ (f.replace('/', '\\')) +"\"/>\n";
+            xml_sources+="      <File RelativePath=\".\\src\\"+ (f.replace('/', '\\')) +"\" />\n";
+            vs10_sources+="    <ClCompile Include=\".\\src\\"+ (f.replace('/', '\\')) +"\" />\n";  //VS adds trailing space and eases compares
         }
 
         if( cpp_files.isEmpty() ) {
@@ -353,8 +386,16 @@ public class GenerateMojo extends AbstractMojo {
         values.put("PROJECT_SOURCES", sources);
         values.put("PROJECT_XML_SOURCES", xml_sources);
         values.put("PROJECT_VS10_SOURCES", vs10_sources);
+        
+        values.put("CUSTOM_PROPS", windowsCustomProps ? "<Import Project=\"" + 
+        		(windowsProjectName != null ? windowsProjectName : "vs2010") + ".custom.props\" />" : "");
+      	values.put("TOOLS_VERSION", windowsToolsVersion);
+      	values.put("TARGET_PLATFORM_VERSION", windowsTargetPlatformVersion != null ? 
+      			"<WindowsTargetPlatformVersion>" + windowsTargetPlatformVersion + "</WindowsTargetPlatformVersion>" : "");
+      	values.put("PLATFORM_TOOLSET", windowsPlatformToolset != null ? 
+      			"<PlatformToolset>" + windowsPlatformToolset + "</PlatformToolset>" : "");
 
-        FileUtils.FilterWrapper wrapper = new FileUtils.FilterWrapper() {
+      	FileUtils.FilterWrapper wrapper = new FileUtils.FilterWrapper() {
             public Reader getReader(Reader reader) {
                 StringSearchInterpolator propertiesInterpolator = new StringSearchInterpolator(startExp, endExp);
                 propertiesInterpolator.addValueSource(new MapBasedValueSource(values));

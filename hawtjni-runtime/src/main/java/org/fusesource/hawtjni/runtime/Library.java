@@ -298,7 +298,7 @@ public class Library {
                 getPlatform() + "/" + System.getProperty("os.arch"),
                 getPlatform(),
                 getOperatingSystem(),
-                null
+                "."
         };
     }
 

@@ -12,6 +12,8 @@ package org.fusesource.hawtjni.runtime;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
@@ -80,7 +82,14 @@ import java.util.Set;
  */
 public class Library {
 
+    public static final String STRATEGY_PROPERTY = "hawtjni.strategy";
+    public static final String STRATEGY_SHA1 = "sha1";
+    public static final String STRATEGY_TEMP = "temp";
+
     static final String SLASH = System.getProperty("file.separator");
+
+    static final String STRATEGY = System.getProperty(STRATEGY_PROPERTY,
+            "windows".equals(getOperatingSystem()) ? STRATEGY_SHA1 : STRATEGY_TEMP);
 
     final private String name;
     final private String version;
@@ -311,7 +320,12 @@ public class Library {
                                     file(System.getProperty("user.home"), ".hawtjni", name))) {
                 if( path!=null ) {
                     // Try to extract it to the custom path...
-                    File target = extract(errors, resource, prefix, suffix, path);
+                    File target;
+                    if (STRATEGY_SHA1.equals(STRATEGY)) {
+                        target = extractSha1(errors, resource, prefix, suffix, path);
+                    } else {
+                        target = extractTemp(errors, resource, prefix, suffix, path);
+                    }
                     if( target!=null ) {
                         if( load(errors, target) ) {
                             nativeLibrarySourceUrl = resource;
@@ -349,7 +363,81 @@ public class Library {
         return libName;
     }
 
-    private File extract(ArrayList<Throwable> errors, URL source, String prefix, String suffix, File directory) {
+    private File extractSha1(ArrayList<Throwable> errors, URL source, String prefix, String suffix, File directory) {
+        File target = null;
+        directory = directory.getAbsoluteFile();
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                errors.add(new IOException("Unable to create directory: " + directory));
+                return null;
+            }
+        }
+        try {
+            String sha1 = computeSha1(source.openStream());
+            String sha1f = "";
+            target = new File(directory, prefix + sha1 + suffix);
+
+            if (target.isFile() && target.canRead()) {
+                sha1f = computeSha1(new FileInputStream(target));
+            }
+            if (sha1f.equals(sha1)) {
+                return target;
+            }
+
+            FileOutputStream os = null;
+            InputStream is = null;
+            try {
+                is = source.openStream();
+                if (is != null) {
+                    byte[] buffer = new byte[4096];
+                    os = new FileOutputStream(target);
+                    int read;
+                    while ((read = is.read(buffer)) != -1) {
+                        os.write(buffer, 0, read);
+                    }
+                    chmod755(target);
+                }
+                return target;
+            } finally {
+                close(os);
+                close(is);
+            }
+        } catch (Throwable e) {
+            IOException io;
+            if (target != null) {
+                target.delete();
+                io = new IOException("Unable to extract library from " + source + " to " + target);
+            } else {
+                io = new IOException("Unable to create temporary file in " + directory);
+            }
+            io.initCause(e);
+            errors.add(io);
+        }
+        return null;
+    }
+
+    private String computeSha1(InputStream is) throws NoSuchAlgorithmException, IOException {
+        String sha1;
+        try {
+            MessageDigest mDigest = MessageDigest.getInstance("SHA1");
+            int read;
+            byte[] buffer = new byte[4096];
+            while ((read = is.read(buffer)) != -1) {
+                mDigest.update(buffer, 0, read);
+            }
+            byte[] result = mDigest.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : result) {
+                sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+            }
+            sha1 = sb.toString();
+        } finally {
+            close(is);
+        }
+        return sha1;
+    }
+
+    private File extractTemp(ArrayList<Throwable> errors, URL source, String prefix, String suffix, File directory) {
         File target = null;
         directory = directory.getAbsoluteFile();
         if (!directory.exists()) {
@@ -381,7 +469,7 @@ public class Library {
             }
         } catch (Throwable e) {
             IOException io;
-            if( target!=null ) {
+            if (target != null) {
                 target.delete();
                 io = new IOException("Unable to extract library from " + source + " to " + target);
             } else {
@@ -394,7 +482,7 @@ public class Library {
     }
 
     static private void close(Closeable file) {
-        if(file!=null) {
+        if (file != null) {
             try {
                 file.close();
             } catch (Exception ignore) {

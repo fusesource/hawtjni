@@ -36,11 +36,12 @@ Features
 * Maven integration:
   * Generates JNI source code
   * Generates an autoconf and msbuild source project to build the 
-    native library. This gets attached to the maven project as as 
+    native library. This gets attached to the Maven project as as 
     the native source zip file.
   * Builds the native source tar for the current platform
   * Built native library is stored in a platform specific jar.  This 
-  gets attached to the maven project as a platform specific jar file.
+  gets attached to the Maven project as a platform specific jar file.
+* [Runtime API](documentation/api/) to load the library.
 
 Introduction
 ------------

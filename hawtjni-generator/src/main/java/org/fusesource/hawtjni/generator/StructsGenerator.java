@@ -12,10 +12,12 @@ package org.fusesource.hawtjni.generator;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIField;
+import org.fusesource.hawtjni.generator.model.JNIFieldAccessor;
 import org.fusesource.hawtjni.generator.model.JNIType;
 import org.fusesource.hawtjni.runtime.ClassFlag;
 
@@ -28,6 +30,8 @@ public class StructsGenerator extends JNIGenerator {
     boolean header;
 
     static final boolean GLOBAL_REF = false;
+
+    private HashMap<JNIClass, ArrayList<JNIField>> structFields = new HashMap<JNIClass, ArrayList<JNIField>>();
 
     public StructsGenerator(boolean header) {
         this.header = header;
@@ -60,15 +64,19 @@ public class StructsGenerator extends JNIGenerator {
     }
 
     private ArrayList<JNIField> getStructFields(JNIClass clazz) {
-        ArrayList<JNIField> rc = new ArrayList<JNIField>();
-        List<JNIField> fields = clazz.getDeclaredFields();
-        for (JNIField field : fields) {
-            int mods = field.getModifiers();
-            if ( (mods & Modifier.STATIC) == 0 && (mods & Modifier.TRANSIENT) == 0) {
-                rc.add(field);
+        if (!structFields.containsKey(clazz)) {
+            ArrayList<JNIField> rc = new ArrayList<JNIField>();
+            List<JNIField> fields = clazz.getDeclaredFields();
+            for (JNIField field : fields) {
+                int mods = field.getModifiers();
+                if ((mods & Modifier.STATIC) == 0 && (mods & Modifier.TRANSIENT) == 0) {
+                    rc.add(field);
+                }
             }
+
+            structFields.put(clazz, rc);
         }
-        return rc;
+        return structFields.get(clazz);
     }
 
     void generateHeaderFile(JNIClass clazz) {
@@ -165,13 +173,14 @@ public class StructsGenerator extends JNIGenerator {
         outputln("_FID_CACHE {");
         outputln("\tint cached;");
         outputln("\tjclass clazz;");
-        output("\tjfieldID ");
         List<JNIField> fields = clazz.getDeclaredFields();
         boolean first = true;
         for (JNIField field : fields) {
             if (ignoreField(field))
                 continue;
-            if (!first)
+            if (first)
+                output("\tjfieldID ");
+            else
                 output(", ");
             output(field.getName());
             first = false;
@@ -193,7 +202,7 @@ public class StructsGenerator extends JNIGenerator {
         output(simpleName);
         outputln("Fc.cached) return;");
         JNIClass superclazz = clazz.getSuperclass();
-        if (!superclazz.getName().equals("java.lang.Object")) {
+        if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             String superName = superclazz.getSimpleName();
             output("\tcache");
             output(superName);
@@ -252,8 +261,8 @@ public class StructsGenerator extends JNIGenerator {
         JNIClass superclazz = clazz.getSuperclass();
         String clazzName = clazz.getNativeName();
         String superName = superclazz.getNativeName();
-	    String Methodname;
-        if (!superclazz.getName().equals("java.lang.Object")) {
+        String methodname;
+        if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             /*
              * Windows exception - cannot call get/set function of super class
              * in this case
@@ -278,21 +287,20 @@ public class StructsGenerator extends JNIGenerator {
             }
             JNIType type = field.getType(), type64 = field.getType64();
             String simpleName = type.getSimpleName();
-            String accessor = field.getAccessor();
-            if (accessor == null || accessor.length() == 0)
-                accessor = field.getName();
+            JNIFieldAccessor accessor = field.getAccessor();
+            output("\t");
             if (type.isPrimitive()) {
-		        if (field.isSharedPointer()) {
-		            output("\tlpStruct->");
-                    output(accessor);
+                if (field.isSharedPointer()) {
+                    output("lpStruct->");
+                    output(accessor.setter());
                     output(" = ");
-		            output("std::shared_ptr");
+                    output("std::shared_ptr");
                     output("<");
-                    Methodname =field.getCast();
-                    String Method =Methodname.replace("*", ">");
-                    Method =Method.replace("(", "");
-                    Method =Method.replace(")", "");
-                    output(Method);
+                    methodname = field.getCast();
+                    String method = methodname.replace("*", ">");
+                    method = method.replace("(", "");
+                    method = method.replace(")", "");
+                    output(method);
                     output("(");
                     output(field.getCast());
                     output("(intptr_t)");
@@ -310,12 +318,21 @@ public class StructsGenerator extends JNIGenerator {
                     output(field.getDeclaringClass().getSimpleName());
                     output("Fc.");
                     output(field.getName());
-		            output(")");
+                    if (accessor.isMethodSetter())
+                        output(")");
                     output(");");
-            	} else {
-                    output("\tlpStruct->");
-                    output(accessor);
-                    output(" = ");
+                } else {
+                    if (!accessor.isNonMemberSetter())
+                        output("lpStruct->");
+                    if (accessor.isMethodSetter()) {
+                        String setterStart = accessor.setter().split("\\(")[0];
+                        output(setterStart + "(");
+                        if (accessor.isNonMemberSetter())
+                            output("lpStruct, ");
+                    } else {
+                        output(accessor.setter());
+                        output(" = ");
+                    }
                     output(field.getCast());
                     if (field.isPointer()) {
                         output("(intptr_t)");
@@ -334,12 +351,14 @@ public class StructsGenerator extends JNIGenerator {
                     output(field.getDeclaringClass().getSimpleName());
                     output("Fc.");
                     output(field.getName());
+                    if (accessor.isMethodSetter())
+                        output(")");
                     output(");");
                 }
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
                 if (componentType.isPrimitive()) {
-                    outputln("\t{");
+                    outputln("{");
                     output("\t");
                     output(type.getTypeSignature2(!type.equals(type64)));
                     output(" lpObject1 = (");
@@ -360,11 +379,13 @@ public class StructsGenerator extends JNIGenerator {
                     }
                     output(componentType.getTypeSignature1(!componentType.equals(componentType64)));
                     if (isCPP) {
-                        output("ArrayRegion(lpObject1, 0, sizeof(lpStruct->");
+                        output("ArrayRegion(lpObject1, 0, sizeof(");
                     } else {
-                        output("ArrayRegion(env, lpObject1, 0, sizeof(lpStruct->");
+                        output("ArrayRegion(env, lpObject1, 0, sizeof(");
                     }
-                    output(accessor);
+                    if (!accessor.isNonMemberGetter())
+                        output("lpStruct->");
+                    output(accessor.getter());
                     output(")");
                     if (!componentType.isType("byte")) {
                         output(" / sizeof(");
@@ -373,8 +394,10 @@ public class StructsGenerator extends JNIGenerator {
                     }
                     output(", (");
                     output(type.getTypeSignature4(!type.equals(type64), false));
-                    output(")lpStruct->");
-                    output(accessor);
+                    output(")");
+                    if (!accessor.isNonMemberGetter())
+                        output("lpStruct->");
+                    output(accessor.getter());
                     outputln(");");
                     output("\t}");
                 } else {
@@ -394,7 +417,7 @@ public class StructsGenerator extends JNIGenerator {
                 output("\tif (lpObject1 != NULL) get");
                 output(simpleName);
                 output("Fields(env, lpObject1, &lpStruct->");
-                output(accessor);
+                output(accessor.getter());
                 outputln(");");
                 output("\t}");
             }
@@ -438,7 +461,7 @@ public class StructsGenerator extends JNIGenerator {
         JNIClass superclazz = clazz.getSuperclass();
         String clazzName = clazz.getNativeName();
         String superName = superclazz.getNativeName();
-        if (!superclazz.getName().equals("java.lang.Object")) {
+        if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             /*
              * Windows exception - cannot call get/set function of super class
              * in this case
@@ -465,9 +488,7 @@ public class StructsGenerator extends JNIGenerator {
             boolean allowConversion = !type.equals(type64);
             
             String simpleName = type.getSimpleName();
-            String accessor = field.getAccessor();
-            if (accessor == null || accessor.length() == 0)
-                accessor = field.getName();
+            JNIFieldAccessor accessor = field.getAccessor();
             if (type.isPrimitive()) {
                 if (isCPP) {
                     output("\tenv->Set");
@@ -490,10 +511,30 @@ public class StructsGenerator extends JNIGenerator {
                 }
 		        if (field.isSharedPointer()) {
                     output("(&");
-                    output("lpStruct->" + accessor);
+                    if (!accessor.isNonMemberGetter())
+                        output("lpStruct->");
+                    if (accessor.isMethodGetter()) {
+                        String getterStart = accessor.getter().split("\\(")[0];
+                        output(getterStart + "(");
+                        if (accessor.isNonMemberGetter())
+                            output("lpStruct");
+                        output(")");
+                    } else {
+                        output(accessor.getter());
+                    }
                     output("));");
                 } else {
-                    output("lpStruct->"+accessor);
+                    if (!accessor.isNonMemberGetter())
+                        output("lpStruct->");
+                    if (accessor.isMethodGetter()) {
+                        String getterStart = accessor.getter().split("\\(")[0];
+                        output(getterStart + "(");
+                        if (accessor.isNonMemberGetter())
+                            output("lpStruct");
+                        output(")");
+                    } else {
+                        output(accessor.getter());
+                    }
                     output(");");
 		        }
             } else if (type.isArray()) {
@@ -520,11 +561,21 @@ public class StructsGenerator extends JNIGenerator {
                     }
                     output(componentType.getTypeSignature1(!componentType.equals(componentType64)));
                     if (isCPP) {
-                        output("ArrayRegion(lpObject1, 0, sizeof(lpStruct->");
+                        output("ArrayRegion(lpObject1, 0, sizeof(");
                     } else {
-                        output("ArrayRegion(env, lpObject1, 0, sizeof(lpStruct->");
+                        output("ArrayRegion(env, lpObject1, 0, sizeof(");
                     }
-                    output(accessor);
+                    if (!accessor.isNonMemberGetter())
+                        output("lpStruct->");
+                    if (accessor.isMethodGetter()) {
+                        String getterStart = accessor.getter().split("\\(")[0];
+                        output(getterStart + "(");
+                        if (accessor.isNonMemberGetter())
+                            output("lpStruct");
+                        output(")");
+                    } else {
+                        output(accessor.getter());
+                    }
                     output(")");
                     if (!componentType.isType("byte")) {
                         output(" / sizeof(");
@@ -533,8 +584,10 @@ public class StructsGenerator extends JNIGenerator {
                     }
                     output(", (");
                     output(type.getTypeSignature4(allowConversion, false));
-                    output(")lpStruct->");
-                    output(accessor);
+                    output(")");
+                    if (!accessor.isNonMemberGetter())
+                        output("lpStruct->");
+                    output(accessor.getter());
                     outputln(");");
                     output("\t}");
                 } else {
@@ -554,7 +607,7 @@ public class StructsGenerator extends JNIGenerator {
                 output("\tif (lpObject1 != NULL) set");
                 output(simpleName);
                 output("Fields(env, lpObject1, &lpStruct->");
-                output(accessor);
+                output(accessor.getter());
                 outputln(");");
                 output("\t}");
             }
@@ -597,6 +650,12 @@ public class StructsGenerator extends JNIGenerator {
     boolean ignoreField(JNIField field) {
         int mods = field.getModifiers();
         return field.ignore() || ((mods & Modifier.FINAL) != 0) || ((mods & Modifier.STATIC) != 0);
+    }
+
+    boolean hasNonIgnoredFields(JNIClass clazz) {
+        for (JNIField field : getStructFields(clazz))
+            if (!ignoreField(field)) return true;
+        return false;
     }
 
 }

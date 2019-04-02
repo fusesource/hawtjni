@@ -20,13 +20,26 @@ struct foo {
    int    a;
    size_t b;     
    char   c[20];        
-   struct foo *prev;            	
+   struct foo *prev;
 };
 
 typedef struct _point {
    int    x;
    int    y;
 } point;
+
+struct ClassWithAccessors {
+    float e;
+
+    float (*get_e)();
+    void (*set_e)(float e);
+};
+
+float get_d(struct foo *arg);
+void set_d(struct foo *arg, float d);
+
+float ClassWithAccessors_get_e(struct foo *arg);
+void ClassWithAccessors_set_e(struct foo *arg, float e);
 
 struct foo * foo_add(struct foo *arg, int count);
 char * char_add(char *arg, int count);

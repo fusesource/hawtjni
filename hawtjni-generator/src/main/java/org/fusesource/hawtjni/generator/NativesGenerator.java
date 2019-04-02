@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.fusesource.hawtjni.generator.model.JNIClass;
 import org.fusesource.hawtjni.generator.model.JNIField;
+import org.fusesource.hawtjni.generator.model.JNIFieldAccessor;
 import org.fusesource.hawtjni.generator.model.JNIMethod;
 import org.fusesource.hawtjni.generator.model.JNIParameter;
 import org.fusesource.hawtjni.generator.model.JNIType;
@@ -189,9 +190,7 @@ public class NativesGenerator extends JNIGenerator {
             boolean allowConversion = !type.equals(type64);
             
             String simpleName = type.getSimpleName();
-            String accessor = field.getAccessor();
-            if (accessor == null || accessor.length() == 0)
-                accessor = field.getName();
+            JNIFieldAccessor accessor = field.getAccessor();
 
             String fieldId = "(*env)->GetStaticFieldID(env, that, \""+field.getName()+"\", \""+type.getTypeSignature(allowConversion)+"\")";
             if (isCPP) {
@@ -208,7 +207,7 @@ public class NativesGenerator extends JNIGenerator {
                 if( field.isPointer() ) {
                     output("(intptr_t)");
                 }
-                output(accessor);
+                output(accessor.getter());
                 output(");");
                 
             } else if (type.isArray()) {
@@ -238,7 +237,7 @@ public class NativesGenerator extends JNIGenerator {
                     } else {
                         output("ArrayRegion(env, lpObject1, 0, sizeof(");
                     }
-                    output(accessor);
+                    output(accessor.getter());
                     output(")");
                     if (!componentType.isType("byte")) {
                         output(" / sizeof(");
@@ -248,7 +247,7 @@ public class NativesGenerator extends JNIGenerator {
                     output(", (");
                     output(type.getTypeSignature4(allowConversion, false));
                     output(")");
-                    output(accessor);
+                    output(accessor.getter());
                     outputln(");");
                     output("\t}");
                 } else {
@@ -268,7 +267,7 @@ public class NativesGenerator extends JNIGenerator {
                 output("\tif (lpObject1 != NULL) set");
                 output(simpleName);
                 output("Fields(env, lpObject1, &lpStruct->");
-                output(accessor);
+                output(accessor.getter());
                 outputln(");");
                 output("\t}");
             }

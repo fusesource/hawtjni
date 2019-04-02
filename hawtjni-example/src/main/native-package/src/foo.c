@@ -9,8 +9,14 @@
 #include "foo.h"
 #include <stdio.h>
 
+float get_d(struct foo *arg) {
+    return 0.0f;
+}
+void set_d(struct foo *arg, float d) {
+}
+
 void print_foo(struct foo *arg) {
-   printf("foo@%p: { a: %d, b: %d, c: \"%s\", prev: @%p}\n", arg, arg->a, (int)arg->b, arg->c, arg->prev);
+   printf("foo@%p: { a: %d, b: %d, c: \"%s\", prev: @%p, d: %f}\n", arg, arg->a, (int)arg->b, arg->c, arg->prev, get_d(arg));
 }
 
 long foowork(struct foo **arg, int count) {

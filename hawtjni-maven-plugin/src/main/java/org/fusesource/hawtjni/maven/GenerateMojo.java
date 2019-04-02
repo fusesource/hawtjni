@@ -263,12 +263,12 @@ public class GenerateMojo extends AbstractMojo {
                 copyTemplateResource("vs2008.vcproj", (windowsProjectName != null ? windowsProjectName : "vs2008") + ".vcproj", true);
                 copyTemplateResource("vs2010.vcxproj", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", true);
                 if (windowsCustomProps) {
-                	copyTemplateResource("vs2010.custom.props", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".custom.props", true);
+                    copyTemplateResource("vs2010.custom.props", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".custom.props", true);
                 }
             } else if( "msbuild".equals(tool) ) {
                 copyTemplateResource("vs2010.vcxproj", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", true);
                 if (windowsCustomProps) {
-                	copyTemplateResource("vs2010.custom.props", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".custom.props", true);
+                    copyTemplateResource("vs2010.custom.props", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".custom.props", true);
                 }
             } else if( "vcbuild".equals(tool) ) {
                 copyTemplateResource("vs2008.vcproj", (windowsProjectName != null ? windowsProjectName : "vs2008") + ".vcproj", true);

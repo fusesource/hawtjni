@@ -37,5 +37,22 @@ public enum FieldFlag {
      */
     
     SHARED_PTR,
-    
+
+    /**
+     * Indicate that the getter method used is not part of
+     * the structure. Useful for using wrappers to access
+     * certain structure fields.
+     *
+     * Only useful when the getter is declared explicitly.
+     */
+    GETTER_NONMEMBER,
+
+    /**
+     * Indicate that the setter method used is not part of
+     * the structure. Useful for using wrappers to access
+     * certain structure fields.
+     *
+     * Only useful when the setter is declared explicitly.
+     */
+    SETTER_NONMEMBER,
 }

@@ -290,71 +290,38 @@ public class StructsGenerator extends JNIGenerator {
             JNIFieldAccessor accessor = field.getAccessor();
             output("\t");
             if (type.isPrimitive()) {
-                if (field.isSharedPointer()) {
+                if (!accessor.isNonMemberSetter())
                     output("lpStruct->");
+                if (accessor.isMethodSetter()) {
+                    String setterStart = accessor.setter().split("\\(")[0];
+                    output(setterStart + "(");
+                    if (accessor.isNonMemberSetter())
+                        output("lpStruct, ");
+                } else {
                     output(accessor.setter());
                     output(" = ");
-                    output("std::shared_ptr");
-                    output("<");
-                    methodname = field.getCast();
-                    String method = methodname.replace("*", ">");
-                    method = method.replace("(", "");
-                    method = method.replace(")", "");
-                    output(method);
-                    output("(");
-                    output(field.getCast());
-                    output("(intptr_t)");
-                    if (isCPP) {
-                        output("env->Get");
-                    } else {
-                        output("(*env)->Get");
-                    }
-                    output(type.getTypeSignature1(!type.equals(type64)));
-                    if (isCPP) {
-                        output("Field(lpObject, ");
-                    } else {
-                        output("Field(env, lpObject, ");
-                    }
-                    output(field.getDeclaringClass().getSimpleName());
-                    output("Fc.");
-                    output(field.getName());
-                    if (accessor.isMethodSetter())
-                        output(")");
-                    output(");");
-                } else {
-                    if (!accessor.isNonMemberSetter())
-                        output("lpStruct->");
-                    if (accessor.isMethodSetter()) {
-                        String setterStart = accessor.setter().split("\\(")[0];
-                        output(setterStart + "(");
-                        if (accessor.isNonMemberSetter())
-                            output("lpStruct, ");
-                    } else {
-                        output(accessor.setter());
-                        output(" = ");
-                    }
-                    output(field.getCast());
-                    if (field.isPointer()) {
-                        output("(intptr_t)");
-                    }
-                    if (isCPP) {
-                        output("env->Get");
-                    } else {
-                        output("(*env)->Get");
-                    }
-                    output(type.getTypeSignature1(!type.equals(type64)));
-                    if (isCPP) {
-                        output("Field(lpObject, ");
-                    } else {
-                        output("Field(env, lpObject, ");
-                    }
-                    output(field.getDeclaringClass().getSimpleName());
-                    output("Fc.");
-                    output(field.getName());
-                    if (accessor.isMethodSetter())
-                        output(")");
-                    output(");");
                 }
+                output(field.getCast());
+                if (field.isPointer()) {
+                    output("(intptr_t)");
+                }
+                if (isCPP) {
+                    output("env->Get");
+                } else {
+                    output("(*env)->Get");
+                }
+                output(type.getTypeSignature1(!type.equals(type64)));
+                if (isCPP) {
+                    output("Field(lpObject, ");
+                } else {
+                    output("Field(env, lpObject, ");
+                }
+                output(field.getDeclaringClass().getSimpleName());
+                output("Fc.");
+                output(field.getName());
+                if (accessor.isMethodSetter())
+                    output(")");
+                output(");");
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
                 if (componentType.isPrimitive()) {
@@ -509,34 +476,18 @@ public class StructsGenerator extends JNIGenerator {
                 if( field.isPointer() ) {
                     output("(intptr_t)");
                 }
-		        if (field.isSharedPointer()) {
-                    output("(&");
-                    if (!accessor.isNonMemberGetter())
-                        output("lpStruct->");
-                    if (accessor.isMethodGetter()) {
-                        String getterStart = accessor.getter().split("\\(")[0];
-                        output(getterStart + "(");
-                        if (accessor.isNonMemberGetter())
-                            output("lpStruct");
-                        output(")");
-                    } else {
-                        output(accessor.getter());
-                    }
-                    output("));");
+                if (!accessor.isNonMemberGetter())
+                    output("lpStruct->");
+                if (accessor.isMethodGetter()) {
+                    String getterStart = accessor.getter().split("\\(")[0];
+                    output(getterStart + "(");
+                    if (accessor.isNonMemberGetter())
+                        output("lpStruct");
+                    output(")");
                 } else {
-                    if (!accessor.isNonMemberGetter())
-                        output("lpStruct->");
-                    if (accessor.isMethodGetter()) {
-                        String getterStart = accessor.getter().split("\\(")[0];
-                        output(getterStart + "(");
-                        if (accessor.isNonMemberGetter())
-                            output("lpStruct");
-                        output(")");
-                    } else {
-                        output(accessor.getter());
-                    }
-                    output(");");
-		        }
+                    output(accessor.getter());
+                }
+                output(");");
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
                 if (componentType.isPrimitive()) {

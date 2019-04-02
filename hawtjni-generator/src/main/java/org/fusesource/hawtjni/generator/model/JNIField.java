@@ -32,6 +32,5 @@ public interface JNIField {
     public String getConditional();
     public boolean ignore();
 
-    public boolean isSharedPointer();
     public boolean isPointer();
 }

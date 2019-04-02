@@ -380,7 +380,7 @@ public class Library {
             }
         } catch (Throwable e) {
             IOException io;
-            if( target!=null ) {
+            if (target != null) {
                 target.delete();
                 io = new IOException("Unable to extract library from " + source + " to " + target);
             } else {
@@ -393,7 +393,7 @@ public class Library {
     }
 
     static private void close(Closeable file) {
-        if(file!=null) {
+        if (file != null) {
             try {
                 file.close();
             } catch (Exception ignore) {

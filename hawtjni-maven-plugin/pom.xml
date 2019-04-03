@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.fusesource.hawtjni</groupId>
     <artifactId>hawtjni-project</artifactId>
-    <version>1.17</version>
+    <version>1.18-SNAPSHOT</version>
   </parent>
 
   <artifactId>hawtjni-maven-plugin</artifactId>

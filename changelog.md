@@ -1,5 +1,40 @@
 # ![HawtJNI](http://fusesource.github.io/hawtjni/images/project-logo.png)
 
+## HawtJNI 1.17, released 2019-04-03
+
+* [`1c4a17b`](https://github.com/fusesource/hawtjni/commit/1c4a17b31bf988f99df6da7085f86829b935c342) Remove shared_ptr support until it's working
+* [`d3f9d0a`](https://github.com/fusesource/hawtjni/commit/d3f9d0ab71fd25d8d6f6eb9c3de6c6b47ddae92e) Keep (long*) for standard pointers
+* [`906aa15`](https://github.com/fusesource/hawtjni/commit/906aa158c24d3603aca6f3766b7fa0da306d23d6) Merge branch 'calin-iorgulescu-master'
+* [`c5130eb`](https://github.com/fusesource/hawtjni/commit/c5130eb900279531f67d4734ccf1ad2f2ad95a70) Fix typo
+* [`9d38df2`](https://github.com/fusesource/hawtjni/commit/9d38df2f4a25ee55fbb0dc921fb2004b33c59541) Merge branch 'master' of https://github.com/calin-iorgulescu/hawtjni into calin-iorgulescu-master
+* [`1c42406`](https://github.com/fusesource/hawtjni/commit/1c42406ec55ed1955d2fc573e3002e5fa557c984) Merge branch 'master' of https://github.com/batterseapower/hawtjni into batterseapower-master
+* [`55afd36`](https://github.com/fusesource/hawtjni/commit/55afd361a8fe44d4d6126de30b279c5b941894ba) Add 10.14 in OSX SDK version list
+* [`d094c95`](https://github.com/fusesource/hawtjni/commit/d094c95e7fd0fb879f896b49c796a92adee72369) Merge pull request #45 from wjsl/osx10.13
+* [`d028542`](https://github.com/fusesource/hawtjni/commit/d028542040a23e090633ab0b192ca9c08f7838e2) Merge pull request #48 from castortech/master
+* [`c0cfb25`](https://github.com/fusesource/hawtjni/commit/c0cfb2558b8e11edd224f08fd7da6daa84876b34) Merge branch 'master' into master
+* [`73e0b4f`](https://github.com/fusesource/hawtjni/commit/73e0b4f68d4597295bcb6d0196a1c030ff14589a) Merge pull request #55 from tdemande/hawtjni-issue-54
+* [`ec9cc6c`](https://github.com/fusesource/hawtjni/commit/ec9cc6c3ce72b7fcd99d356f1abbc0f36fbb9a29) Merge branch 'hawtjni_shared_pointer' of https://github.com/ossdev07/hawtjni into ossdev07-hawtjni_shared_pointer
+* [`bd514b7`](https://github.com/fusesource/hawtjni/commit/bd514b71878415e7091b914420a291310de3ec30) Implement a different strategy with sha1 checksum for extracting libraries, fixes #56
+* [`40e0b2f`](https://github.com/fusesource/hawtjni/commit/40e0b2f27a2218b4d10ae3989a4ed74bcf40562d) Formatting
+* [`bc3f187`](https://github.com/fusesource/hawtjni/commit/bc3f187087a043caa6737a78c10f982159bd8c2c) #54 Also search in base dir when finding/extracting native lib
+* [`8f464d0`](https://github.com/fusesource/hawtjni/commit/8f464d07bc9a807acf33f0f2e355065471f15235) Implement new JNIField accessor model: allow support for separate getter/setter methods for individual fields.
+* [`5f52fee`](https://github.com/fusesource/hawtjni/commit/5f52fee5720c5cbeeaae71cfaa90611bcba56e8d) StructsGenerator: Fix bug where a JniClass extending another class that has only ignored fields would generate calls to cache the fields.
+* [`2b88a8f`](https://github.com/fusesource/hawtjni/commit/2b88a8f56fdbbf0e71b213f15b333a681e7dc72f) StructsGenerator: Fix bug where an empty field declaration would be created if only skipped fields are declared in a struct.
+* [`235f0b9`](https://github.com/fusesource/hawtjni/commit/235f0b985acba4559cfda588a0312287f9420791) Change maven settings to allow building.
+* [`839ddcf`](https://github.com/fusesource/hawtjni/commit/839ddcf2bff9e53020f162feeac7258ea6ac97db) added icon for hawtjni-runtime artifact in Central
+* [`27af76b`](https://github.com/fusesource/hawtjni/commit/27af76b5f73af61ef592cc66ed65fb12438cc166) Update StructsGenerator.java
+* [`f29f849`](https://github.com/fusesource/hawtjni/commit/f29f84960133e5a5740bcd6b6120b8bb7f172f0d) added Automatic-Module-Name to manifest for Java 9 auto-module name
+* [`1c2d511`](https://github.com/fusesource/hawtjni/commit/1c2d511d970ad07924ebdbb1e8566fb56e2edf6c) Hawtjni: Shared_pointer support added in hawtjni
+* [`7a6082f`](https://github.com/fusesource/hawtjni/commit/7a6082faed85ea73945065466e68ad6035cf724d) fixed typo
+* [`35c061c`](https://github.com/fusesource/hawtjni/commit/35c061ca7ffedb11fa52a18c8c087a41bbb5cd88) added Runtime API as a feature
+* [`6c1f140`](https://github.com/fusesource/hawtjni/commit/6c1f140970a59727a102b8ee2daef909eb991b78) Added customization for the Windows build.
+* [`98b1531`](https://github.com/fusesource/hawtjni/commit/98b1531628f236aa9a68fd49b67ac09f1b547868) Added missing case of "no directory" as per method documentation.
+* [`a103c50`](https://github.com/fusesource/hawtjni/commit/a103c50b1b1b357d6a5d932cac7ebc599bb0d16b) Added support to detect newer versions of Visual Studio as candidates for msbuild
+* [`6f891af`](https://github.com/fusesource/hawtjni/commit/6f891af96768e77f5e800fd0f723712b87e30735) Updated documentation to clearly indicate the vcbuild is deprecated and that msbuild is supported.
+* [`84aa381`](https://github.com/fusesource/hawtjni/commit/84aa381836dae2b784ea685b71c54c6eb6622646) update changelog.md for 1.16 release
+* [`3fffa67`](https://github.com/fusesource/hawtjni/commit/3fffa67c2b23f92a1c57552e3779c58382795855) fixed and improved changelog.md formatting
+* [`2c7134b`](https://github.com/fusesource/hawtjni/commit/2c7134b4ee612af788d8486181459580811ba1d6) Add 10.13 in OSX SDK version list
+
 ## HawtJNI 1.16, released 2018-02-02
 
 * [`2e99592`](https://github.com/fusesource/hawtjni/commit/2e99592f7be976a935beeed7d7395d4a5787e04e) fixed site build

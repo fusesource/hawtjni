@@ -261,7 +261,7 @@ public class StructsGenerator extends JNIGenerator {
         JNIClass superclazz = clazz.getSuperclass();
         String clazzName = clazz.getNativeName();
         String superName = superclazz.getNativeName();
-        String methodname;
+        String Methodname;
         if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             /*
              * Windows exception - cannot call get/set function of super class
@@ -290,41 +290,78 @@ public class StructsGenerator extends JNIGenerator {
             JNIFieldAccessor accessor = field.getAccessor();
             output("\t");
             if (type.isPrimitive()) {
-                if (!accessor.isNonMemberSetter())
-                    output("lpStruct->");
-                if (accessor.isMethodSetter()) {
-                    String setterStart = accessor.setter().split("\\(")[0];
-                    output(setterStart + "(");
-                    if (accessor.isNonMemberSetter())
-                        output("lpStruct, ");
-                } else {
-                    output(accessor.setter());
+                if(field.isSharedPointer()){
+                    output("\tlpStruct->");
+                    output(accessor.getter());
                     output(" = ");
-                }
-                output(field.getCast());
-                if (field.isPointer()) {
+		    output("std::shared_ptr");
+		    output("<");
+		    Methodname = field.getCast();
+		    String Method = Methodname.replace("*", ">");
+		    Method = Method.replace("(", "");
+		    Method = Method.replace(")", "");
+		    output(Method);
+		    output("(");
+                    output(field.getCast());
                     output("(intptr_t)");
-                }
-                if (isCPP) {
-                    output("env->Get");
-                } else {
-                    output("(*env)->Get");
-                }
-                output(type.getTypeSignature1(!type.equals(type64)));
-                if (isCPP) {
-                    output("Field(lpObject, ");
-                } else {
-                    output("Field(env, lpObject, ");
-                }
-                output(field.getDeclaringClass().getSimpleName());
-                output("Fc.");
-                output(field.getName());
-                if (accessor.isMethodSetter())
+                    if (isCPP) {
+                        output("env->Get");
+                    } else {
+                        output("(*env)->Get");
+                    }
+                    output(type.getTypeSignature1(!type.equals(type64)));
+                    if (isCPP) {
+                        output("Field(lpObject, ");
+                    } else {
+                        output("Field(env, lpObject, ");
+                    }
+                    output(field.getDeclaringClass().getSimpleName());
+                    output("Fc.");
+		    output(field.getName());
                     output(")");
-                output(");");
+                    output(");");
+	       } else {
+                   if (!accessor.isNonMemberSetter())
+                       output("lpStruct->");
+                       if (accessor.isMethodSetter()) {
+                           String setterStart = accessor.setter().split("\\(")[0];
+                           output(setterStart + "(");
+			   if (accessor.isNonMemberSetter())
+			        output("lpStruct, ");
+                           } else {
+                               output(accessor.setter());
+                               output(" = ");
+                           }
+                           output(field.getCast());
+                           if (field.isPointer()) {
+                               output("(intptr_t)");
+                           }
+                           if (isCPP) {
+                               output("env->Get");
+                           } else {
+                               output("(*env)->Get");
+                           }
+                           output(type.getTypeSignature1(!type.equals(type64)));
+                           if (isCPP) {
+                               output("Field(lpObject, ");
+                           } else {
+                               output("Field(env, lpObject, ");
+                           }
+                           output(field.getDeclaringClass().getSimpleName());
+                           output("Fc.");
+                           output(field.getName());
+                           if (accessor.isMethodSetter())
+                               output(")");
+                           output(");");
+	       }
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
-                if (componentType.isPrimitive()) {
+                if (componentType.isPrimitive()){
+		    if( field.isSharedPointer() ) {
+                            output("(&");
+	                    output("lpStruct->"+accessor);
+                            output("));");
+		    }
                     outputln("{");
                     output("\t");
                     output(type.getTypeSignature2(!type.equals(type64)));

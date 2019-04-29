@@ -88,6 +88,9 @@ public class Example {
     public static int O_WRONLY;
     @JniField(flags={CONSTANT})
     public static int O_RDWR;
+
+    @JniField(flags={SHARED_PTR})
+    public static int CheckStr;
     
     @JniMethod(cast="void *")
     public static final native long malloc(

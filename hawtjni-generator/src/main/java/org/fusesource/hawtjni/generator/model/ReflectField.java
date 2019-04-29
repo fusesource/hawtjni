@@ -100,6 +100,14 @@ public class ReflectField implements JNIField {
         return getFlag(POINTER_FIELD) || ( type.getWrappedClass() == Long.TYPE && getCast().endsWith("*") );
     }
 
+    public boolean isSharedPointer() {
+        if( annotation == null ) {
+
+             return false;
+        }
+        return getFlag(SHARED_PTR) || ( type.getWrappedClass() == Long.TYPE && getCast().endsWith("*") );
+    }
+
     public String getConditional() {
         String parentConditional = getDeclaringClass().getConditional();
         String myConditional = annotation == null ? null : emptyFilter(annotation.conditional());

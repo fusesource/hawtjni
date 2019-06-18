@@ -101,9 +101,8 @@ public class ReflectField implements JNIField {
     }
 
     public boolean isSharedPointer() {
-        if( annotation == null ) {
-
-             return false;
+        if (annotation == null) {
+            return false;
         }
         return getFlag(SHARED_PTR) || ( type.getWrappedClass() == Long.TYPE && getCast().endsWith("*") );
     }

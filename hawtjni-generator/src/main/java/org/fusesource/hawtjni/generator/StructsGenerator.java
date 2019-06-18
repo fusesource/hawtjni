@@ -290,7 +290,7 @@ public class StructsGenerator extends JNIGenerator {
             JNIFieldAccessor accessor = field.getAccessor();
             output("\t");
             if (type.isPrimitive()) {
-                if(field.isSharedPointer()){
+                if (field.isSharedPointer()) {
                     output("\tlpStruct->");
                     output(accessor.getter());
                     output(" = ");
@@ -320,47 +320,47 @@ public class StructsGenerator extends JNIGenerator {
 		    output(field.getName());
                     output(")");
                     output(");");
-	       } else {
-                   if (!accessor.isNonMemberSetter())
-                       output("lpStruct->");
-                       if (accessor.isMethodSetter()) {
-                           String setterStart = accessor.setter().split("\\(")[0];
-                           output(setterStart + "(");
-			   if (accessor.isNonMemberSetter())
-			        output("lpStruct, ");
-                           } else {
-                               output(accessor.setter());
-                               output(" = ");
-                           }
-                           output(field.getCast());
-                           if (field.isPointer()) {
-                               output("(intptr_t)");
-                           }
-                           if (isCPP) {
-                               output("env->Get");
-                           } else {
-                               output("(*env)->Get");
-                           }
-                           output(type.getTypeSignature1(!type.equals(type64)));
-                           if (isCPP) {
-                               output("Field(lpObject, ");
-                           } else {
-                               output("Field(env, lpObject, ");
-                           }
-                           output(field.getDeclaringClass().getSimpleName());
-                           output("Fc.");
-                           output(field.getName());
-                           if (accessor.isMethodSetter())
-                               output(")");
-                           output(");");
-	       }
+	        } else {
+                    if (!accessor.isNonMemberSetter())
+                        output("lpStruct->");
+                    if (accessor.isMethodSetter()) {
+                        String setterStart = accessor.setter().split("\\(")[0];
+                        output(setterStart + "(");
+                        if (accessor.isNonMemberSetter())
+	                    output("lpStruct, ");
+                    } else {
+	                output(accessor.setter());
+	                output(" = ");
+                    }
+                    output(field.getCast());
+                    if (field.isPointer()) {
+	                output("(intptr_t)");
+                    }
+                    if (isCPP) {
+	                output("env->Get");
+                    } else {
+	                output("(*env)->Get");
+                    }
+                    output(type.getTypeSignature1(!type.equals(type64)));
+                    if (isCPP) {
+	                output("Field(lpObject, ");
+                    } else {
+	                output("Field(env, lpObject, ");
+                    }
+                    output(field.getDeclaringClass().getSimpleName());
+                    output("Fc.");
+                    output(field.getName());
+                    if (accessor.isMethodSetter())
+	                output(")");
+                    output(");");
+                }
             } else if (type.isArray()) {
                 JNIType componentType = type.getComponentType(), componentType64 = type64.getComponentType();
-                if (componentType.isPrimitive()){
-		    if( field.isSharedPointer() ) {
-                            output("(&");
-	                    output("lpStruct->"+accessor);
-                            output("));");
+                if (componentType.isPrimitive()) {
+                    if ( field.isSharedPointer() ) {
+                        output("(&");
+	                output("lpStruct->"+accessor);
+                        output("));");
 		    }
                     outputln("{");
                     output("\t");

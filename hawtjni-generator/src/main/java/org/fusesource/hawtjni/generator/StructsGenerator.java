@@ -359,7 +359,7 @@ public class StructsGenerator extends JNIGenerator {
                 if (componentType.isPrimitive()) {
                     if ( field.isSharedPointer() ) {
                         output("(&");
-	                output("lpStruct->"+accessor);
+                        output("lpStruct->"+accessor);
                         output("));");
 		    }
                     outputln("{");

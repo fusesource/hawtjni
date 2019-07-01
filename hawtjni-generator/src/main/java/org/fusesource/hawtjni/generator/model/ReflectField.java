@@ -104,7 +104,7 @@ public class ReflectField implements JNIField {
         if (annotation == null) {
             return false;
         }
-        return getFlag(SHARED_PTR) || ( type.getWrappedClass() == Long.TYPE && getCast().endsWith("*") );
+        return getFlag(SHARED_PTR);
     }
 
     public String getConditional() {

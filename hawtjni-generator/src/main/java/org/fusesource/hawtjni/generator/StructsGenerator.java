@@ -261,7 +261,7 @@ public class StructsGenerator extends JNIGenerator {
         JNIClass superclazz = clazz.getSuperclass();
         String clazzName = clazz.getNativeName();
         String superName = superclazz.getNativeName();
-        String Methodname;
+        String methodname;
         if (!superclazz.getName().equals("java.lang.Object") && hasNonIgnoredFields(superclazz)) {
             /*
              * Windows exception - cannot call get/set function of super class
@@ -296,11 +296,11 @@ public class StructsGenerator extends JNIGenerator {
                     output(" = ");
 		    output("std::shared_ptr");
 		    output("<");
-		    Methodname = field.getCast();
-		    String Method = Methodname.replace("*", ">");
-		    Method = Method.replace("(", "");
-		    Method = Method.replace(")", "");
-		    output(Method);
+		    methodname = field.getCast();
+		    String method = methodname.replace("*", ">");
+		    method = method.replace("(", "");
+		    method = method.replace(")", "");
+		    output(method);
 		    output("(");
                     output(field.getCast());
                     output("(intptr_t)");

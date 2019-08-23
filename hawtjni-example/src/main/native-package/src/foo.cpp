@@ -15,8 +15,14 @@ float get_d(struct foo *arg) {
 void set_d(struct foo *arg, float d) {
 }
 
+int get_sp(struct foo *arg) {
+    return 0;
+}
+void set_sp(struct foo *arg, std::shared_ptr<intptr_t> ptr) {
+}
+
 void print_foo(struct foo *arg) {
-   printf("foo@%p: { a: %d, b: %d, c: \"%s\", prev: @%p, d: %f}\n", arg, arg->a, (int)arg->b, arg->c, arg->prev, get_d(arg));
+   printf("foo@%p: { a: %d, b: %d, c: \"%s\", prev: @%p, d: %f, Checkstr: %d}\n", arg, arg->a, (int)arg->b, arg->c, arg->prev, get_d(arg), get_sp(arg));
 }
 
 long foowork(struct foo **arg, int count) {

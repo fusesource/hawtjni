@@ -10,6 +10,7 @@
 #define INCLUDED_FOO_H
 
 #include <stdlib.h>
+#include <memory>
 #include "jni.h"
 
 #ifdef __cplusplus
@@ -37,6 +38,9 @@ struct ClassWithAccessors {
 
 float get_d(struct foo *arg);
 void set_d(struct foo *arg, float d);
+
+int get_sp(struct foo *arg);
+void set_sp(struct foo *arg, std::shared_ptr<intptr_t>);
 
 float ClassWithAccessors_get_e(struct foo *arg);
 void ClassWithAccessors_set_e(struct foo *arg, float e);

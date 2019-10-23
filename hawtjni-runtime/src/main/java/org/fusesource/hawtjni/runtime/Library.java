@@ -172,6 +172,11 @@ public class Library {
         if( prop!=null ) {
             return Integer.parseInt(prop);
         }
+        // GraalVM support, see https://github.com/fusesource/jansi/issues/162
+        String arch = System.getProperty("os.arch");
+        if (arch.endsWith("64") && "Substrate VM".equals(System.getProperty("java.vm.name"))) {
+            return 64;
+        }
         return -1; // we don't know..
     }
 

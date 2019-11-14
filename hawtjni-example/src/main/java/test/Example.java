@@ -226,8 +226,8 @@ public class Example {
         @JniField(getter = "get_d()", setter = "set_d()", flags = { GETTER_NONMEMBER, SETTER_NONMEMBER })
         private float d;
 
-        @JniField(getter = "get_sp()", setter = "set_sp()", flags={SHARED_PTR, GETTER_NONMEMBER, SETTER_NONMEMBER}, cast="std::shared_ptr<intptr_t>")
-        private int CheckStr;
+        @JniField(getter = "get_sp()", setter = "set_sp()", flags={SHARED_PTR, GETTER_NONMEMBER, SETTER_NONMEMBER})
+        private long CheckStr;
 
         @Override
         public int hashCode() {

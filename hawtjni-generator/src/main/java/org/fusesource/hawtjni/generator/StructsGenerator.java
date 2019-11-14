@@ -288,6 +288,7 @@ public class StructsGenerator extends JNIGenerator {
             JNIType type = field.getType(), type64 = field.getType64();
             String simpleName = type.getSimpleName();
             JNIFieldAccessor accessor = field.getAccessor();
+            boolean allowConversion = !type.equals(type64);
             output("\t");
             if (type.isPrimitive()) {
                 if (!accessor.isNonMemberSetter())
@@ -302,9 +303,10 @@ public class StructsGenerator extends JNIGenerator {
                 output(" = ");
                 }
                 if (field.isSharedPointer())
-                    output("std::make_shared<intptr_t>(");
+                    output("std::make_shared<"+type.getTypeSignature2(allowConversion)+">(");
                 else
-	            output(field.getCast());
+                    output(field.getCast());
+
                 if (field.isPointer()) {
 	            output("(intptr_t)");
                 }
@@ -496,6 +498,9 @@ public class StructsGenerator extends JNIGenerator {
                     output(")");
                 } else {
                     output(accessor.getter());
+                }
+		if (field.isSharedPointer()) {
+                    output(".get()");
                 }
                 output(");");
             } else if (type.isArray()) {

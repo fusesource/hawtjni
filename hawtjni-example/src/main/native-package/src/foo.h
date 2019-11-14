@@ -39,7 +39,7 @@ struct ClassWithAccessors {
 float get_d(struct foo *arg);
 void set_d(struct foo *arg, float d);
 
-int get_sp(struct foo *arg);
+std::shared_ptr<intptr_t> get_sp(struct foo *arg);
 void set_sp(struct foo *arg, std::shared_ptr<intptr_t>);
 
 float ClassWithAccessors_get_e(struct foo *arg);

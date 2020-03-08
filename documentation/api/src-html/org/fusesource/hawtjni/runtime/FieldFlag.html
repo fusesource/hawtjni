@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+<html lang="fr">
 <head>
 <title>Source code</title>
 <link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
@@ -39,8 +39,25 @@
 <span class="sourceLineNo">031</span>     * Indicate that the field is a pointer.<a name="line.31"></a>
 <span class="sourceLineNo">032</span>     */<a name="line.32"></a>
 <span class="sourceLineNo">033</span>    POINTER_FIELD,<a name="line.33"></a>
-<span class="sourceLineNo">034</span>    <a name="line.34"></a>
-<span class="sourceLineNo">035</span>}<a name="line.35"></a>
+<span class="sourceLineNo">034</span><a name="line.34"></a>
+<span class="sourceLineNo">035</span>    /**<a name="line.35"></a>
+<span class="sourceLineNo">036</span>     * Indicate that the getter method used is not part of<a name="line.36"></a>
+<span class="sourceLineNo">037</span>     * the structure. Useful for using wrappers to access<a name="line.37"></a>
+<span class="sourceLineNo">038</span>     * certain structure fields.<a name="line.38"></a>
+<span class="sourceLineNo">039</span>     *<a name="line.39"></a>
+<span class="sourceLineNo">040</span>     * Only useful when the getter is declared explicitly.<a name="line.40"></a>
+<span class="sourceLineNo">041</span>     */<a name="line.41"></a>
+<span class="sourceLineNo">042</span>    GETTER_NONMEMBER,<a name="line.42"></a>
+<span class="sourceLineNo">043</span><a name="line.43"></a>
+<span class="sourceLineNo">044</span>    /**<a name="line.44"></a>
+<span class="sourceLineNo">045</span>     * Indicate that the setter method used is not part of<a name="line.45"></a>
+<span class="sourceLineNo">046</span>     * the structure. Useful for using wrappers to access<a name="line.46"></a>
+<span class="sourceLineNo">047</span>     * certain structure fields.<a name="line.47"></a>
+<span class="sourceLineNo">048</span>     *<a name="line.48"></a>
+<span class="sourceLineNo">049</span>     * Only useful when the setter is declared explicitly.<a name="line.49"></a>
+<span class="sourceLineNo">050</span>     */<a name="line.50"></a>
+<span class="sourceLineNo">051</span>    SETTER_NONMEMBER,<a name="line.51"></a>
+<span class="sourceLineNo">052</span>}<a name="line.52"></a>
 
 
 

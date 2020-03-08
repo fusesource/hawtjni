@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Built-By: osboxes
-Created-By: Apache Maven 3.0.5
-Build-Jdk: 1.8.0_121
+Built-By: gnodet
+Created-By: Apache Maven 3.6.0
+Build-Jdk: 1.8.0-adoptopenjdk
 

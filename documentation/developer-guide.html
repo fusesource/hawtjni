@@ -30,7 +30,7 @@
     <div id="navigation">
       <div class="wrapper">
 <ul>
-<li><a href="../index.html">HawtJNI 1.16</a></li>
+<li><a href="../index.html">HawtJNI 1.17</a></li>
 <li><a href="developer-guide.html">Docs</a></li>
 <li><a href="../community/index.html">Support</a></li>
 </ul>
@@ -110,37 +110,18 @@
 the JNI code needed to access the native methods defined in your Java classes.  Lets say you 
 wanted to access to the c library's classic <code>printf</code> function:</p>
 
-<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
-int printf(const char *format, ...);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">printf</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">format</span><span class="p">,</span> <span class="p">...);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>To do that, you would only need to define a simple Java class like:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-import org.fusesource.hawtjni.runtime.*
-
-@JniClass
-public class Simple {
-
-  private static final Library LIBRARY = new Library(&quot;simple&quot;, Simple.class);    
-  static {
-    LIBRARY.load();
-  }
-
-  public static native int printf(String message);
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">org.fusesource.hawtjni.runtime.*</span>&#x000A;&#x000A;<span class="nd">@JniClass</span>&#x000A;<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Simple</span> <span class="o">{</span>&#x000A;    &#x000A;  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Library</span> <span class="n">LIBRARY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Library</span><span class="o">(</span><span class="s">&quot;simple&quot;</span><span class="o">,</span> <span class="n">Simple</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>    &#x000A;  <span class="kd">static</span> <span class="o">{</span>&#x000A;    <span class="n">LIBRARY</span><span class="o">.</span><span class="na">load</span><span class="o">();</span>&#x000A;  <span class="o">}</span>&#x000A;&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">printf</span><span class="o">(</span><span class="n">String</span> <span class="n">message</span><span class="o">);</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>That's it.  No JNI coding required.  It's composed of a static class initializer
 and a native method interface definition for the <code>printf</code> function.  For folks
 who have done JNI before this looks familiar except for the way the library is loaded.
 You could have also loaded the library the traditional textbook way:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  static {
-    System.loadLibrary(&quot;simple&quot;);
-  }
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kd">static</span> <span class="o">{</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">loadLibrary</span><span class="o">(</span><span class="s">&quot;simple&quot;</span><span class="o">);</span>&#x000A;  <span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>The benefit of using the Library class to load the native library is that it can
 automatically unpack the native library from a jar resource and use that so that
@@ -159,9 +140,7 @@ by using some Maven tooling which we will cover in the next example.</p>
 
 <p>At the root of the Maven project run:</p>
 
-<div class="syntax"><pre name='code' class='brush: text; gutter: false;'><code>
-mvn install
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>mvn install&#x000A;</pre></div>&#x000A;</div>
 
 <p>The Maven build will produce the following artifacts:</p>
 
@@ -298,36 +277,23 @@ java array picks up any changes.</p>
 native code can handle wide character (i.e. double byte unicode characters), then you 
 annotate the argument with <code>UNICODE</code> flag.  For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  public static native int printf(
-    @JniArg(flags={UNICODE}) String message);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">printf</span><span class="o">(</span>&#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">UNICODE</span><span class="o">})</span> <span class="n">String</span> <span class="n">message</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h3 id = "Passing_Primitives_by_Reference">Passing Primitives by Reference</h3>
 
 <p>It is common to run into native methods similar to the following:</p>
 
-<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
-void adder(int *result, int left, int right) {
-  *result = left + right;
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">adder</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="n">result</span><span class="p">,</span> <span class="kt">int</span> <span class="n">left</span><span class="p">,</span> <span class="kt">int</span> <span class="n">right</span><span class="p">)</span> <span class="p">{</span>&#x000A;  <span class="o">*</span><span class="n">result</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="n">right</span><span class="p">;</span>&#x000A;<span class="p">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>They use a pointer to a simple type to store the result of function call.  It may
 not be obvious at first, but this can be mapped in java using a primitive array.
 For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  public static native void adder(int []result, int left, int right);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">adder</span><span class="o">(</span><span class="kt">int</span> <span class="o">[]</span><span class="n">result</span><span class="o">,</span> <span class="kt">int</span> <span class="n">left</span><span class="o">,</span> <span class="kt">int</span> <span class="n">right</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Just make sure you use the method with 1 element array:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  byte[] result = new byte[1];
-  adder(result, 3, 4);
-  System.out.println(&quot;The result was: &quot;+result[0]);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kt">byte</span><span class="o">[]</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span>&#x000A;  <span class="n">adder</span><span class="o">(</span><span class="n">result</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">);</span>&#x000A;  <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;The result was: &quot;</span><span class="o">+</span><span class="n">result</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h2 id = "mapping-native-structures">Mapping Native Structures</h2>
 
@@ -336,50 +302,25 @@ replicate all the fields that you will need to access as regular java fields.</p
 
 <p>For example, say you had a C structure and function that was defined as follows:</p>
 
-<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
-struct COORD {
-  int x;
-  int y;
-};
-void display_coord(struct COORD* position);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">COORD</span> <span class="p">{</span>&#x000A;  <span class="kt">int</span> <span class="n">x</span><span class="p">;</span>&#x000A;  <span class="kt">int</span> <span class="n">y</span><span class="p">;</span>&#x000A;<span class="p">};</span>&#x000A;<span class="kt">void</span> <span class="nf">display_coord</span><span class="p">(</span><span class="k">struct</span> <span class="n">COORD</span><span class="o">*</span> <span class="n">position</span><span class="p">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Then the the corresponding Java class for the structure would look like:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-@JniClass(flags={STRUCT})
-public static class COORD {
-  public short x;
-  public short y;
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="nd">@JniClass</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">STRUCT</span><span class="o">})</span>&#x000A;<span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">COORD</span> <span class="o">{</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">x</span><span class="o">;</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">y</span><span class="o">;</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>The native method definition can then just take COORD java object as an argument.</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-public static native void display_coord(COORD position);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">display_coord</span><span class="o">(</span><span class="n">COORD</span> <span class="n">position</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h3 id = "Nested_Structures">Nested Structures</h3>
 
 <p>Nested native structures are also easy.  For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
-struct RECT {
-  struct COORD top_left;
-  struct COORD bottom_right;
-};
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">RECT</span> <span class="p">{</span>&#x000A;  <span class="k">struct</span> <span class="n">COORD</span> <span class="n">top_left</span><span class="p">;</span>&#x000A;  <span class="k">struct</span> <span class="n">COORD</span> <span class="n">bottom_right</span><span class="p">;</span>&#x000A;<span class="p">};</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Would be mapped as:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-@JniClass(flags={STRUCT})
-public static class RECT {
-  public COORD top_left = new COORD();
-  public COORD bottom_right = new COORD();
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="nd">@JniClass</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">STRUCT</span><span class="o">})</span>&#x000A;<span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">RECT</span> <span class="o">{</span>&#x000A;  <span class="kd">public</span> <span class="n">COORD</span> <span class="n">top_left</span> <span class="o">=</span> <span class="k">new</span> <span class="n">COORD</span><span class="o">();</span>&#x000A;  <span class="kd">public</span> <span class="n">COORD</span> <span class="n">bottom_right</span> <span class="o">=</span> <span class="k">new</span> <span class="n">COORD</span><span class="o">();</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h3 id = "Passing_Structures_By_Value">Passing Structures By Value</h3>
 
@@ -388,16 +329,11 @@ native method accepts the structure by value instead, then you need to annotate 
 
 <p>For example, if your native method was defined as:</p>
 
-<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
-int validate_coord(struct COORD position);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">validate_coord</span><span class="p">(</span><span class="k">struct</span> <span class="n">COORD</span> <span class="n">position</span><span class="p">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Then your Java method mapping would look like</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  public static native int validate_coord(
-    @JniArg(flags={BY_VALUE}) COORD position);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">validate_coord</span><span class="o">(</span>&#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">BY_VALUE</span><span class="o">})</span> <span class="n">COORD</span> <span class="n">position</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>The passed object MUST not be <code>null</code>.</p>
 
@@ -407,22 +343,11 @@ int validate_coord(struct COORD position);
 
 <p>For example, if the native definition was:</p>
 
-<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
-typedef struct _COORD {
-  int x;
-  int y;
-} COORD;
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_COORD</span> <span class="p">{</span>&#x000A;  <span class="kt">int</span> <span class="n">x</span><span class="p">;</span>&#x000A;  <span class="kt">int</span> <span class="n">y</span><span class="p">;</span>&#x000A;<span class="p">}</span> <span class="n">COORD</span><span class="p">;</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Then the the corresponding Java class for the structure would look like:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-@JniClass(flags={STRUCT,TYPEDEF})
-public static class COORD {
-  public short x;
-  public short y;
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="nd">@JniClass</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">STRUCT</span><span class="o">,</span><span class="n">TYPEDEF</span><span class="o">})</span>&#x000A;<span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">COORD</span> <span class="o">{</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">x</span><span class="o">;</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">y</span><span class="o">;</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h3 id = "Zero_Out_Structures">Zero Out Structures</h3>
 
@@ -430,12 +355,7 @@ public static class COORD {
 
 <p>If not all the fields of the structure are mapped, then when the native structure is created from a Java structure, the unmapped fields will have whatever random data was in the allocated memory location the native structure was allocated on.  If you prefer or NEED to zero out unmapped fields, then add the <code>ZERO_OUT</code> flag.  For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-@JniClass(flags={STRUCT,ZERO_OUT})
-public static class COORD {
-  public short x;
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="nd">@JniClass</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">STRUCT</span><span class="o">,</span><span class="n">ZERO_OUT</span><span class="o">})</span>&#x000A;<span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">COORD</span> <span class="o">{</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">x</span><span class="o">;</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h3 id = "Skipping_Fields">Skipping Fields</h3>
 
@@ -444,47 +364,13 @@ to holding java side computations of the structure.</p>
 
 <p>For example, if you want to cache the hash computation of the structure you could do the following:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-@JniClass(flags={STRUCT,ZERO_OUT})
-public static class COORD {
-  public short x;
-  public short y;
-
-  @JniField(flags={FIELD_SKIP})
-  public int hash;
-  public int hashCode() {
-    if( hash==0 ) {
-      hash = (x &lt;&lt; 16) &amp; y;
-    }
-    return hash;
-  }
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="nd">@JniClass</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">STRUCT</span><span class="o">,</span><span class="n">ZERO_OUT</span><span class="o">})</span>&#x000A;<span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">COORD</span> <span class="o">{</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">x</span><span class="o">;</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">y</span><span class="o">;</span>&#x000A;&#x000A;  <span class="nd">@JniField</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">FIELD_SKIP</span><span class="o">})</span>&#x000A;  <span class="kd">public</span> <span class="kt">int</span> <span class="n">hash</span><span class="o">;</span>&#x000A;  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>&#x000A;    <span class="k">if</span><span class="o">(</span> <span class="n">hash</span><span class="o">==</span><span class="mi">0</span> <span class="o">)</span> <span class="o">{</span>&#x000A;      <span class="n">hash</span> <span class="o">=</span> <span class="o">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="o">)</span> <span class="o">&amp;</span> <span class="n">y</span><span class="o">;</span>&#x000A;    <span class="o">}</span>&#x000A;    <span class="k">return</span> <span class="n">hash</span><span class="o">;</span>&#x000A;  <span class="o">}</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h2 id = "Binding_to_C___Classes">Binding to C++ Classes</h2>
 
 <p>HawtJNI support binding to C++ classes. Here's an example of bind to the &ldquo;std::string&rdquo; class.</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-@JniClass(name=&quot;std::string&quot;, flags={ClassFlag.CPP})
-private static class StdString {
-
-    @JniMethod(flags={CPP_NEW})
-    public static final native long create();
-
-    @JniMethod(flags={CPP_NEW})
-    public static final native long create(String value);
-
-    @JniMethod(flags={CPP_DELETE})
-    static final native void delete(long self);
-
-    @JniMethod(flags={CPP_METHOD}, cast=&quot;const char*&quot;)
-    public static final native long c_str_ptr (long self);
-
-    @JniMethod(flags={CPP_METHOD}, cast=&quot;size_t&quot;)
-    public static final native long length (long self);
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="nd">@JniClass</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">&quot;std::string&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">ClassFlag</span><span class="o">.</span><span class="na">CPP</span><span class="o">})</span>&#x000A;<span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">StdString</span> <span class="o">{</span>&#x000A;&#x000A;    <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CPP_NEW</span><span class="o">})</span>&#x000A;    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">long</span> <span class="nf">create</span><span class="o">();</span>&#x000A;&#x000A;    <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CPP_NEW</span><span class="o">})</span>&#x000A;    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">long</span> <span class="nf">create</span><span class="o">(</span><span class="n">String</span> <span class="n">value</span><span class="o">);</span>&#x000A;&#x000A;    <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CPP_DELETE</span><span class="o">})</span>&#x000A;    <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="kt">long</span> <span class="n">self</span><span class="o">);</span>&#x000A;&#x000A;    <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CPP_METHOD</span><span class="o">},</span> <span class="n">cast</span><span class="o">=</span><span class="s">&quot;const char*&quot;</span><span class="o">)</span>&#x000A;    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">long</span> <span class="nf">c_str_ptr</span> <span class="o">(</span><span class="kt">long</span> <span class="n">self</span><span class="o">);</span>&#x000A;&#x000A;    <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CPP_METHOD</span><span class="o">},</span> <span class="n">cast</span><span class="o">=</span><span class="s">&quot;size_t&quot;</span><span class="o">)</span>&#x000A;    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">long</span> <span class="nf">length</span> <span class="o">(</span><span class="kt">long</span> <span class="n">self</span><span class="o">);</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>The <code>CPP_NEW</code> flagged methods are constructor methods.  They allocate
 a new instance of the class or structure on the native heap and return 
@@ -496,13 +382,7 @@ The <code>CPP_METHOD</code> flagged methods are used to call methods on the obje
 <p>You can also get and set fields on the object using the <code>GETTER</code> and <code>SETTER</code>
 method flags.  For example, if we had an object with a <code>int count</code> field.</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-    @JniMethod(flags={GETTER})
-    public static final native int count(long self);
-
-    @JniMethod(flags={SETTER})
-    public static final native void count(long self, int value);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>    <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">GETTER</span><span class="o">})</span>&#x000A;    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">count</span><span class="o">(</span><span class="kt">long</span> <span class="n">self</span><span class="o">);</span>&#x000A;&#x000A;    <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">SETTER</span><span class="o">})</span>&#x000A;    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">count</span><span class="o">(</span><span class="kt">long</span> <span class="n">self</span><span class="o">,</span> <span class="kt">int</span> <span class="n">value</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Notice that the <code>CPP_DELETE</code>, <code>CPP_METHOD</code>, <code>GETTER</code>, and <code>SETTER</code> all take
 a pointer the object they operating against as the first argument of the java
@@ -519,27 +399,15 @@ platform constants you will need to:</p>
 <li><p>Define a constant initializer method which when called will sets all the
 static fields annotated as constant fields with the constant value.  Example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  @JniMethod(flags={CONSTANT_INITIALIZER})
-  private static final native void init();
-</code></pre></div></li>
+<div class="syntax"><div class="highlight"><pre><span></span>      <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CONSTANT_INITIALIZER</span><span class="o">})</span>&#x000A;      <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">();</span>&#x000A;    &#x000A;</pre></div>&#x000A;</div></li>
 <li><p>For each constant you want to load define a static field for it with the 
 <code>@JniField(flags={CONSTANT})</code> annotation.  Example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  @JniField(flags={CONSTANT})
-  public static short FOREGROUND_BLUE;
-</code></pre></div></li>
+<div class="syntax"><div class="highlight"><pre><span></span>      <span class="nd">@JniField</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CONSTANT</span><span class="o">})</span>&#x000A;      <span class="kd">public</span> <span class="kd">static</span> <span class="kt">short</span> <span class="n">FOREGROUND_BLUE</span><span class="o">;</span>&#x000A;    &#x000A;</pre></div>&#x000A;</div></li>
 <li><p>Call the constant initializer method in the class initializer, after the 
 library is loaded.  For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  private static final Library LIBRARY = new Library(&quot;simple&quot;, Simple.class);    
-  static {
-    LIBRARY.load();
-    init();
-  }
-</code></pre></div></li>
+<div class="syntax"><div class="highlight"><pre><span></span>      <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Library</span> <span class="n">LIBRARY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Library</span><span class="o">(</span><span class="s">&quot;simple&quot;</span><span class="o">,</span> <span class="n">Simple</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>    &#x000A;      <span class="kd">static</span> <span class="o">{</span>&#x000A;        <span class="n">LIBRARY</span><span class="o">.</span><span class="na">load</span><span class="o">();</span>&#x000A;        <span class="n">init</span><span class="o">();</span>&#x000A;      <span class="o">}</span>&#x000A;    &#x000A;</pre></div>&#x000A;</div></li>
 </ol>
 
 <h3 id = "accessors">Renaming</h3>
@@ -550,33 +418,17 @@ name, you can set the <code>accessor</code> attribute on a <code>@JniMethod</cod
 <p>For example, to call the native <code>printf</code> function from a Java <code>print</code> method,
 you would set it up as follows:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  @JniMethod(accessor=&quot;printf&quot;)
-  public static native int print(String message);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">accessor</span><span class="o">=</span><span class="s">&quot;printf&quot;</span><span class="o">)</span>&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">print</span><span class="o">(</span><span class="n">String</span> <span class="n">message</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>In the case of field on a structure this can be used to do simple renames or
 to map field to the field of a nested structure or union:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-
-  // Just a simple rename..
-  @JniField(accessor=&quot;dwSize&quot;)
-  public int size;
-
-  // Mapping to a nested field.
-  @JniField(accessor=&quot;u.pos&quot;)
-  public int deep;
-
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="c1">// Just a simple rename..</span>&#x000A;  <span class="nd">@JniField</span><span class="o">(</span><span class="n">accessor</span><span class="o">=</span><span class="s">&quot;dwSize&quot;</span><span class="o">)</span>&#x000A;  <span class="kd">public</span> <span class="kt">int</span> <span class="n">size</span><span class="o">;</span>&#x000A;&#x000A;  <span class="c1">// Mapping to a nested field.</span>&#x000A;  <span class="nd">@JniField</span><span class="o">(</span><span class="n">accessor</span><span class="o">=</span><span class="s">&quot;u.pos&quot;</span><span class="o">)</span>&#x000A;  <span class="kd">public</span> <span class="kt">int</span> <span class="n">deep</span><span class="o">;</span>&#x000A;  &#x000A;</pre></div>&#x000A;</div>
 
 <p>The accessor also comes in handy when you want to load constants which 
 are not a simple symbol, for example the size of a structure:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  @JniField(accessor=&quot;sizeof(struct COORD)&quot;, flags={CONSTANT})
-  public static int SIZEOF_COORD;
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="nd">@JniField</span><span class="o">(</span><span class="n">accessor</span><span class="o">=</span><span class="s">&quot;sizeof(struct COORD)&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">CONSTANT</span><span class="o">})</span>&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">SIZEOF_COORD</span><span class="o">;</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h3 id = "pointers">Pointers</h3>
 
@@ -595,11 +447,7 @@ practice to set the cast attribute to the defined type of value.</p>
 <p>For example, to let HawtJNI know that the <code>malloc</code> function returns a void
 pointer you would define it as follows:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  @JniMethod(cast=&quot;void *&quot;)
-  public static final native long malloc(
-    @JniArg(cast=&quot;size_t&quot;) long size);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;void *&quot;</span><span class="o">)</span>&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">long</span> <span class="nf">malloc</span><span class="o">(</span>&#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;size_t&quot;</span><span class="o">)</span> <span class="kt">long</span> <span class="n">size</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>If the cast end with <code>*</code> and it's being mapped to a Java <code>long</code> then HawtJNI knows that it's dealing with a pointer type.  But if your using a typedef to pointer, then you need to flag the condition with one of the following:</p>
 
@@ -620,9 +468,7 @@ pointer you would define it as follows:</p>
 <p>This is accomplished using the standard native <code>malloc</code> function call.
 For example to create a char array 80 bytes big:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  long buffer = malloc(80);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kt">long</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">malloc</span><span class="o">(</span><span class="mi">80</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>To create a structure on the the heap, your going to need a couple of helper methods.</p>
 
@@ -633,43 +479,11 @@ For example to create a char array 80 bytes big:</p>
 
 <p>I recommend keeping those defined in the structure class itself.  For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-@JniClass(flags={STRUCT})
-public static class COORD {
-
-  public short x;
-  public short y;
-
-  // To hand loading the SIZE_OF constant
-  @JniMethod(flags={CONSTANT_INITIALIZER})
-  private static final native void init();
-  @JniField(flags={CONSTANT}, accessor=&quot;sizeof(struct COORD)&quot;)
-  public static short SIZE_OF;
-  static {
-    init();
-  }
-
-  public static final native void memmove (
-    @JniArg(cast=&quot;void *&quot;, flags={NO_IN, CRITICAL})) COORD dest, 
-    @JniArg(cast=&quot;const void *&quot;, flags={NO_OUT, CRITICAL}) long src, 
-    @JniArg(cast=&quot;size_t&quot;) long size);
-
-  public static final native void memmove (
-    @JniArg(cast=&quot;void *&quot;, flags={NO_IN, CRITICAL})) long dest, 
-    @JniArg(cast=&quot;const void *&quot;, flags={NO_OUT, CRITICAL}) COORD src, 
-    @JniArg(cast=&quot;size_t&quot;) long size);
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="nd">@JniClass</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">STRUCT</span><span class="o">})</span>&#x000A;<span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">COORD</span> <span class="o">{</span>&#x000A;&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">x</span><span class="o">;</span>&#x000A;  <span class="kd">public</span> <span class="kt">short</span> <span class="n">y</span><span class="o">;</span>&#x000A;&#x000A;  <span class="c1">// To hand loading the SIZE_OF constant</span>&#x000A;  <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CONSTANT_INITIALIZER</span><span class="o">})</span>&#x000A;  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">init</span><span class="o">();</span>&#x000A;  <span class="nd">@JniField</span><span class="o">(</span><span class="n">flags</span><span class="o">={</span><span class="n">CONSTANT</span><span class="o">},</span> <span class="n">accessor</span><span class="o">=</span><span class="s">&quot;sizeof(struct COORD)&quot;</span><span class="o">)</span>&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">short</span> <span class="n">SIZE_OF</span><span class="o">;</span>&#x000A;  <span class="kd">static</span> <span class="o">{</span>&#x000A;    <span class="n">init</span><span class="o">();</span>&#x000A;  <span class="o">}</span>&#x000A;&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">memmove</span> <span class="o">(</span>&#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;void *&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">NO_IN</span><span class="o">,</span> <span class="n">CRITICAL</span><span class="o">}))</span> <span class="n">COORD</span> <span class="n">dest</span><span class="o">,</span> &#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;const void *&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">NO_OUT</span><span class="o">,</span> <span class="n">CRITICAL</span><span class="o">})</span> <span class="kt">long</span> <span class="n">src</span><span class="o">,</span> &#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;size_t&quot;</span><span class="o">)</span> <span class="kt">long</span> <span class="n">size</span><span class="o">);</span>&#x000A;&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">memmove</span> <span class="o">(</span>&#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;void *&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">NO_IN</span><span class="o">,</span> <span class="n">CRITICAL</span><span class="o">}))</span> <span class="kt">long</span> <span class="n">dest</span><span class="o">,</span> &#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;const void *&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">NO_OUT</span><span class="o">,</span> <span class="n">CRITICAL</span><span class="o">})</span> <span class="n">COORD</span> <span class="n">src</span><span class="o">,</span> &#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;size_t&quot;</span><span class="o">)</span> <span class="kt">long</span> <span class="n">size</span><span class="o">);</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Now you can allocate and initialize a structure on the heap:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  long buffer = malloc(COORD.SIZE_OF);
-  COORD tmp = new COORD()
-  tmp.x = 3;
-  tmp.y = 4;
-  COORD.memmove(buffer, tmp, COORD.SIZE_OF);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kt">long</span> <span class="n">buffer</span> <span class="o">=</span> <span class="n">malloc</span><span class="o">(</span><span class="n">COORD</span><span class="o">.</span><span class="na">SIZE_OF</span><span class="o">);</span>&#x000A;  <span class="n">COORD</span> <span class="n">tmp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">COORD</span><span class="o">()</span>&#x000A;  <span class="n">tmp</span><span class="o">.</span><span class="na">x</span> <span class="o">=</span> <span class="mi">3</span><span class="o">;</span>&#x000A;  <span class="n">tmp</span><span class="o">.</span><span class="na">y</span> <span class="o">=</span> <span class="mi">4</span><span class="o">;</span>&#x000A;  <span class="n">COORD</span><span class="o">.</span><span class="na">memmove</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="n">tmp</span><span class="o">,</span> <span class="n">COORD</span><span class="o">.</span><span class="na">SIZE_OF</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <!-- TODO: talk about pointer arithmetic to index into an array of structs -->
 
@@ -679,16 +493,11 @@ public static class COORD {
 create one using a <code>Callback</code> object.  For example, lets say needed to call the following
 native function:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-long foo(void (*fp)(char *buffer, int n));
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="kt">long</span> <span class="nf">foo</span><span class="o">(</span><span class="kt">void</span> <span class="o">(*</span><span class="n">fp</span><span class="o">)(</span><span class="kt">char</span> <span class="o">*</span><span class="n">buffer</span><span class="o">,</span> <span class="kt">int</span> <span class="n">n</span><span class="o">));</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>It you could map it in Java as:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  public static final native void foo (
-    @JniArg(cast=&quot;void *&quot;) long fp);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">foo</span> <span class="o">(</span>&#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;void *&quot;</span><span class="o">)</span> <span class="kt">long</span> <span class="n">fp</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Next you need to create a java method that can accept the callback.  The method MUST
 return long and can have any number of arguments, but they must also all be longs.
@@ -696,13 +505,7 @@ The method can be a static or instance method.</p>
 
 <p>For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-class MyObject {
-  public long mymethod(long buffer, long n) {
-    System.out.println(&quot;Was given a buffer &quot;+n+&quot; byte big at &quot;+buffer);
-  }
-}
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">MyObject</span> <span class="o">{</span>&#x000A;  <span class="kd">public</span> <span class="kt">long</span> <span class="nf">mymethod</span><span class="o">(</span><span class="kt">long</span> <span class="n">buffer</span><span class="o">,</span> <span class="kt">long</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>&#x000A;    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Was given a buffer &quot;</span><span class="o">+</span><span class="n">n</span><span class="o">+</span><span class="s">&quot; byte big at &quot;</span><span class="o">+</span><span class="n">buffer</span><span class="o">);</span>&#x000A;  <span class="o">}</span>&#x000A;<span class="o">}</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Then to create a function pointer which points back to a Java method, you create
 a Callback object with a reference to the Java object, method name, and number of arguments
@@ -710,12 +513,7 @@ on the method takes.</p>
 
 <p>For example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  MyObject object = new MyObject();
-  Callback callback = new Callback(object, &quot;mymethod&quot;, 2);
-  long fp = callback.getAddress();
-  foo(fp);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="n">MyObject</span> <span class="n">object</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyObject</span><span class="o">();</span>&#x000A;  <span class="n">Callback</span> <span class="n">callback</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Callback</span><span class="o">(</span><span class="n">object</span><span class="o">,</span> <span class="s">&quot;mymethod&quot;</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>&#x000A;  <span class="kt">long</span> <span class="n">fp</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="na">getAddress</span><span class="o">();</span>&#x000A;  <span class="n">foo</span><span class="o">(</span><span class="n">fp</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Warning: you can only create up to 128 Callbacks concurrently.  If you exceed this number
 <code>callback.getAddress()</code> returns zero.  You should use the <code>callback.dispose()</code> method
@@ -761,12 +559,7 @@ with low latency functions. This only makes sense if the parameter is an array</
 for example, to copy the the contents of a <code>byte[]</code> into a java <code>int[]</code>, you would
 define the <code>memmove</code> method as follows:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  public static final native void memmove (
-    @JniArg(cast=&quot;void *&quot;, flags={NO_IN, CRITICAL})) int[] dest, 
-    @JniArg(cast=&quot;const void *&quot;, flags={NO_OUT, CRITICAL}) byte[] src, 
-    @JniArg(cast=&quot;size_t&quot;) long size);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kd">native</span> <span class="kt">void</span> <span class="nf">memmove</span> <span class="o">(</span>&#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;void *&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">NO_IN</span><span class="o">,</span> <span class="n">CRITICAL</span><span class="o">}))</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">dest</span><span class="o">,</span> &#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;const void *&quot;</span><span class="o">,</span> <span class="n">flags</span><span class="o">={</span><span class="n">NO_OUT</span><span class="o">,</span> <span class="n">CRITICAL</span><span class="o">})</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">src</span><span class="o">,</span> &#x000A;    <span class="nd">@JniArg</span><span class="o">(</span><span class="n">cast</span><span class="o">=</span><span class="s">&quot;size_t&quot;</span><span class="o">)</span> <span class="kt">long</span> <span class="n">size</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <h3 id = "conditionals">Conditionals</h3>
 
@@ -779,19 +572,12 @@ be made available to.</p>
 
 <p>Example:</p>
 
-<div class="syntax"><pre name='code' class='brush: java; gutter: false;'><code>
-  @JniMethod(conditional=&quot;defined(_WIN32)&quot;)
-  public static native int printf(String message);
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="nd">@JniMethod</span><span class="o">(</span><span class="n">conditional</span><span class="o">=</span><span class="s">&quot;defined(_WIN32)&quot;</span><span class="o">)</span>&#x000A;  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">printf</span><span class="o">(</span><span class="n">String</span> <span class="n">message</span><span class="o">);</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>Would produce a JNI <code>printf</code> method implementation which is surrounded by the
 following pre-processor directives:</p>
 
-<div class="syntax"><pre name='code' class='brush: c; gutter: false;'><code>
-  #if defined(_WIN32)
-  // ... the JNI method implementation would be here
-  #endif
-</code></pre></div>
+<div class="syntax"><div class="highlight"><pre><span></span>  <span class="cp">#if defined(_WIN32)</span>&#x000A;  <span class="c1">// ... the JNI method implementation would be here</span>&#x000A;  <span class="cp">#endif</span>&#x000A;</pre></div>&#x000A;</div>
 
 <p>The <code>conditional</code> on a <code>@JniMethod</code> or <code>@JniField</code> defaults to value configured on
 the enclosing <code>@JniClass</code>. So if most of the fields or methods in a class need to
@@ -822,46 +608,10 @@ use HawtJNI to generate your JNI libraries. With the following steps:</p>
 <li><p>Add the <code>hawtjni-runtime</code> dependency to pom. This small 19k jar file contains the HawtJNI annotations and a few helper classes that
 you will be developing against.</p>
 
-<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
-&lt;pom&gt;
-  &lt;dependencies&gt;
-    ...
-    &lt;dependency&gt;
-      &lt;groupId&gt;org.fusesource.hawtjni&lt;/groupId&gt;
-      &lt;artifactId&gt;hawtjni-runtime&lt;/artifactId&gt;
-      &lt;version&gt;1.16&lt;/version&gt;
-    &lt;/dependency&gt;
-    ...
-  &lt;/dependencies&gt;
-&lt;pom&gt;
-</code></pre></div></li>
+<div class="syntax"><div class="highlight"><pre><span></span>    <span class="nt">&lt;pom&gt;</span>&#x000A;      <span class="nt">&lt;dependencies&gt;</span>&#x000A;        ...&#x000A;        <span class="nt">&lt;dependency&gt;</span>&#x000A;          <span class="nt">&lt;groupId&gt;</span>org.fusesource.hawtjni<span class="nt">&lt;/groupId&gt;</span>&#x000A;          <span class="nt">&lt;artifactId&gt;</span>hawtjni-runtime<span class="nt">&lt;/artifactId&gt;</span>&#x000A;          <span class="nt">&lt;version&gt;</span>1.17<span class="nt">&lt;/version&gt;</span>&#x000A;        <span class="nt">&lt;/dependency&gt;</span>&#x000A;        ...&#x000A;      <span class="nt">&lt;/dependencies&gt;</span>&#x000A;    <span class="nt">&lt;pom&gt;</span>&#x000A;    &#x000A;</pre></div>&#x000A;</div></li>
 <li><p>Add the HawtJNI Maven plugin to the pom.</p>
 
-<div class="syntax"><pre name='code' class='brush: xml; gutter: false;'><code>
-&lt;project&gt;
-  &lt;build&gt;
-    &lt;plugins&gt;
-      ...
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.fusesource.hawtjni&lt;/groupId&gt;
-        &lt;artifactId&gt;hawtjni-maven-plugin&lt;/artifactId&gt;&lt;!-- was maven-hawtjni-plugin until 1.15 --&gt;
-        &lt;version&gt;1.16&lt;/version&gt;
-        &lt;executions&gt;
-          &lt;execution&gt;
-            &lt;goals&gt;
-              &lt;goal&gt;generate&lt;/goal&gt;
-              &lt;goal&gt;build&lt;/goal&gt;
-              &lt;goal&gt;package-jar&lt;/goal&gt;
-              &lt;goal&gt;package-source&lt;/goal&gt;
-            &lt;/goals&gt;
-          &lt;/execution&gt;
-        &lt;/executions&gt;        
-      &lt;/plugin&gt;
-      ...
-    &lt;/plugins&gt;
-  &lt;/build&gt;
-&lt;project&gt;
-</code></pre></div></li>
+<div class="syntax"><div class="highlight"><pre><span></span>    <span class="nt">&lt;project&gt;</span>&#x000A;      <span class="nt">&lt;build&gt;</span>&#x000A;        <span class="nt">&lt;plugins&gt;</span>&#x000A;          ...&#x000A;          <span class="nt">&lt;plugin&gt;</span>&#x000A;            <span class="nt">&lt;groupId&gt;</span>org.fusesource.hawtjni<span class="nt">&lt;/groupId&gt;</span>&#x000A;            <span class="nt">&lt;artifactId&gt;</span>hawtjni-maven-plugin<span class="nt">&lt;/artifactId&gt;</span><span class="c">&lt;!-- was maven-hawtjni-plugin until 1.15 --&gt;</span>&#x000A;            <span class="nt">&lt;version&gt;</span>1.17<span class="nt">&lt;/version&gt;</span>&#x000A;            <span class="nt">&lt;executions&gt;</span>&#x000A;              <span class="nt">&lt;execution&gt;</span>&#x000A;                <span class="nt">&lt;goals&gt;</span>&#x000A;                  <span class="nt">&lt;goal&gt;</span>generate<span class="nt">&lt;/goal&gt;</span>&#x000A;                  <span class="nt">&lt;goal&gt;</span>build<span class="nt">&lt;/goal&gt;</span>&#x000A;                  <span class="nt">&lt;goal&gt;</span>package-jar<span class="nt">&lt;/goal&gt;</span>&#x000A;                  <span class="nt">&lt;goal&gt;</span>package-source<span class="nt">&lt;/goal&gt;</span>&#x000A;                <span class="nt">&lt;/goals&gt;</span>&#x000A;              <span class="nt">&lt;/execution&gt;</span>&#x000A;            <span class="nt">&lt;/executions&gt;</span>        &#x000A;          <span class="nt">&lt;/plugin&gt;</span>&#x000A;          ...&#x000A;        <span class="nt">&lt;/plugins&gt;</span>&#x000A;      <span class="nt">&lt;/build&gt;</span>&#x000A;    <span class="nt">&lt;project&gt;</span>&#x000A;    &#x000A;</pre></div>&#x000A;</div></li>
 </ol>
 
 <h3 id = "Build_Phases">Build Phases</h3>
@@ -898,15 +648,14 @@ agnostic source package for building the native library.</p></li>
 
 <h3 id = "Windows">Windows</h3>
 
-<p>Download and install the free <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505">Microsoft Windows SDK</a>.  The SDK includes
+<p>Download and install the free <a href="https://developer.microsoft.com/en-us/windows/downloads">Microsoft Windows SDK</a>.  The SDK includes
 all the headers, libraries, and build tools needed to compile the JNI library.</p>
 
 <p>Set the <code>JAVA_HOME</code> environment variable to the location where your JDK is 
-installed.  </p>
+installed.</p>
 
-<p>Make sure the <code>vcbuild</code> tool is on in your system PATH.  The simplest way 
-to use SDK command prompt by following the following menu choices: 
-<code>Start &gt; All Programs &gt; Microsoft Windows SDK ... &gt; CMD</code></p>
+<p>Make sure the <code>msbuild</code> (<code>vcbuild</code> for legacy SDK versions) tool is on in your system PATH.  The simplest way 
+is to use SDK command prompt.</p>
 
 <h3 id = "Ubuntu_Linux">Ubuntu Linux</h3>
 

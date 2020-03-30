@@ -19,9 +19,10 @@ extern "C" {
 
 struct foo {
    int    a;
-   size_t b;     
-   char   c[20];        
+   size_t b;
+   char   c[20];
    struct foo *prev;
+   long CheckStr;
 };
 
 typedef struct _point {
@@ -39,7 +40,7 @@ struct ClassWithAccessors {
 float get_d(struct foo *arg);
 void set_d(struct foo *arg, float d);
 
-std::shared_ptr<intptr_t> get_sp(struct foo *arg);
+std::shared_ptr<intptr_t> get_sp(long CheckStr);
 void set_sp(struct foo *arg, std::shared_ptr<intptr_t>);
 
 float ClassWithAccessors_get_e(struct foo *arg);

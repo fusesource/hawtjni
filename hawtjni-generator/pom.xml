@@ -16,82 +16,96 @@
   limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.fusesource.hawtjni</groupId>
-    <artifactId>hawtjni-project</artifactId>
-    <version>1.18-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <groupId>org.fusesource.hawtjni</groupId>
+        <artifactId>hawtjni-project</artifactId>
+        <version>1.18-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>hawtjni-generator</artifactId>
+    <artifactId>hawtjni-generator</artifactId>
 
-  <name>HawtJNI Generator</name>
-  <description>This module contains the JNI code generation tools.</description>
+    <name>HawtJNI Generator</name>
+    <description>This module contains the JNI code generation tools.</description>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.fusesource.hawtjni</groupId>
-      <artifactId>hawtjni-runtime</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>xbean-finder</artifactId>    
-      <groupId>org.apache.xbean</groupId>
-      <version>4.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>5.0.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm-commons</artifactId>
-      <version>5.0.3</version>
-    </dependency>
-    
-    <!-- 
-    <dependency>
-      <groupId>com.thoughtworks.paranamer</groupId>
-      <artifactId>paranamer-generator</artifactId>
-      <version>2.1</version>
-    </dependency>
-     -->
-    
-    <dependency>
-      <groupId>commons-cli</groupId>
-      <artifactId>commons-cli</artifactId>
-      <version>1.0</version>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.fusesource.hawtjni</groupId>
+            <artifactId>hawtjni-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>xbean-finder</artifactId>    
+            <groupId>org.apache.xbean</groupId>
+            <version>4.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>8.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>8.0.1</version>
+        </dependency>
+        <!--
+          <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.10</version>
+          </dependency>
+        -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
   
-  <build>
-    <plugins>
-      
-      <!-- include all the dependencies into the jar so it can run standalone -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <excludes>
-                  <exclude>junit:junit</exclude>
-                </excludes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-    </plugins>
-  </build>
-
+    <build>
+        <plugins>
+            <!-- include all the dependencies into the jar so it can run standalone -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/LICENSE*</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.xbean:xbean-finder</artifact>
+                                    <excludes>
+                                        <exclude>org/apache/xbean/asm7/original/commons/AsmConstants.class</exclude>
+                                        <exclude>org/apache/xbean/asm7/original/commons/EmptyVisitor*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>              
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

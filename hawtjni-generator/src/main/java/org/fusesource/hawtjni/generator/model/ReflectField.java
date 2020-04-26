@@ -13,7 +13,6 @@ package org.fusesource.hawtjni.generator.model;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
-
 import org.apache.commons.lang.StringUtils;
 import org.fusesource.hawtjni.runtime.FieldFlag;
 import org.fusesource.hawtjni.runtime.JniField;

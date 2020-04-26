@@ -16,66 +16,56 @@
   limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.fusesource.hawtjni</groupId>
-    <artifactId>hawtjni-project</artifactId>
-    <version>1.18-SNAPSHOT</version>
-  </parent>
-
-  <artifactId>hawtjni-example</artifactId>
-  <name>HawtJNI Example</name>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.fusesource.hawtjni</groupId>
-      <artifactId>hawtjni-runtime</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.7</version>
-      <scope>test</scope>
-    </dependency>    
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.14</version>      
-      <scope>test</scope>
-    </dependency>
-        
-  </dependencies>
-  
-  <build>
-    <plugins>
-      
-      <!-- the older clean plugin has trouble deleting directories with symlinks in them -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>3.0.0</version>
-      </plugin>
-        
-      <plugin>
+    <parent>
         <groupId>org.fusesource.hawtjni</groupId>
-        <artifactId>hawtjni-maven-plugin</artifactId>
-        <version>${project.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-              <goal>build</goal>
-              <goal>package-jar</goal>
-              <goal>package-source</goal>
-            </goals>
-            <configuration>
-              <downloadUrl><![CDATA[
+        <artifactId>hawtjni-project</artifactId>
+        <version>1.18-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hawtjni-example</artifactId>
+    <name>HawtJNI Example</name>
+  
+    <dependencies>
+        <dependency>
+            <groupId>org.fusesource.hawtjni</groupId>
+            <artifactId>hawtjni-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13</version>
+            <scope>test</scope>
+        </dependency>    
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>      
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+  
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.fusesource.hawtjni</groupId>
+                <artifactId>hawtjni-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                            <goal>build</goal>
+                            <goal>package-jar</goal>
+                            <goal>package-source</goal>
+                        </goals>
+                        <configuration>
+                            <downloadUrl><![CDATA[
                 http://repo.fusesource.com/nexus/service/local/artifact/maven/redirect?r=snapshots&g=${project.groupId}&a=${project.artifactId}&v=${project.version}&c=native-src&e=zip
               ]]></downloadUrl>
-              <copyright><![CDATA[
+                            <copyright><![CDATA[
 /*******************************************************************************
  * Copyright (C) 2009-2011 FuseSource Corp.
  * 
@@ -85,65 +75,74 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
               ]]></copyright>
-            </configuration>
-          </execution>
-        </executions>        
-      </plugin>
+                        </configuration>
+                    </execution>
+                </executions>        
+            </plugin>
       
-      <!-- include all the dependencies into the jar so it can run standalone -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <excludes>
-                  <exclude>junit:junit</exclude>
-                </excludes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-    </plugins>
-  </build>
-  
-  <profiles>
-    
-    <!-- Profile which enables Universal binaries on OS X -->
-    <profile>
-      <id>mac</id>
-      <activation>
-        <os><family>mac</family></os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.fusesource.hawtjni</groupId>
-            <artifactId>hawtjni-maven-plugin</artifactId>
-            <configuration>
-              <osgiPlatforms>
-                <osgiPlatform>osname=MacOS;processor=x86-64</osgiPlatform>
-                <osgiPlatform>osname=MacOS;processor=x86</osgiPlatform>
-                <osgiPlatform>*</osgiPlatform>
-              </osgiPlatforms>
-              <configureArgs>
-                <arg>--with-universal</arg>
-              </configureArgs>
-              <platform>osx</platform>
-            </configuration>
-          </plugin>
+            <!-- include all the dependencies into the jar so it can run standalone -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>              
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-      </build>
-    </profile>
-  </profiles>
+    </build>
+  
+    <profiles>
+    
+        <!-- Profile which enables Universal binaries on OS X -->
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.fusesource.hawtjni</groupId>
+                        <artifactId>hawtjni-maven-plugin</artifactId>
+                        <configuration>
+                            <osgiPlatforms>
+                                <osgiPlatform>osname=MacOS;processor=x86-64</osgiPlatform>
+                                <osgiPlatform>osname=MacOS;processor=x86</osgiPlatform>
+                                <osgiPlatform>*</osgiPlatform>
+                            </osgiPlatforms>
+                            <configureArgs>
+                                <arg>--with-universal</arg>
+                            </configureArgs>
+                            <platform>osx</platform>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
   
 </project>

@@ -159,7 +159,7 @@ public class NativeStats {
 
     /**
      * Dumps the stats to the print stream in a JSON format.
-     * @param ps
+     * @param ps Print stream.
      */
     public void dump(PrintStream ps) {
         boolean firstSI=true;

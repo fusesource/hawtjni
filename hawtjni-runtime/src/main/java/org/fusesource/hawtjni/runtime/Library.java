@@ -29,7 +29,6 @@ import java.util.Set;
  *   <li> "<code>${platform}/${arch}</code>"
  *   <li> "<code>${platform}</code>"
  *   <li> "<code>${os}</code>"
- *   <li> "<code></code>"
  *   </ol>
  *   for 2 namings of the library:
  *   <ol>

@@ -16,216 +16,231 @@
   limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
   
-  <parent>
-    <groupId>org.fusesource</groupId>
-    <artifactId>fusesource-pom</artifactId>
-    <version>1.11</version>
-  </parent>
+    <parent>
+        <groupId>org.fusesource</groupId>
+        <artifactId>fusesource-pom</artifactId>
+        <version>1.12</version>
+    </parent>
 
-  <groupId>org.fusesource.hawtjni</groupId>
-  <artifactId>hawtjni-project</artifactId>
-  <version>1.18-SNAPSHOT</version>
-  <packaging>pom</packaging>
+    <groupId>org.fusesource.hawtjni</groupId>
+    <artifactId>hawtjni-project</artifactId>
+    <version>1.18-SNAPSHOT</version>
+    <packaging>pom</packaging>
   
-  <name>HawtJNI</name>
-  <description>A JNI code generator based on the JNI generator used by the eclipse SWT project</description>
+    <name>HawtJNI</name>
+    <description>A JNI code generator based on the JNI generator used by the eclipse SWT project</description>
 
-  <properties>
-    <forge-project-id>hawtjni</forge-project-id>
-    <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
+    <properties>
+        <forge-project-id>hawtjni</forge-project-id>
+        <forge-project-id-uc>HAWTJNI</forge-project-id-uc>
+        <scalate-version>1.6.1</scalate-version>
+        <scalamd-version>1.6</scalamd-version>    
+        <slf4j-version>1.7.30</slf4j-version>
+        <jetty-plugin-version>9.4.28.v20200408</jetty-plugin-version>
+        <scala-plugin-version>2.9</scala-plugin-version>
+        <scala-version>2.9.3</scala-version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
+
+    <url>http://fusesource.github.io/${forge-project-id}</url>
+    <inceptionYear>2009</inceptionYear>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/fusesource/hawtjni/issues</url>
+    </issueManagement>
+  
+    <mailingLists>
     
-    <scalate-version>1.5.1</scalate-version>
-    <scalamd-version>1.5</scalamd-version>    
-    <slf4j-version>1.6.1</slf4j-version>
-    <jetty-plugin-version>7.0.1.v20091125</jetty-plugin-version>
-    <scala-plugin-version>2.15.2</scala-plugin-version>
-    <scala-version>2.9.0-1</scala-version>
-  </properties>
+        <mailingList>
+            <name>Discussion List</name>
+            <archive>http://groups.google.com/group/${forge-project-id}</archive>
+            <post>${forge-project-id}@googlegroups.com</post>
+            <subscribe>${forge-project-id}+subscribe@googlegroups.com</subscribe>
+            <unsubscribe>${forge-project-id}+unsubscribe@googlegroups.com</unsubscribe>
+        </mailingList>
+        <mailingList>
+            <name>Commits and Issue Tracker List</name>
+            <archive>http://groups.google.com/group/${forge-project-id}-commits</archive>
+            <post>${forge-project-id}-commits@googlegroups.com</post>
+            <subscribe>${forge-project-id}-commits+subscribe@googlegroups.com</subscribe>
+            <unsubscribe>${forge-project-id}-commits+unsubscribe@googlegroups.com</unsubscribe>
+        </mailingList>
+    </mailingLists>
 
-  <url>http://fusesource.github.io/${forge-project-id}</url>
-  <inceptionYear>2009</inceptionYear>
-
-  <issueManagement>
-    <system>github</system>
-    <url>https://github.com/fusesource/hawtjni/issues</url>
-  </issueManagement>
+    <licenses>
+        <license>
+            <name>Eclipse Public License - v 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
   
-  <mailingLists>
-    
-    <mailingList>
-      <name>Discussion List</name>
-      <archive>http://groups.google.com/group/${forge-project-id}</archive>
-      <post>${forge-project-id}@googlegroups.com</post>
-      <subscribe>${forge-project-id}+subscribe@googlegroups.com</subscribe>
-      <unsubscribe>${forge-project-id}+unsubscribe@googlegroups.com</unsubscribe>
-    </mailingList>
-    <mailingList>
-      <name>Commits and Issue Tracker List</name>
-      <archive>http://groups.google.com/group/${forge-project-id}-commits</archive>
-      <post>${forge-project-id}-commits@googlegroups.com</post>
-      <subscribe>${forge-project-id}-commits+subscribe@googlegroups.com</subscribe>
-      <unsubscribe>${forge-project-id}-commits+unsubscribe@googlegroups.com</unsubscribe>
-    </mailingList>
-  </mailingLists>
+    <scm>
+        <connection>scm:git:https://github.com/fusesource/${forge-project-id}.git</connection>
+        <developerConnection>scm:git:https://github.com/fusesource/${forge-project-id}.git</developerConnection>
+        <url>https://github.com/fusesource/${forge-project-id}/tree/${project.scm.tag}</url>
+        <tag>master</tag>
+    </scm>
 
-  <licenses>
-    <license>
-      <name>Eclipse Public License - v 1.0</name>
-      <url>http://www.eclipse.org/legal/epl-v10.html</url>
-      <distribution>repo</distribution>
-    </license>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Sonatype Staging Repository</name>
+            <url> https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
   
-  <scm>
-    <connection>scm:git:https://github.com/fusesource/${forge-project-id}.git</connection>
-    <developerConnection>scm:git:https://github.com/fusesource/${forge-project-id}.git</developerConnection>
-    <url>https://github.com/fusesource/${forge-project-id}/tree/${project.scm.tag}</url>
-    <tag>master</tag>
-  </scm>
+    <developers>
+        <developer>
+            <id>chirino</id>
+            <name>Hiram Chirino</name>
+            <email>hiram@hiramchirino.com</email>
+            <url>http://hiramchirino.com</url>
+            <timezone>GMT-5</timezone>
+        </developer>
+    </developers>
 
-  <distributionManagement>
-    <repository>
-        <id>sonatype-nexus-staging</id>
-        <name>Sonatype Staging Repository</name>
-        <url> https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-    </repository>
-    <snapshotRepository>
-        <id>sonatype-nexus-snapshots</id>
-        <name>Sonatype Snapshot Repository</name>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
-  
-  <developers>
-    <developer>
-      <id>chirino</id>
-      <name>Hiram Chirino</name>
-      <email>hiram@hiramchirino.com</email>
-      <url>http://hiramchirino.com</url>
-      <timezone>GMT-5</timezone>
-    </developer>
-  </developers>
+    <build>
+        <defaultGoal>install</defaultGoal>
 
-  <build>
-    <defaultGoal>install</defaultGoal>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M4</version>
+                    <configuration>
+                        <failIfNoTests>false</failIfNoTests>
+                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.source}</target>              
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <excludePackageNames>*.internal</excludePackageNames>
+                        <linksource>true</linksource>
+                        <links>
+                            <link>https://docs.oracle.com/en/java/javase/11/docs/api</link>
+                        </links>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.6.1</version>
-          <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.20</version>
-          <configuration>
-            <failIfNoTests>false</failIfNoTests>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.10.4</version>
-          <configuration>
-            <encoding>${project.build.sourceEncoding}</encoding>
-            <excludePackageNames>*.internal</excludePackageNames>
-            <linksource>true</linksource>
-            <links>
-              <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-            </links>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.0.1</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
+        <plugins>
         
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-idea-plugin</artifactId>
-        <version>2.2.1</version>
-        <configuration>
-          <downloadSources>true</downloadSources>
-          <downloadJavadocs>true</downloadJavadocs>
-        </configuration>
-      </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                </configuration>
+            </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <version>2.10</version>
-        <configuration>
-          <downloadSources>true</downloadSources>
-          <downloadJavadocs>true</downloadJavadocs>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.10</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
   
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <aggregate>true</aggregate>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.9</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>index</report>
-              <report>summary</report>
-              <report>plugins</report>
-              <report>dependencies</report>
-              <report>mailing-list</report>
-              <report>issue-tracking</report>
-              <report>license</report>
-              <report>scm</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>surefire-report-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </reporting>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>summary</report>
+                            <report>plugins</report>
+                            <report>dependencies</report>
+                            <report>mailing-list</report>
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>surefire-report-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
 
-  <modules>
-    <module>hawtjni-runtime</module>
-    <module>hawtjni-generator</module>
-    <module>hawtjni-maven-plugin</module>
-    <module>hawtjni-example</module>
-    <!--
+    <modules>
+        <module>hawtjni-runtime</module>
+        <module>hawtjni-generator</module>
+        <module>hawtjni-maven-plugin</module>
+        <module>hawtjni-example</module>
+        <!--
     <module>hawtjni-website</module>
-    -->
-  </modules>
+        -->
+    </modules>
 
 </project>

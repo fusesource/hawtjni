@@ -19,7 +19,7 @@
     #define HAVE_STRINGS_H 1
   #endif
 #endif
-
+#include <memory>
 #ifdef __APPLE__
 #import <objc/objc-runtime.h>
 #endif

@@ -88,6 +88,7 @@ public class Example {
     public static int O_WRONLY;
     @JniField(flags={CONSTANT})
     public static int O_RDWR;
+
     
     @JniMethod(cast="void *")
     public static final native long malloc(
@@ -224,6 +225,9 @@ public class Example {
 
         @JniField(getter = "get_d()", setter = "set_d()", flags = { GETTER_NONMEMBER, SETTER_NONMEMBER })
         private float d;
+
+        @JniField(getter = "get_sp()", setter = "set_sp()", flags={ SHARED_PTR, GETTER_NONMEMBER, SETTER_NONMEMBER })
+        private long CheckStr;
 
         @Override
         public int hashCode() {

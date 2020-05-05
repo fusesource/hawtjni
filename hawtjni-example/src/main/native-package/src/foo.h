@@ -10,6 +10,7 @@
 #define INCLUDED_FOO_H
 
 #include <stdlib.h>
+#include <memory>
 #include "jni.h"
 
 #ifdef __cplusplus
@@ -18,9 +19,10 @@ extern "C" {
 
 struct foo {
    int    a;
-   size_t b;     
-   char   c[20];        
+   size_t b;
+   char   c[20];
    struct foo *prev;
+   long CheckStr;
 };
 
 typedef struct _point {
@@ -54,5 +56,8 @@ void passingtheenv (const char *who, JNIEnv *env);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+std::shared_ptr<intptr_t> get_sp(long CheckStr);
+void set_sp(struct foo *arg, std::shared_ptr<intptr_t>);
 
 #endif /* INCLUDED_FOO_H */

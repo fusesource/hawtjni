@@ -33,6 +33,12 @@ public enum FieldFlag {
     POINTER_FIELD,
 
     /**
+     * Indicate that the field is a shared pointer.
+     */
+
+     SHARED_PTR,
+
+    /**
      * Indicate that the getter method used is not part of
      * the structure. Useful for using wrappers to access
      * certain structure fields.

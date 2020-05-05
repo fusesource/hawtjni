@@ -41,8 +41,8 @@
         <jetty-plugin-version>9.4.28.v20200408</jetty-plugin-version>
         <scala-plugin-version>2.9</scala-plugin-version>
         <scala-version>2.9.3</scala-version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
     <url>http://fusesource.github.io/${forge-project-id}</url>
@@ -143,13 +143,8 @@
                     <version>3.2.0</version>
                     <configuration>
                         <source>${maven.compiler.source}</source>
-                        <target>${maven.compiler.source}</target>              
                         <encoding>${project.build.sourceEncoding}</encoding>
                         <excludePackageNames>*.internal</excludePackageNames>
-                        <linksource>true</linksource>
-                        <links>
-                            <link>https://docs.oracle.com/en/java/javase/11/docs/api</link>
-                        </links>
                     </configuration>
                 </plugin>
                 <plugin>

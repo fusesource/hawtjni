@@ -58,13 +58,13 @@ public class ObjectiveCExample {
     @JniMethod(cast="id", flags={POINTER_RETURN})
     public static final native long objc_getClass(String className);
     
-    @JniMethod(cast="id", flags={POINTER_RETURN}, accessor="objc_msgSend")
+    @JniMethod(cast="id", flags={POINTER_RETURN}, accessor="reinterpret_cast<id (*)(id, SEL)> (objc_msgSend)")
     public static final native long $(
             @JniArg(cast="id", flags={POINTER_ARG})long id, 
             @JniArg(cast="SEL", flags={POINTER_ARG})long sel
             );
     
-    @JniMethod(cast="id", flags={POINTER_RETURN}, accessor="objc_msgSend")
+    @JniMethod(cast="id", flags={POINTER_RETURN}, accessor="reinterpret_cast<id (*)(id, SEL, const char*)> (objc_msgSend)")
     public static final native long $(
             @JniArg(cast="id", flags={POINTER_ARG})long id, 
             @JniArg(cast="SEL", flags={POINTER_ARG})long sel,

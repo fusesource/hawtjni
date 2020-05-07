@@ -794,6 +794,22 @@ agnostic source package for building the native library.
 
 ## Platform Build Tools Requirements
 
+### macOS
+
+Use brew to install the necessary tools:
+
+    brew install automake autoconf libtool gcc
+
+Make sure the GCC compiler is used by default:
+
+    cd /usr/local/bin
+    ln -s c++-9 c++
+    ln -s cpp-9 cpp
+    ln -s g++-9 g++
+    ln -s gcc-9 gcc
+    export PATH=/usr/local/bin:$PATH
+    rehash
+
 ### Windows
 
 Download and install the free [Microsoft Windows SDK][ms_sdk].  The SDK includes

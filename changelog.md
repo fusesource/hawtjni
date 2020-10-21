@@ -1,5 +1,23 @@
 # ![HawtJNI](http://fusesource.github.io/hawtjni/images/project-logo.png)
 
+## HawtJNI 1.18, released 2020-10-21
+
+* [`84606da`](https://github.com/fusesource/hawtjni/commit/84606dacef9bced4d21c2d47bb641b2737738ceb) Bump junit from 4.13 to 4.13.1 in /hawtjni-example
+* [`de46737`](https://github.com/fusesource/hawtjni/commit/de4673789a0f0892516450f837c301f5e81246d0) Merge pull request #70 from Siddhesh-Ghadi/ci-power
+* [`c06f662`](https://github.com/fusesource/hawtjni/commit/c06f662b9e7ef74dd98bf73f9458cae7a3f5fd86) Add ppc64le support on travis-ci
+* [`2976527`](https://github.com/fusesource/hawtjni/commit/2976527a43ec256c98c383110d436bba7aff8c9c) Add doc to setup the native build environment macOS
+* [`c00e2d2`](https://github.com/fusesource/hawtjni/commit/c00e2d22b4dfa105d31754bf044874845d7cacb5) Support for shared pointers, fixes #57
+* [`5b4e5ad`](https://github.com/fusesource/hawtjni/commit/5b4e5ad74e63f1c1c180b2169eedd20c9b64e716) Merge pull request #59 from voutilad/master
+* [`8678713`](https://github.com/fusesource/hawtjni/commit/8678713caf00652f4f7d52e36b8b384cf611dde5) Merge pull request #61 from remkop/master
+* [`d145a1d`](https://github.com/fusesource/hawtjni/commit/d145a1dea37bbd8f98c9f1e6f21d756f849d7979) Do not force JDK 11 but rather support it
+* [`8ee5b21`](https://github.com/fusesource/hawtjni/commit/8ee5b2113069399c79610a1de6e01af7d5ae8c45) Updated to work with JDK11
+* [`d1f1492`](https://github.com/fusesource/hawtjni/commit/d1f14926156d103357e7761c4182085b27e7c663) Fix example on OSX
+* [`b7277af`](https://github.com/fusesource/hawtjni/commit/b7277aff8f3b01c1c462ede437efb3a4a33973ff) prepare 1.17 release website
+* [`56b5bd0`](https://github.com/fusesource/hawtjni/commit/56b5bd0dd3e9a3091905cf262dbe232b65447e07) use hawtjni-maven-plugin for Maven Central badge
+* [`c14fec0`](https://github.com/fusesource/hawtjni/commit/c14fec00b9976ff6b84e62e483d678594a7d3832) Support for OSX Catalina
+* [`2c64ed4`](https://github.com/fusesource/hawtjni/commit/2c64ed4134de9b3cefd9423382a59f60c8f3ad25) jansi/#162 fix issue where bitModel could not be retrieved on GraalVM
+* [`e7806ff`](https://github.com/fusesource/hawtjni/commit/e7806ff89508fce6a61c300ea9a16992324c0ce1) support for OpenBSD
+
 ## HawtJNI 1.17, released 2019-04-03
 
 * [`1c4a17b`](https://github.com/fusesource/hawtjni/commit/1c4a17b31bf988f99df6da7085f86829b935c342) Remove shared_ptr support until it's working

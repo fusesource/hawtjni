@@ -176,7 +176,7 @@ public class Library {
         if (arch.endsWith("64") && "Substrate VM".equals(System.getProperty("java.vm.name"))) {
             return 64;
         }
-        return -1; // we don't know..
+        return 64; // we don't know, assume 64..
     }
 
     /**

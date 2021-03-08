@@ -278,7 +278,7 @@ public class BuildMojo extends AbstractMojo {
             // vcbuild was removed.. use the msbuild tool instead.
             int rc = cli.system(buildDir, new String[]{"msbuild", (windowsProjectName != null ? windowsProjectName : "vs2010") + ".vcxproj", "/property:Platform="+platform, "/property:Configuration="+configuration});
             if( rc != 0 ) {
-                throw new MojoExecutionException("vcbuild failed with exit code: "+rc);
+                throw new MojoExecutionException("msbuild failed with exit code: "+rc);
             }
         } else {
             // try to use a vcbuild..
@@ -290,7 +290,7 @@ public class BuildMojo extends AbstractMojo {
 
         File libFile=FileUtils.resolveFile(buildDir, "target/"+platform+"-"+configuration+"/lib/"+library.getLibraryFileName());
         if( !libFile.exists() ) {
-            throw new MojoExecutionException("vcbuild did not generate: "+libFile);
+            throw new MojoExecutionException("Visual Studio did not generate: "+libFile);
         }        
 
         File target=FileUtils.resolveFile(libDirectory, library.getPlatformSpecificResourcePath(libPlatform));

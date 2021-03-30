@@ -307,7 +307,7 @@ public class Library {
     }
 
     private boolean extractAndLoad(ArrayList<Throwable> errors, String customPath, String dir, String libName, String targetLibName) {
-        String resourcePath = "META-INF/native/" + ( dir == null ? "" : (dir + '/')) + libName;
+        String resourcePath = "META-INF/native/" + ( dir == "." ? "" : (dir + '/')) + libName;
         URL resource = classLoader.getResource(resourcePath);
         if( resource !=null ) {
 
